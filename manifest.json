@@ -1,0 +1,58 @@
+{
+  "manifest_version": 3,
+  "name": "TabVault - Tab & Session Manager",
+  "version": "2.0.0",
+  "description": "Stash open active tabs instantly, free up memory, and optionally sync stashes across PCs.",
+  "permissions": [
+    "tabs",
+    "storage",
+    "contextMenus",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://pdh9ryeacb.execute-api.ap-south-1.amazonaws.com/*",
+    "http://localhost:5000/*",
+    "http://127.0.0.1:5000/*",
+    "https://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "TabVault Manager",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "tabvault@extension.stash",
+      "strict_min_version": "109.0"
+    }
+  },
+  "commands": {
+    "stash_all_tabs": {
+      "suggested_key": {
+        "default": "Alt+Shift+S",
+        "mac": "Alt+Shift+S"
+      },
+      "description": "Stash all tabs in current window"
+    },
+    "open_dashboard": {
+      "suggested_key": {
+        "default": "Alt+Shift+D",
+        "mac": "Alt+Shift+D"
+      },
+      "description": "Open TabVault Dashboard"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
