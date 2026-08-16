@@ -32,11 +32,20 @@ jobs:
             echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
           fi
 
-      - name: Build Zip Packages for Chrome & Firefox
+      - name: Build Clean Folder Zip Packages for Chrome & Firefox
         run: |
           mkdir -p releases
-          zip -r "releases/tabvault-chrome-${{ env.TAG }}.zip" manifest.json background.js popup.html popup.css popup.js dashboard.html dashboard.css dashboard.js lib icons
-          zip -r "releases/tabvault-firefox-${{ env.TAG }}.zip" manifest.json background.js popup.html popup.css popup.js dashboard.html dashboard.css dashboard.js lib icons
+          mkdir -p dist_pkg/tabvault-chrome
+          mkdir -p dist_pkg/tabvault-firefox
+
+          # Stage Chrome package
+          cp -r manifest.json background.js popup.html popup.css popup.js dashboard.html dashboard.css dashboard.js HOW_TO_INSTALL.txt lib icons dist_pkg/tabvault-chrome/
+          cd dist_pkg && zip -r "../releases/tabvault-chrome-${{ env.TAG }}.zip" tabvault-chrome && cd ..
+
+          # Stage Firefox package
+          cp -r manifest.json background.js popup.html popup.css popup.js dashboard.html dashboard.css dashboard.js HOW_TO_INSTALL.txt lib icons dist_pkg/tabvault-firefox/
+          cd dist_pkg && zip -r "../releases/tabvault-firefox-${{ env.TAG }}.zip" tabvault-firefox && cd ..
+
           ls -la releases
 
       - name: Publish GitHub Release with Artifacts
