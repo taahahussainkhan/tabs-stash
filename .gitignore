@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+*/node_modules/
+server/node_modules/
+server/build_lambda/
+
+# Environment variables & Secrets
+.env
+.env.local
+server/.env
+server/.env.local
+*.pem
+*.key
+
+# Build outputs
+dist/
+server/dist/
+build/
+*.zip
+terraform/lambda_payload.zip
+
+# Terraform Local State & Lockfiles
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.tfvars
+
+# OS & IDE Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+npm-debug.log*
+yarn-debug.log*

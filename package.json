@@ -1,0 +1,13 @@
+{
+  "name": "tabvault",
+  "version": "2.0.0",
+  "private": true,
+  "description": "TabVault - High-performance browser tab stash with cross-PC synchronization and cloud backup",
+  "scripts": {
+    "dev": "npm --prefix server run dev",
+    "build:server": "npm --prefix server run build",
+    "package:chrome": "powershell -Command \"if (!(Test-Path releases)) { New-Item -ItemType Directory -Path releases }; tar -a -c -f releases/tabvault-chrome-v2.0.0.zip manifest.json background.js popup.html popup.css popup.js dashboard.html dashboard.css dashboard.js lib icons\"",
+    "package:firefox": "powershell -Command \"if (!(Test-Path releases)) { New-Item -ItemType Directory -Path releases }; tar -a -c -f releases/tabvault-firefox-v2.0.0.zip manifest.json background.js popup.html popup.css popup.js dashboard.html dashboard.css dashboard.js lib icons\"",
+    "package:all": "npm run package:chrome && npm run package:firefox"
+  }
+}
