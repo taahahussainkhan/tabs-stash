@@ -1,0 +1,4 @@
+aws_region        = "ap-south-1"
+aws_profile       = "personal"
+mongodb_uri       = "mongodb+srv://<username>:<password>@cluster0.bdcde4t.mongodb.net/tabvault?retryWrites=true&w=majority&appName=Cluster0"
+jwt_access_secret = "tabvault_super_secure_access_secret_min_32_characters"
