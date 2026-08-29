@@ -2,6 +2,7 @@
 node_modules/
 */node_modules/
 server/node_modules/
+frontend/node_modules/
 server/build_lambda/
 
 # Environment variables & Secrets
@@ -14,7 +15,10 @@ server/.env.local
 
 # Build outputs
 dist/
+dist_pkg/
+releases/
 server/dist/
+frontend/dist/
 build/
 *.zip
 terraform/lambda_payload.zip
