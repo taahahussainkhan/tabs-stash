@@ -1,7 +1,12 @@
-// TabVault Dashboard Script (Modular Architecture with Archive & Grouped All-Tabs Views)
+// TabVault Dashboard Script (Modular Architecture with Archive, Grouped All-Tabs, & Saved Links Shelf)
 
 document.addEventListener('DOMContentLoaded', async () => {
   const grid = document.getElementById('dash-sessions-grid');
+  const dashLinksContainer = document.getElementById('dash-links-container');
+  const dashLinksList = document.getElementById('dash-links-list');
+  const dashLinksBadge = document.getElementById('dash-links-badge');
+  const dashConvertLinksBtn = document.getElementById('dash-convert-links-btn');
+
   const emptyState = document.getElementById('dash-empty-state');
   const emptyHeading = emptyState.querySelector('h2');
   const emptySubtext = emptyState.querySelector('p');
@@ -67,6 +72,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const dashAuthSubmitBtn = document.getElementById('dash-auth-submit-btn');
 
   let allSessions = [];
+  let allSavedLinks = [];
+  let linksFilterMode = 'all';
   let authMode = 'login';
 
   // Initialize Device Manager
@@ -75,12 +82,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Initialize Data
   loadDashboardData();
+  loadSavedLinksData();
   updateCloudUI();
+
+  // Keyboard shortcut Ctrl+K to search
+  window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      searchInput.focus();
+      searchInput.select();
+    }
+  });
 
   // Listen for sync, data, and device updates
   window.addEventListener('tabvault:data-updated', () => {
     loadDashboardData();
     updateCloudUI();
+  });
+
+  window.addEventListener('tabvault:links-updated', () => {
+    loadSavedLinksData();
   });
 
   window.addEventListener('tabvault:sync-status', (e) => {
@@ -90,6 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   window.addEventListener('tabvault:auth-change', () => {
     updateCloudUI();
     loadDashboardData();
+    loadSavedLinksData();
   });
 
   window.addEventListener('tabvault:device-updated', (e) => {
@@ -101,18 +123,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderFilteredGrid();
   });
 
-  // Navigation switching (Active Sessions | Pinned | All Tabs | Archive)
+  // Navigation switching (Active Sessions | Pinned | All Tabs | Archive | Saved Links)
   document.querySelectorAll('.nav-item').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.nav-item').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       const view = btn.dataset.view;
-      TabVaultFilterManager.setViewMode(view);
 
-      if (view === 'all-tabs') {
-        dashGroupingBar.classList.remove('hidden');
-      } else {
+      if (view === 'links') {
+        grid.classList.add('hidden');
         dashGroupingBar.classList.add('hidden');
+        dashLinksContainer.classList.remove('hidden');
+        renderSavedLinksDashboard();
+      } else {
+        dashLinksContainer.classList.add('hidden');
+        grid.classList.remove('hidden');
+        TabVaultFilterManager.setViewMode(view);
+
+        if (view === 'all-tabs') {
+          dashGroupingBar.classList.remove('hidden');
+        } else {
+          dashGroupingBar.classList.add('hidden');
+        }
       }
     });
   });
@@ -126,21 +158,77 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Stash button
-  stashNowBtn.addEventListener('click', () => {
-    TabVaultAPI.runtime.sendMessage({ action: "STASH_ALL_TABS" }).then(() => {
-      setTimeout(loadDashboardData, 300);
+  // Stash Now button
+  stashNowBtn.addEventListener('click', async () => {
+    stashNowBtn.disabled = true;
+    stashNowBtn.textContent = 'Stashing...';
+    await TabVaultAPI.runtime.sendMessage({ action: 'STASH_ALL_TABS' });
+    setTimeout(() => {
+      stashNowBtn.disabled = false;
+      stashNowBtn.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Stash Window Tabs
+      `;
+      loadDashboardData();
+    }, 500);
+  });
+
+  // Copy Markdown
+  copyMarkdownBtn.addEventListener('click', () => {
+    const activeSessions = allSessions.filter((s) => !s.isArchived);
+    if (!activeSessions.length) return;
+
+    let md = '# TabVault Stashed Sessions\n\n';
+    activeSessions.forEach((s) => {
+      md += `## ${s.title} (${new Date(s.timestamp).toLocaleDateString()})\n`;
+      (s.tabs || [])
+        .filter((t) => !t.isPopped)
+        .forEach((t) => {
+          md += `- [${t.title}](${t.url})\n`;
+        });
+      md += '\n';
+    });
+
+    navigator.clipboard.writeText(md).then(() => {
+      copyMarkdownBtn.textContent = 'Copied Markdown!';
+      setTimeout(() => {
+        copyMarkdownBtn.textContent = 'Copy as Markdown';
+      }, 2000);
     });
   });
 
-  // Search
-  searchInput.addEventListener('input', (e) => {
-    TabVaultFilterManager.setFilter('query', e.target.value);
+  // Clear All Data
+  clearAllBtn.addEventListener('click', async () => {
+    if (
+      confirm(
+        'Are you sure you want to permanently clear all TabVault stashed sessions and links?'
+      )
+    ) {
+      await TabVaultAPI.storage.local.set({
+        savedSessions: [],
+        savedLinks: [],
+        totalTabsStashed: 0,
+      });
+      allSessions = [];
+      allSavedLinks = [];
+      loadDashboardData();
+      loadSavedLinksData();
+      TabVaultSyncEngine.onLocalDataChanged();
+    }
   });
 
-  // Filter Modal Handlers
+  // Search input
+  searchInput.addEventListener('input', (e) => {
+    const val = e.target.value;
+    TabVaultFilterManager.setFilter('query', val);
+    if (document.querySelector('.nav-item[data-view="links"].active')) {
+      renderSavedLinksDashboard();
+    }
+  });
+
+  // Filter Modal Controls
   dashOpenFilterBtn.addEventListener('click', () => {
-    populateDashboardFilterModal();
+    populateDashFilterModal();
     dashFilterModal.classList.remove('hidden');
   });
 
@@ -157,7 +245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   dashResetFiltersBtn.addEventListener('click', () => {
     TabVaultFilterManager.reset();
     searchInput.value = '';
-    populateDashboardFilterModal();
+    populateDashFilterModal();
     dashFilterModal.classList.add('hidden');
   });
 
@@ -170,6 +258,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     searchInput.value = '';
   });
 
+  // Date Filter Chips
   document.querySelectorAll('.dash-date-chip').forEach((chip) => {
     chip.addEventListener('click', () => {
       document.querySelectorAll('.dash-date-chip').forEach((c) => c.classList.remove('active'));
@@ -178,47 +267,27 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Device Renaming
-  dashRenameBtn.addEventListener('click', async () => {
-    const newName = dashRenameInput.value.trim();
-    if (newName) {
-      await TabVaultDeviceManager.setDeviceName(newName);
-      dashRenameBtn.textContent = 'Saved!';
-      setTimeout(() => {
-        dashRenameBtn.textContent = 'Rename';
-      }, 1500);
-    }
-  });
-
-  function updateDeviceSidebar(info) {
-    if (!info) return;
-    dashDeviceIcon.textContent = TabVaultDeviceManager.getPlatformIcon(info.platform);
-    dashDeviceNameDisplay.textContent = info.deviceName;
-    dashDeviceBrowser.textContent = `${info.platform} • ${info.browser}`;
-    dashRenameInput.value = info.deviceName;
-  }
-
   // Populate Filter Modal
-  function populateDashboardFilterModal() {
+  function populateDashFilterModal() {
     const uniqueDomains = TabVaultFilterManager.extractUniqueDomains(allSessions);
     dashDomainChips.innerHTML = '';
 
-    const allDom = document.createElement('button');
-    allDom.className = `filter-chip ${!TabVaultFilterManager.filters.domain ? 'active' : ''}`;
-    allDom.textContent = 'All Sites';
-    allDom.addEventListener('click', () => {
+    const allDomChip = document.createElement('button');
+    allDomChip.className = `filter-chip ${!TabVaultFilterManager.filters.domain ? 'active' : ''}`;
+    allDomChip.textContent = 'All Sites';
+    allDomChip.addEventListener('click', () => {
       TabVaultFilterManager.setFilter('domain', null);
-      populateDashboardFilterModal();
+      populateDashFilterModal();
     });
-    dashDomainChips.appendChild(allDom);
+    dashDomainChips.appendChild(allDomChip);
 
-    uniqueDomains.slice(0, 15).forEach(({ domain, count }) => {
+    uniqueDomains.slice(0, 20).forEach(({ domain, count }) => {
       const chip = document.createElement('button');
       chip.className = `filter-chip ${TabVaultFilterManager.filters.domain === domain ? 'active' : ''}`;
       chip.textContent = `${domain} (${count})`;
       chip.addEventListener('click', () => {
         TabVaultFilterManager.setDomain(domain);
-        populateDashboardFilterModal();
+        populateDashFilterModal();
       });
       dashDomainChips.appendChild(chip);
     });
@@ -226,14 +295,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const uniqueDevices = TabVaultFilterManager.extractUniqueDevices(allSessions);
     dashDeviceChips.innerHTML = '';
 
-    const allDev = document.createElement('button');
-    allDev.className = `filter-chip ${!TabVaultFilterManager.filters.deviceId ? 'active' : ''}`;
-    allDev.textContent = 'All PCs';
-    allDev.addEventListener('click', () => {
+    const allDevChip = document.createElement('button');
+    allDevChip.className = `filter-chip ${!TabVaultFilterManager.filters.deviceId ? 'active' : ''}`;
+    allDevChip.textContent = 'All PCs';
+    allDevChip.addEventListener('click', () => {
       TabVaultFilterManager.setFilter('deviceId', null);
-      populateDashboardFilterModal();
+      populateDashFilterModal();
     });
-    dashDeviceChips.appendChild(allDev);
+    dashDeviceChips.appendChild(allDevChip);
 
     uniqueDevices.forEach((dev) => {
       const chip = document.createElement('button');
@@ -241,98 +310,39 @@ document.addEventListener('DOMContentLoaded', async () => {
       chip.textContent = `${TabVaultDeviceManager.getPlatformIcon(dev.platform)} ${dev.name} (${dev.tabCount} tabs)`;
       chip.addEventListener('click', () => {
         TabVaultFilterManager.setDevice(dev.id);
-        populateDashboardFilterModal();
+        populateDashFilterModal();
       });
       dashDeviceChips.appendChild(chip);
     });
   }
 
-  // Copy Markdown List
-  copyMarkdownBtn.addEventListener('click', () => {
-    let markdown = `# TabVault Stashed Tabs Backup\n\n`;
-    allSessions.forEach((s) => {
-      const activeTabs = (s.tabs || []).filter((t) => !t.isPopped);
-      if (activeTabs.length > 0) {
-        markdown += `## ${s.title || 'Session'} (${new Date(s.timestamp).toLocaleString()}) - ${s.deviceInfo?.deviceName || 'PC'}\n`;
-        activeTabs.forEach((t) => {
-          markdown += `- [${t.title}](${t.url})\n`;
-        });
-        markdown += `\n`;
-      }
-    });
+  // Device Sidebar update
+  function updateDeviceSidebar(info) {
+    if (!info) return;
+    dashDeviceIcon.textContent = TabVaultDeviceManager.getPlatformIcon(info.platform);
+    dashDeviceNameDisplay.textContent = info.deviceName;
+    dashDeviceBrowser.textContent = `${info.browser} • ${info.platform}`;
+    dashRenameInput.value = info.deviceName;
+  }
 
-    navigator.clipboard.writeText(markdown).then(() => {
-      copyMarkdownBtn.textContent = 'Copied!';
+  dashRenameBtn.addEventListener('click', async () => {
+    const val = dashRenameInput.value.trim();
+    if (val) {
+      await TabVaultDeviceManager.setDeviceName(val);
+      dashRenameBtn.textContent = 'Saved!';
       setTimeout(() => {
-        copyMarkdownBtn.textContent = 'Copy as Markdown';
-      }, 2000);
-    });
-  });
-
-  // Clear All
-  clearAllBtn.addEventListener('click', async () => {
-    if (confirm('Are you sure you want to delete all saved tab sessions? This action cannot be undone.')) {
-      await TabVaultAPI.storage.local.set({ savedSessions: [], totalTabsStashed: 0 });
-      loadDashboardData();
+        dashRenameBtn.textContent = 'Rename';
+      }, 1500);
     }
   });
 
-  // Export JSON
-  exportBtn.addEventListener('click', () => {
-    const jsonStr = JSON.stringify(allSessions, null, 2);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `tabvault-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-
-  // Import JSON
-  importBtn.addEventListener('click', () => {
-    importFileInput.click();
-  });
-
-  importFileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = async (event) => {
-      try {
-        const importedSessions = JSON.parse(event.target.result);
-        if (Array.isArray(importedSessions)) {
-          const data = await TabVaultAPI.storage.local.get(['savedSessions']);
-          const existing = data.savedSessions || [];
-          const merged = [...importedSessions, ...existing];
-          await TabVaultAPI.storage.local.set({ savedSessions: merged });
-          alert('Successfully imported tab sessions!');
-          loadDashboardData();
-          TabVaultSyncEngine.onLocalDataChanged();
-        }
-      } catch (err) {
-        alert('Invalid JSON file format.');
-      }
-    };
-    reader.readAsText(file);
-  });
-
-  // Cloud Sync & Auth Modal Handlers
+  // Auth / Cloud Modal Handlers
   dashLoginBtn.addEventListener('click', () => {
     dashAuthModal.classList.remove('hidden');
   });
 
   dashCloseModalBtn.addEventListener('click', () => {
     dashAuthModal.classList.add('hidden');
-    hideDashAuthError();
-  });
-
-  dashAuthModal.addEventListener('click', (e) => {
-    if (e.target === dashAuthModal) {
-      dashAuthModal.classList.add('hidden');
-      hideDashAuthError();
-    }
   });
 
   dashTabLogin.addEventListener('click', () => {
@@ -358,7 +368,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     hideDashAuthError();
 
     const email = dashEmailInput.value.trim();
-    const password = dashPasswordInput.value;
+    const pass = dashPasswordInput.value;
     const name = dashNameInput.value.trim();
 
     dashAuthSubmitBtn.disabled = true;
@@ -366,9 +376,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     try {
       if (authMode === 'register') {
-        await TabVaultApiClient.register(email, password, name);
+        await TabVaultApiClient.register(email, pass, name);
       } else {
-        await TabVaultApiClient.login(email, password);
+        await TabVaultApiClient.login(email, pass);
       }
 
       dashAuthModal.classList.add('hidden');
@@ -376,7 +386,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateCloudUI();
       loadDashboardData();
     } catch (err) {
-      showDashAuthError(err.message || 'Authentication failed.');
+      showDashAuthError(err.message || 'Authentication error');
     } finally {
       dashAuthSubmitBtn.disabled = false;
       dashAuthSubmitBtn.querySelector('span').textContent =
@@ -451,6 +461,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  // Load Sessions Data
   async function loadDashboardData() {
     const data = await TabVaultAPI.storage.local.get(['savedSessions']);
     allSessions = data.savedSessions || [];
@@ -475,7 +486,112 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderFilteredGrid();
   }
 
+  // Load Saved Links Data
+  async function loadSavedLinksData() {
+    allSavedLinks = await TabVaultLinksManager.getLinks();
+
+    const unreadCount = allSavedLinks.filter((l) => !l.isRead).length;
+    if (unreadCount > 0) {
+      dashLinksBadge.textContent = unreadCount;
+      dashLinksBadge.classList.remove('hidden');
+    } else {
+      dashLinksBadge.classList.add('hidden');
+    }
+
+    renderSavedLinksDashboard();
+  }
+
+  // Dashboard Saved Links Filter Pills
+  document.querySelectorAll('.dash-links-view .link-filter-pill').forEach((pill) => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.dash-links-view .link-filter-pill').forEach((p) => p.classList.remove('active'));
+      pill.classList.add('active');
+      linksFilterMode = pill.dataset.filter;
+      renderSavedLinksDashboard();
+    });
+  });
+
+  function renderSavedLinksDashboard() {
+    if (!document.querySelector('.nav-item[data-view="links"].active')) {
+      return;
+    }
+
+    dashLinksList.innerHTML = '';
+    const query = (searchInput.value || '').toLowerCase().trim();
+
+    let filtered = allSavedLinks;
+    if (linksFilterMode === 'unread') {
+      filtered = filtered.filter((l) => !l.isRead);
+    } else if (linksFilterMode === 'read') {
+      filtered = filtered.filter((l) => l.isRead);
+    }
+
+    if (query) {
+      filtered = filtered.filter(
+        (l) =>
+          (l.title || '').toLowerCase().includes(query) ||
+          (l.url || '').toLowerCase().includes(query) ||
+          (l.hostname || '').toLowerCase().includes(query)
+      );
+    }
+
+    if (filtered.length === 0) {
+      dashLinksList.innerHTML = `
+        <div style="padding: 60px 20px; text-align: center; color: var(--text-dim); background: var(--bg-card); border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+          <div style="font-size: 40px; margin-bottom: 12px;">🔗</div>
+          <h3 style="color: var(--text-main); font-size: 15px; margin-bottom: 6px;">No Saved Links Found</h3>
+          <p style="font-size: 12px;">Right-click any link on any website and select <strong>"Save Link to TabVault Reading List"</strong> to store it here.</p>
+        </div>
+      `;
+      emptyState.classList.add('hidden');
+      return;
+    }
+
+    emptyState.classList.add('hidden');
+
+    filtered.forEach((link) => {
+      const item = TabVaultUI.createSavedLinkItem(link, {
+        onOpenLink: async (url) => {
+          await TabVaultAPI.tabs.create({ url });
+        },
+        onToggleRead: async (linkId, isRead) => {
+          await TabVaultLinksManager.toggleRead(linkId, isRead);
+          loadSavedLinksData();
+        },
+        onDeleteLink: async (linkId) => {
+          await TabVaultLinksManager.deleteLink(linkId);
+          loadSavedLinksData();
+        },
+      });
+      dashLinksList.appendChild(item);
+    });
+  }
+
+  // Dashboard Convert Links to Session Button
+  dashConvertLinksBtn.addEventListener('click', async () => {
+    const selectedBoxes = dashLinksList.querySelectorAll('.link-checkbox:checked');
+    const selectedIds = Array.from(selectedBoxes).map((b) => b.dataset.linkId);
+
+    dashConvertLinksBtn.disabled = true;
+    dashConvertLinksBtn.querySelector('span').textContent = 'Converting...';
+
+    try {
+      await TabVaultLinksManager.convertLinksToSession(selectedIds);
+      loadSavedLinksData();
+      loadDashboardData();
+    } catch (err) {
+      alert(err.message || 'Error converting links');
+    } finally {
+      dashConvertLinksBtn.disabled = false;
+      dashConvertLinksBtn.querySelector('span').textContent = 'Convert Selected Links to Session';
+    }
+  });
+
   function renderFilteredGrid() {
+    if (document.querySelector('.nav-item[data-view="links"].active')) {
+      return;
+    }
+
     grid.innerHTML = '';
 
     const hasFilters = TabVaultFilterManager.hasActiveFilters();
@@ -558,6 +674,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         onRename: handleRenameSession,
         onTogglePin: handleTogglePin,
         onRestore: handleRestoreSession,
+        onRestashSession: handleRestashSession,
         onArchiveSession: handleArchiveSession,
         onUnarchiveSession: handleUnarchiveSession,
         onDomainFilter: (domain) => {
@@ -641,9 +758,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const sessionIndex = sessions.findIndex((s) => s.id === sessionId);
     if (sessionIndex !== -1) {
       const session = sessions[sessionIndex];
-      const activeTabs = (session.tabs || []).filter((t) => !t.isPopped);
-      if (activeTabs.length > 0) {
-        const urls = activeTabs.map((t) => t.url);
+      const tabsToOpen = session.tabs || [];
+      if (tabsToOpen.length > 0) {
+        const urls = tabsToOpen.map((t) => t.url);
         if (inNewWindow) {
           await TabVaultAPI.windows.create({ url: urls });
         } else {
@@ -652,16 +769,39 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
 
-        activeTabs.forEach((t) => {
+        tabsToOpen.forEach((t) => {
           t.isPopped = true;
           t.poppedAt = Date.now();
         });
+        session.isRestored = true;
+        session.restoredAt = Date.now();
         session.clientUpdatedAt = Date.now();
 
         await TabVaultAPI.storage.local.set({ savedSessions: sessions });
         loadDashboardData();
         TabVaultSyncEngine.onLocalDataChanged();
       }
+    }
+  }
+
+  // Re-Stash Session (Move from Restored back to Active)
+  async function handleRestashSession(sessionId) {
+    const data = await TabVaultAPI.storage.local.get(['savedSessions']);
+    let sessions = data.savedSessions || [];
+    const sessionIndex = sessions.findIndex((s) => s.id === sessionId);
+    if (sessionIndex !== -1) {
+      const session = sessions[sessionIndex];
+      session.isRestored = false;
+      session.restoredAt = null;
+      (session.tabs || []).forEach((t) => {
+        t.isPopped = false;
+        t.poppedAt = null;
+      });
+      session.clientUpdatedAt = Date.now();
+
+      await TabVaultAPI.storage.local.set({ savedSessions: sessions });
+      loadDashboardData();
+      TabVaultSyncEngine.onLocalDataChanged();
     }
   }
 
