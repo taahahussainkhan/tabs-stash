@@ -20,16 +20,13 @@ export interface ClientSessionChange {
 export class SyncService {
   /**
    * Normalized Delta Sync Protocol
-   * 1. Routes active sessions into `stashed_sessions` (StashedSessionModel)
-   * 2. Routes archived sessions into `archived_sessions` (ArchivedSessionModel)
-   * 3. Pulls changes from both collections updated since lastSyncedTimestamp
    */
   static async deltaSync(
     userId: string,
     lastSyncedTimestamp: number,
     clientChanges: ClientSessionChange[]
   ) {
-    const userObjectId = new Types.ObjectId(userId);
+    const userObjectId = Types.ObjectId.isValid(userId) ? new Types.ObjectId(userId) : userId;
     const now = Date.now();
 
     // 1. Process Push Phase (Client -> Server)
@@ -40,7 +37,7 @@ export class SyncService {
         if (isArchived) {
           // Store in ArchivedSessionModel
           const existingArchive = await ArchivedSessionModel.findOne({
-            userId: userObjectId,
+            $or: [{ userId: userObjectId }, { userId: String(userId) }],
             sessionId: change.id,
           });
 
@@ -72,11 +69,14 @@ export class SyncService {
           }
 
           // Soft-delete or remove from active sessions collection if it existed there
-          await StashedSessionModel.deleteOne({ userId: userObjectId, sessionId: change.id });
+          await StashedSessionModel.deleteOne({
+            $or: [{ userId: userObjectId }, { userId: String(userId) }],
+            sessionId: change.id,
+          });
         } else {
           // Store in StashedSessionModel
           const existingActive = await StashedSessionModel.findOne({
-            userId: userObjectId,
+            $or: [{ userId: userObjectId }, { userId: String(userId) }],
             sessionId: change.id,
           });
 
@@ -108,49 +108,52 @@ export class SyncService {
           }
 
           // Remove from archived sessions collection if it was unarchived
-          await ArchivedSessionModel.deleteOne({ userId: userObjectId, sessionId: change.id });
+          await ArchivedSessionModel.deleteOne({
+            $or: [{ userId: userObjectId }, { userId: String(userId) }],
+            sessionId: change.id,
+          });
         }
       }
     }
 
     // 2. Process Pull Phase (Server -> Client)
-    // Find modified active sessions
     const modifiedActive = await StashedSessionModel.find({
-      userId: userObjectId,
+      $or: [{ userId: userObjectId }, { userId: String(userId) }],
       serverUpdatedAt: { $gt: lastSyncedTimestamp },
     }).lean();
 
-    // Find modified archived sessions
     const modifiedArchived = await ArchivedSessionModel.find({
-      userId: userObjectId,
+      $or: [{ userId: userObjectId }, { userId: String(userId) }],
       serverUpdatedAt: { $gt: lastSyncedTimestamp },
     }).lean();
 
     const serverChanges = [
       ...modifiedActive.map((s) => ({
         id: s.sessionId,
+        sessionId: s.sessionId,
         title: s.title,
         timestamp: s.timestamp,
         isPinned: s.isPinned,
         isArchived: false,
         archivedAt: null,
-        tags: s.tags,
-        tabs: s.tabs,
-        deviceInfo: s.deviceInfo,
+        tags: s.tags || [],
+        tabs: s.tabs || [],
+        deviceInfo: s.deviceInfo || {},
         clientUpdatedAt: s.clientUpdatedAt,
         serverUpdatedAt: s.serverUpdatedAt,
         deletedAt: s.deletedAt,
       })),
       ...modifiedArchived.map((a) => ({
         id: a.sessionId,
+        sessionId: a.sessionId,
         title: a.title,
         timestamp: a.timestamp,
         isPinned: false,
         isArchived: true,
         archivedAt: a.archivedAt,
-        tags: a.tags,
-        tabs: a.tabs,
-        deviceInfo: a.deviceInfo,
+        tags: a.tags || [],
+        tabs: a.tabs || [],
+        deviceInfo: a.deviceInfo || {},
         clientUpdatedAt: a.clientUpdatedAt,
         serverUpdatedAt: a.serverUpdatedAt,
         deletedAt: a.deletedAt,
@@ -167,23 +170,31 @@ export class SyncService {
    * Get all active sessions for user
    */
   static async getActiveSessions(userId: string) {
-    const userObjectId = new Types.ObjectId(userId);
+    const userObjectId = Types.ObjectId.isValid(userId) ? new Types.ObjectId(userId) : userId;
     const sessions = await StashedSessionModel.find({
-      userId: userObjectId,
-      deletedAt: null,
+      $and: [
+        { $or: [{ userId: userObjectId }, { userId: String(userId) }] },
+        {
+          $or: [
+            { deletedAt: null },
+            { deletedAt: { $exists: false } },
+          ],
+        },
+      ],
     })
       .sort({ isPinned: -1, timestamp: -1 })
       .lean();
 
     return sessions.map((s) => ({
       id: s.sessionId,
+      sessionId: s.sessionId,
       title: s.title,
       timestamp: s.timestamp,
-      isPinned: s.isPinned,
+      isPinned: s.isPinned || false,
       isArchived: false,
-      tags: s.tags,
-      tabs: s.tabs,
-      deviceInfo: s.deviceInfo,
+      tags: s.tags || [],
+      tabs: s.tabs || [],
+      deviceInfo: s.deviceInfo || {},
       clientUpdatedAt: s.clientUpdatedAt,
       serverUpdatedAt: s.serverUpdatedAt,
     }));
@@ -193,23 +204,31 @@ export class SyncService {
    * Get all archived sessions for user
    */
   static async getArchivedSessions(userId: string) {
-    const userObjectId = new Types.ObjectId(userId);
+    const userObjectId = Types.ObjectId.isValid(userId) ? new Types.ObjectId(userId) : userId;
     const sessions = await ArchivedSessionModel.find({
-      userId: userObjectId,
-      deletedAt: null,
+      $and: [
+        { $or: [{ userId: userObjectId }, { userId: String(userId) }] },
+        {
+          $or: [
+            { deletedAt: null },
+            { deletedAt: { $exists: false } },
+          ],
+        },
+      ],
     })
       .sort({ archivedAt: -1 })
       .lean();
 
     return sessions.map((s) => ({
       id: s.sessionId,
+      sessionId: s.sessionId,
       title: s.title,
       timestamp: s.timestamp,
       isArchived: true,
       archivedAt: s.archivedAt,
-      tags: s.tags,
-      tabs: s.tabs,
-      deviceInfo: s.deviceInfo,
+      tags: s.tags || [],
+      tabs: s.tabs || [],
+      deviceInfo: s.deviceInfo || {},
       clientUpdatedAt: s.clientUpdatedAt,
       serverUpdatedAt: s.serverUpdatedAt,
     }));
@@ -227,15 +246,15 @@ export class SyncService {
    * Soft delete session
    */
   static async deleteSession(userId: string, sessionId: string) {
-    const userObjectId = new Types.ObjectId(userId);
+    const userObjectId = Types.ObjectId.isValid(userId) ? new Types.ObjectId(userId) : userId;
     const now = Date.now();
 
     await StashedSessionModel.updateOne(
-      { userId: userObjectId, sessionId },
+      { $or: [{ userId: userObjectId }, { userId: String(userId) }], sessionId },
       { deletedAt: now, serverUpdatedAt: now }
     );
     await ArchivedSessionModel.updateOne(
-      { userId: userObjectId, sessionId },
+      { $or: [{ userId: userObjectId }, { userId: String(userId) }], sessionId },
       { deletedAt: now, serverUpdatedAt: now }
     );
 
@@ -246,15 +265,25 @@ export class SyncService {
    * Clear all sessions
    */
   static async clearAll(userId: string) {
-    const userObjectId = new Types.ObjectId(userId);
+    const userObjectId = Types.ObjectId.isValid(userId) ? new Types.ObjectId(userId) : userId;
     const now = Date.now();
 
     await StashedSessionModel.updateMany(
-      { userId: userObjectId, deletedAt: null },
+      {
+        $and: [
+          { $or: [{ userId: userObjectId }, { userId: String(userId) }] },
+          { $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }] },
+        ],
+      },
       { deletedAt: now, serverUpdatedAt: now }
     );
     await ArchivedSessionModel.updateMany(
-      { userId: userObjectId, deletedAt: null },
+      {
+        $and: [
+          { $or: [{ userId: userObjectId }, { userId: String(userId) }] },
+          { $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }] },
+        ],
+      },
       { deletedAt: now, serverUpdatedAt: now }
     );
 
