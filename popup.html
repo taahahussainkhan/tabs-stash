@@ -64,31 +64,79 @@
 
     <!-- Primary Action Banner -->
     <div class="action-section">
-      <button id="stash-all-btn" class="primary-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-          <polyline points="17 21 17 13 7 13 7 21"></polyline>
-          <polyline points="7 3 7 8 15 8"></polyline>
-        </svg>
-        <span>Stash All Window Tabs</span>
-        <span class="hotkey">Alt+S</span>
-      </button>
-      <button id="stash-except-btn" class="secondary-btn" title="Stash all tabs except the tab you are currently viewing">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="12"></line>
-          <line x1="12" y1="16" x2="12.01" y2="16"></line>
-        </svg>
-        <span>Except Current</span>
-      </button>
+      <div class="primary-action-row">
+        <button id="stash-all-btn" class="primary-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+            <polyline points="7 3 7 8 15 8"></polyline>
+          </svg>
+          <span>Stash All Window Tabs</span>
+          <span class="hotkey">Alt+S</span>
+        </button>
+        <button id="stash-except-btn" class="secondary-btn" title="Stash all tabs except the tab you are currently viewing">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>Except Current</span>
+        </button>
+      </div>
+
+      <!-- Quick Stash Options Bar -->
+      <div class="quick-stash-row">
+        <button id="open-tab-selector-btn" class="quick-action-pill" title="Pick and choose which open tabs to stash">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 11 12 14 22 4"></polyline>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+          </svg>
+          <span>Select Tabs...</span>
+        </button>
+
+        <button id="stash-domain-btn" class="quick-action-pill domain-pill-btn hidden" title="Stash all tabs from active website">
+          <span class="pill-icon">🌐</span>
+          <span id="stash-domain-btn-text">Stash Site</span>
+        </button>
+
+        <div class="quick-action-group">
+          <button id="stash-right-btn" class="quick-icon-pill" title="Stash all tabs to the right of active tab">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14"></path>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+            <span>Right</span>
+          </button>
+          <button id="stash-left-btn" class="quick-icon-pill" title="Stash all tabs to the left of active tab">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M19 12H5"></path>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span>Left</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Open Tabs Domain Breakdown Chips Carousel -->
+      <div id="open-domains-bar" class="open-domains-bar hidden">
+        <span class="open-domains-label">Stash by Site:</span>
+        <div id="open-domains-container" class="open-domains-chips">
+          <!-- Dynamically populated open domain chips -->
+        </div>
+      </div>
     </div>
 
-    <!-- View Switcher Tabs: Active | All Tabs | Archive -->
+    <!-- View Switcher Tabs: Active | Restored | All Tabs | Archive | Links -->
     <div class="popup-nav-row">
       <div class="popup-view-tabs">
         <button class="popup-tab-btn active" data-view="active">Active</button>
+        <button class="popup-tab-btn" data-view="restored">Restored</button>
         <button class="popup-tab-btn" data-view="all-tabs">All Tabs</button>
         <button class="popup-tab-btn" data-view="archive">Archive</button>
+        <button class="popup-tab-btn" data-view="links">
+          <span>Links</span>
+          <span id="links-count-badge" class="count-badge hidden">0</span>
+        </button>
       </div>
       <div id="popup-grouping-selector" class="popup-grouping-selector hidden">
         <button class="popup-group-btn active" data-group="site" title="Group by Site">🌐</button>
@@ -105,7 +153,7 @@
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
-        <input type="text" id="search-input" placeholder="Search tabs, URLs, domains..." />
+        <input type="text" id="search-input" placeholder="Search open tabs, stashes, links... (Ctrl+K)" />
         <button id="clear-search-btn" class="clear-btn hidden">&times;</button>
       </div>
       <button id="open-filter-btn" class="icon-btn filter-btn" title="Filter by Site, Device / PC, Date">
@@ -123,10 +171,42 @@
       <button id="clear-filters-btn" class="clear-filters-btn" title="Clear all filters">&times;</button>
     </div>
 
-    <!-- Saved Sessions Content List -->
+    <!-- Main Scrollable Content Area -->
     <div class="content-scroll">
+      <!-- Universal Search Live Open Tabs Section -->
+      <div id="search-open-tabs-section" class="search-section-box hidden">
+        <div class="search-section-header">
+          <span class="search-section-tag green">🟢 Open in Browser</span>
+          <span id="search-open-count" class="search-section-count">0 tabs</span>
+        </div>
+        <div id="search-open-tabs-list" class="search-results-list"></div>
+      </div>
+
+      <!-- Sessions Container -->
       <div id="sessions-container" class="sessions-list">
         <!-- Dynamic Session Cards render here -->
+      </div>
+
+      <!-- Saved Links View Container -->
+      <div id="links-container" class="links-list-container hidden">
+        <div class="links-toolbar">
+          <div class="links-filter-pills">
+            <button class="link-filter-pill active" data-filter="all">All</button>
+            <button class="link-filter-pill" data-filter="unread">Unread</button>
+            <button class="link-filter-pill" data-filter="read">Read</button>
+          </div>
+          <div class="links-bulk-actions">
+            <button id="convert-links-to-stash-btn" class="sm-btn primary-btn" title="Convert selected (or unread) links into a Stashed Tab Session">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              </svg>
+              <span>Convert to Stash</span>
+            </button>
+          </div>
+        </div>
+        <div id="saved-links-list" class="saved-links-list">
+          <!-- Dynamic Saved Link Cards render here -->
+        </div>
       </div>
 
       <!-- Empty State -->
@@ -140,6 +220,46 @@
         </div>
         <h3 id="empty-heading">No Stashed Tabs Found</h3>
         <p id="empty-subtext">Click <strong>"Stash All Window Tabs"</strong> above to store your open tabs safely here!</p>
+      </div>
+    </div>
+
+    <!-- Interactive Tab Selector Modal / Drawer -->
+    <div id="tab-selector-modal" class="modal-overlay hidden">
+      <div class="modal-card selector-card">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.5">
+              <polyline points="9 11 12 14 22 4"></polyline>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <h3>Select Tabs to Stash</h3>
+          </div>
+          <button id="close-tab-selector-btn" class="close-modal-btn">&times;</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="selector-controls-row">
+            <input type="text" id="open-tabs-filter-input" placeholder="Filter open tabs..." />
+            <div class="selector-quick-btns">
+              <button id="select-all-open-tabs-btn" class="text-link-btn">Select All</button>
+              <span class="btn-divider">•</span>
+              <button id="deselect-all-open-tabs-btn" class="text-link-btn">None</button>
+              <span class="btn-divider">•</span>
+              <button id="invert-open-tabs-btn" class="text-link-btn">Invert</button>
+            </div>
+          </div>
+
+          <div id="open-tabs-list-container" class="open-tabs-list-scroll">
+            <!-- Dynamic open tab rows render here -->
+          </div>
+
+          <div class="modal-actions-row selector-footer">
+            <span id="selected-tabs-count-label" class="selected-count-text">0 tabs selected</span>
+            <button id="stash-selected-confirm-btn" class="primary-btn">
+              <span>Stash Selected Tabs</span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -304,6 +424,7 @@
 
   <script src="lib/browser-adapter.js"></script>
   <script src="lib/device-manager.js"></script>
+  <script src="lib/links-manager.js"></script>
   <script src="lib/filter-manager.js"></script>
   <script src="lib/ui-components.js"></script>
   <script src="lib/api-client.js"></script>
