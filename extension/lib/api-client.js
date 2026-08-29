@@ -4,13 +4,32 @@
  */
 
 (function (global) {
-  const API_BASE_URL = 'https://pdh9ryeacb.execute-api.ap-south-1.amazonaws.com/api/v1';
+  const CLOUD_API_URL = 'https://pdh9ryeacb.execute-api.ap-south-1.amazonaws.com/api/v1';
+  const LOCAL_API_URL = 'http://localhost:5000/api/v1';
 
   class TabVaultApiClient {
     constructor() {
-      this.baseUrl = API_BASE_URL;
       this.isRefreshing = false;
       this.refreshSubscribers = [];
+    }
+
+    /**
+     * Get active backend API URL (custom / localhost / cloud)
+     */
+    async getBaseUrl() {
+      const data = await TabVaultAPI.storage.local.get(['tabvault_api_url']);
+      if (data && data.tabvault_api_url) {
+        return data.tabvault_api_url.replace(/\/$/, '');
+      }
+      return LOCAL_API_URL;
+    }
+
+    /**
+     * Set active backend API URL
+     */
+    async setBaseUrl(url) {
+      const cleanUrl = url ? url.trim().replace(/\/$/, '') : LOCAL_API_URL;
+      await TabVaultAPI.storage.local.set({ tabvault_api_url: cleanUrl });
     }
 
     /**
@@ -34,9 +53,10 @@
      */
     async clearAuth() {
       const auth = await this.getAuth();
+      const baseUrl = await this.getBaseUrl();
       if (auth && auth.refreshToken) {
         try {
-          await fetch(`${this.baseUrl}/auth/logout`, {
+          await fetch(`${baseUrl}/auth/logout`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ refreshToken: auth.refreshToken }),
@@ -69,7 +89,8 @@
      * Register a new user
      */
     async register(email, password, name = '') {
-      const res = await fetch(`${this.baseUrl}/auth/register`, {
+      const baseUrl = await this.getBaseUrl();
+      const res = await fetch(`${baseUrl}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -93,7 +114,8 @@
      * Login user
      */
     async login(email, password) {
-      const res = await fetch(`${this.baseUrl}/auth/login`, {
+      const baseUrl = await this.getBaseUrl();
+      const res = await fetch(`${baseUrl}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -105,7 +127,7 @@
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error?.message || 'Login failed.');
+        throw new Error(data.error?.message || 'Invalid email or password.');
       }
 
       await this.setAuth(data.data);
@@ -113,7 +135,7 @@
     }
 
     /**
-     * Refresh access token
+     * Refresh expired access token using refresh token
      */
     async refreshTokens() {
       const auth = await this.getAuth();
@@ -121,7 +143,8 @@
         throw new Error('No refresh token available');
       }
 
-      const res = await fetch(`${this.baseUrl}/auth/refresh`, {
+      const baseUrl = await this.getBaseUrl();
+      const res = await fetch(`${baseUrl}/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken: auth.refreshToken }),
@@ -148,6 +171,7 @@
      */
     async request(endpoint, options = {}) {
       const auth = await this.getAuth();
+      const baseUrl = await this.getBaseUrl();
       const headers = {
         'Content-Type': 'application/json',
         ...(options.headers || {}),
@@ -158,7 +182,7 @@
       }
 
       try {
-        let res = await fetch(`${this.baseUrl}${endpoint}`, {
+        let res = await fetch(`${baseUrl}${endpoint}`, {
           ...options,
           headers,
         });
@@ -169,7 +193,7 @@
             const newAccessToken = await this.refreshTokens();
             headers['Authorization'] = `Bearer ${newAccessToken}`;
 
-            res = await fetch(`${this.baseUrl}${endpoint}`, {
+            res = await fetch(`${baseUrl}${endpoint}`, {
               ...options,
               headers,
             });
