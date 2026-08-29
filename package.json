@@ -4,8 +4,8 @@
   "private": true,
   "description": "TabVault & Personal Assistant - All-in-One Life & Knowledge Management Platform",
   "scripts": {
-    "dev": "concurrently -n \"server,web\" -c \"blue,magenta\" \"npm --prefix server run dev\" \"npm --prefix frontend run dev\"",
-    "dev:server": "npm --prefix server run dev",
+    "dev": "concurrently -n \"server,web\" -c \"blue,magenta\" \"npm run dev:server\" \"npm run dev:frontend\"",
+    "dev:server": "powershell -Command \"Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; npm --prefix server run dev\"",
     "dev:frontend": "npm --prefix frontend run dev",
     "build:server": "npm --prefix server run build",
     "build:frontend": "npm --prefix frontend run build",
