@@ -11,18 +11,37 @@ declare global {
   }
 }
 
+export function parseCookies(cookieHeader?: string): Record<string, string> {
+  const list: Record<string, string> = {};
+  if (!cookieHeader) return list;
+  cookieHeader.split(';').forEach((cookie) => {
+    let [name, ...rest] = cookie.split('=');
+    name = name?.trim();
+    if (!name) return;
+    const value = rest.join('=').trim();
+    list[name] = decodeURIComponent(value);
+  });
+  return list;
+}
+
 export async function authenticate(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  const cookies = parseCookies(req.headers.cookie);
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return next(new AppError('Authentication required. Missing Bearer token.', 401));
+  let token: string | null = null;
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.split(' ')[1];
+  } else if (cookies.access_token) {
+    token = cookies.access_token;
   }
 
-  const token = authHeader.split(' ')[1];
+  if (!token) {
+    return next(new AppError('Authentication required. Missing Bearer token or session cookie.', 401));
+  }
 
   try {
     const payload = verifyAccessToken(token);
