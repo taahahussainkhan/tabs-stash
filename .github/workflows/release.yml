@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Release version tag (e.g. v2.0.0)'
+        description: 'Release version tag (e.g. v2.1.0)'
         required: true
-        default: 'v2.0.0'
+        default: 'v2.1.0'
 
 permissions:
   contents: write
@@ -38,12 +38,12 @@ jobs:
           mkdir -p dist_pkg/tabvault-chrome
           mkdir -p dist_pkg/tabvault-firefox
 
-          # Stage Chrome package
-          cp -r manifest.json background.js popup.html popup.css popup.js dashboard.html dashboard.css dashboard.js HOW_TO_INSTALL.txt lib icons dist_pkg/tabvault-chrome/
+          # Stage Chrome package from extension/
+          cp -r extension/* dist_pkg/tabvault-chrome/
           cd dist_pkg && zip -r "../releases/tabvault-chrome-${{ env.TAG }}.zip" tabvault-chrome && cd ..
 
-          # Stage Firefox package
-          cp -r manifest.json background.js popup.html popup.css popup.js dashboard.html dashboard.css dashboard.js HOW_TO_INSTALL.txt lib icons dist_pkg/tabvault-firefox/
+          # Stage Firefox package from extension/
+          cp -r extension/* dist_pkg/tabvault-firefox/
           cd dist_pkg && zip -r "../releases/tabvault-firefox-${{ env.TAG }}.zip" tabvault-firefox && cd ..
 
           ls -la releases
