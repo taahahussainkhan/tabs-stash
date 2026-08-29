@@ -4,14 +4,18 @@
   "private": true,
   "description": "TabVault & Personal Assistant - All-in-One Life & Knowledge Management Platform",
   "scripts": {
+    "dev": "concurrently -n \"server,web\" -c \"blue,magenta\" \"npm --prefix server run dev\" \"npm --prefix frontend run dev\"",
     "dev:server": "npm --prefix server run dev",
     "dev:frontend": "npm --prefix frontend run dev",
-    "dev": "npm --prefix server run dev",
     "build:server": "npm --prefix server run build",
     "build:frontend": "npm --prefix frontend run build",
+    "build": "npm run build:server && npm run build:frontend",
     "package:chrome": "powershell -Command \"if (Test-Path dist_pkg) { Remove-Item -Recurse -Force dist_pkg }; New-Item -ItemType Directory -Path dist_pkg/tabvault-chrome, releases -Force; Copy-Item extension/* -Destination dist_pkg/tabvault-chrome -Recurse; tar -a -c -f releases/tabvault-chrome-v2.1.0.zip -C dist_pkg tabvault-chrome; Remove-Item -Recurse -Force dist_pkg\"",
     "package:firefox": "powershell -Command \"if (Test-Path dist_pkg) { Remove-Item -Recurse -Force dist_pkg }; New-Item -ItemType Directory -Path dist_pkg/tabvault-firefox, releases -Force; Copy-Item extension/* -Destination dist_pkg/tabvault-firefox -Recurse; tar -a -c -f releases/tabvault-firefox-v2.1.0.zip -C dist_pkg tabvault-firefox; Remove-Item -Recurse -Force dist_pkg\"",
     "package:all": "npm run package:chrome && npm run package:firefox",
-    "build:all": "npm run build:server && npm run package:all"
+    "build:all": "npm run build && npm run package:all"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }
