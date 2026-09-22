@@ -66,7 +66,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       toast.success('Logged in successfully')
       navigate('/')
     } catch (error: unknown) {
-      const detail = (error as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message ?? (error as Error)?.message ?? 'Login failed'
+      const err = error as any
+      console.error('Login failure:', err?.response?.data || err?.message || err)
+      const data = err?.response?.data
+      const detail =
+        data?.error?.message ||
+        data?.message ||
+        err?.message ||
+        'Login failed. Please check your credentials.'
       toast.error(detail)
       throw error
     }
@@ -84,7 +91,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       toast.success('Account created. You can now log in.')
       navigate('/auth/login')
     } catch (error: unknown) {
-      const detail = (error as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message ?? (error as Error)?.message ?? 'Sign up failed'
+      const err = error as any
+      console.error('Signup failure:', err?.response?.data || err?.message || err)
+      const data = err?.response?.data
+      const detail =
+        data?.error?.message ||
+        data?.message ||
+        err?.message ||
+        'Sign up failed. Please try again.'
       toast.error(detail)
       throw error
     }
