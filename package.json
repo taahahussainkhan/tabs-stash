@@ -14,6 +14,7 @@
     "package:firefox": "node scripts/package-extensions.js firefox",
     "package:all": "node scripts/package-extensions.js all",
     "package:lambda": "node scripts/package-lambda.js",
+    "deploy:amplify": "node scripts/deploy-amplify.js",
     "build:all": "npm run build && npm run package:all"
   },
   "devDependencies": {

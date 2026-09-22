@@ -84,7 +84,11 @@ resource "aws_apigatewayv2_api" "http_api" {
       "http://localhost:3000",
       "http://127.0.0.1:5173",
       "http://127.0.0.1:5174",
-      "http://127.0.0.1:5175"
+      "http://127.0.0.1:5175",
+      "https://d1rmonr4dy05xx.amplifyapp.com",
+      "https://main.d1rmonr4dy05xx.amplifyapp.com",
+      "https://d31f2v0n3tseq0.amplifyapp.com",
+      "https://main.d31f2v0n3tseq0.amplifyapp.com"
     ]
     max_age           = 86400
   }
