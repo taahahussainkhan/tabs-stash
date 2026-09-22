@@ -1,20 +1,18 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const { execSync } = require('child_process');
 
 const rootDir = path.resolve(__dirname, '..');
 const serverDir = path.join(rootDir, 'server');
 const terraformDir = path.join(rootDir, 'terraform');
-const stagingDir = path.join(serverDir, '.lambda-staging');
+const stagingDir = path.join(os.tmpdir(), `lore-lambda-${Date.now()}`);
 const zipPath = path.join(terraformDir, 'lambda_payload.zip');
 
 console.log('🔨 Step 1: Compiling server TypeScript...');
 execSync('npm run build', { cwd: serverDir, stdio: 'inherit' });
 
-console.log('🧹 Step 2: Preparing staging directory...');
-if (fs.existsSync(stagingDir)) {
-  fs.rmSync(stagingDir, { recursive: true, force: true });
-}
+console.log('🧹 Step 2: Preparing staging directory:', stagingDir);
 fs.mkdirSync(stagingDir, { recursive: true });
 
 // Copy dist directory
@@ -49,5 +47,9 @@ try {
 } finally {
   // Cleanup staging directory
   console.log('🧹 Cleaning staging directory...');
-  fs.rmSync(stagingDir, { recursive: true, force: true });
+  try {
+    fs.rmSync(stagingDir, { recursive: true, force: true, maxRetries: 3, retryDelay: 500 });
+  } catch (e) {
+    // Ignore tmp dir cleanup failures
+  }
 }

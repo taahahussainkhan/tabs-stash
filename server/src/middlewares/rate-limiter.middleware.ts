@@ -6,6 +6,7 @@ export const generalLimiter = rateLimit({
   max: env.RATE_LIMIT_MAX_REQUESTS,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   skip: (req) => {
     const url = req.originalUrl || req.path || '';
     return url.includes('/auth/refresh') || url.includes('/health');
@@ -23,6 +24,7 @@ export const authLimiter = rateLimit({
   max: env.AUTH_RATE_LIMIT_MAX_REQUESTS, // 10 attempts
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: {
     success: false,
     error: {
@@ -36,6 +38,7 @@ export const syncLimiter = rateLimit({
   max: 60, // 60 sync requests per minute max per IP
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: {
     success: false,
     error: {

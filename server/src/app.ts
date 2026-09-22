@@ -9,8 +9,16 @@ import { env } from './config/env';
 
 export const app = express();
 
+// Trust proxy for API Gateway / CloudFront / Lambda
+app.set('trust proxy', 1);
+
 // Security Middlewares
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: { policy: 'unsafe-none' },
+  })
+);
 app.use(corsMiddleware);
 
 // Rate Limiting
