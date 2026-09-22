@@ -16,10 +16,10 @@ export function Logo({ hideText = false, className = '', noLink = false }: Props
       {!hideText && (
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5 leading-none">
-            <span className="text-[15px] font-bold tracking-tight text-content-primary">Chronicle</span>
-            <span className="text-[10px] font-mono font-bold text-accent-ochre bg-accent-ochre/10 px-1 py-0.5 rounded-[3px] border border-accent-ochre/20">LOG</span>
+            <span className="text-[15px] font-bold tracking-tight text-content-primary">Lore</span>
+            <span className="text-[10px] font-mono font-bold text-accent-ochre bg-accent-ochre/10 px-1 py-0.5 rounded-[3px] border border-accent-ochre/20">CORE</span>
           </div>
-          <span className="text-[10px] font-mono text-content-muted tracking-wider uppercase mt-0.5">Personal Archive</span>
+          <span className="text-[10px] font-mono text-content-muted tracking-wider uppercase mt-0.5">Personal Assistant &amp; Archive</span>
         </div>
       )}
     </div>

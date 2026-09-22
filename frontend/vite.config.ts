@@ -11,5 +11,12 @@ export default defineConfig({
   server: {
     host: 'localhost',
     port: 5174,
+    proxy: {
+      '/api': {
+        target: 'https://pdh9ryeacb.execute-api.ap-south-1.amazonaws.com',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
   },
 })

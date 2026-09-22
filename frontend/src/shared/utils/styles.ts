@@ -15,6 +15,8 @@ export const getStatusColorClass = (status: string) => {
     case 'planning':
     case 'wishlist':
     case 'want-to-read':
+    case 'to_watch':
+    case 'to-watch':
       return 'text-[#a5b4fc] bg-[#1e1b4b] border-[#3730a3]'
     case 'rewatching':
     case 'rereading':
@@ -41,6 +43,8 @@ export const getStatusDotClass = (status: string) => {
     case 'planning':
     case 'wishlist':
     case 'want-to-read':
+    case 'to_watch':
+    case 'to-watch':
       return 'bg-[#5c67f2]'
     case 'rewatching':
     case 'rereading':

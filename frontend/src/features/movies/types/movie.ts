@@ -43,6 +43,7 @@ export interface MovieLog {
   created_at: string
   updated_at: string
   rewatch_count?: number
+  comments?: CommentData[]
 }
 
 export interface PaginationParams {
@@ -110,6 +111,7 @@ export interface SessionOut {
   notes?: string | null
   created_at: string
   updated_at: string
+  comments?: any[]
 }
 
 export interface MovieWithCurrentSessionOut {

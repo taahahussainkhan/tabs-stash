@@ -5,15 +5,16 @@ import { Input } from '../../../shared/components/common/form/Input'
 import { PasswordInput } from '../../../shared/components/common/form/PasswordInput'
 import { Mail, ArrowRight, Lock } from 'lucide-react'
 import { loginSchema, type LoginSchemaData } from '../schemas/loginSchema'
+import { formatFieldError } from '../../../shared/utils/errorUtils'
 
 export function LoginForm() {
   const { login } = useAuth()
 
-  const form = useForm<LoginSchemaData>({
+  const form = useForm({
     defaultValues: {
       email: '',
       password: '',
-    } satisfies LoginSchemaData,
+    } as LoginSchemaData,
     validators: {
       onChange: loginSchema,
     },
@@ -36,7 +37,7 @@ export function LoginForm() {
           name="email"
           children={(field) => {
             const error = field.state.meta.isTouched && !field.state.meta.isValid
-              ? field.state.meta.errors.map(String).join(', ')
+              ? formatFieldError(field.state.meta.errors)
               : undefined
 
             return (
@@ -61,7 +62,7 @@ export function LoginForm() {
           name="password"
           children={(field) => {
             const error = field.state.meta.isTouched && !field.state.meta.isValid
-              ? field.state.meta.errors.map(String).join(', ')
+              ? formatFieldError(field.state.meta.errors)
               : undefined
 
             return (

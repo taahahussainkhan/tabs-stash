@@ -66,15 +66,28 @@ export function useCreateWatchlistSeriesMutation() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: { title: string; creator?: string; year?: number; genre?: string }) =>
-      seriesApi.createWatchlist(data),
+    mutationFn: (data: {
+      title: string
+      creator?: string
+      director?: string
+      year?: number
+      genre?: string
+      posterImage?: string | null
+      externalId?: string | null
+      seasons?: Array<{
+        seasonNumber: number
+        episodeCount: number
+        title?: string
+        year?: number
+      }>
+    }) => seriesApi.createWatchlist(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: seriesKeys.lists() })
       queryClient.invalidateQueries({ queryKey: seriesKeys.stats() })
       toast.success('Series added to watchlist')
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.detail || 'Failed to add to watchlist')
+      toast.error(error.response?.data?.error?.message || error.response?.data?.detail || 'Failed to add to watchlist')
     },
   })
 }

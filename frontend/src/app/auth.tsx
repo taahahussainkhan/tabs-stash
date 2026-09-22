@@ -51,15 +51,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-    
-      await authApi.login(email, password)
-
-      
+      const response = await authApi.login(email, password)
       queryClient.clear()
 
-    
-      const userResponse = await authApi.getCurrentUser()
-      setUser(userResponse.data)
+      // Directly hydrate user from login response (eliminates 200ms redundant network roundtrip)
+      const loggedUser = response.data?.data?.user || response.data?.user
+      if (loggedUser) {
+        setUser(loggedUser)
+      } else {
+        const userResponse = await authApi.getCurrentUser()
+        setUser(userResponse.data)
+      }
 
       toast.success('Logged in successfully')
       navigate('/')

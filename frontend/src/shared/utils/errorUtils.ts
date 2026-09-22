@@ -50,3 +50,26 @@ export function getErrorMessage(error: unknown): string {
 
     return 'An unexpected error occurred'
 }
+
+export function formatFieldError(errors: unknown[] | undefined | null): string | undefined {
+    if (!errors || errors.length === 0) return undefined
+
+    const messages = errors
+        .map((err) => {
+            if (!err) return null
+            if (typeof err === 'string') return err
+            if (typeof err === 'object') {
+                if ('message' in err && typeof (err as any).message === 'string') {
+                    return (err as any).message
+                }
+                if ('error' in err && typeof (err as any).error === 'string') {
+                    return (err as any).error
+                }
+            }
+            return String(err)
+        })
+        .filter(Boolean) as string[]
+
+    return messages.length > 0 ? messages.join(', ') : undefined
+}
+

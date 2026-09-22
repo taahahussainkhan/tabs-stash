@@ -1,9 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef } from 'react'
 import { useForm } from '@tanstack/react-form'
-import { X, Plus, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
+import { X, Plus, Trash2, Sparkles } from 'lucide-react'
 import type { SeasonStructure } from '../types/series'
 import { Input } from '../../../shared/components/common/form/Input'
 import { addSeriesWithStructureSchema, type AddSeriesWithStructureSchemaData } from '../schemas/addSeriesWithStructureSchema'
+import { MediaCatalogAutocomplete } from '../../../shared/components/common/catalog/MediaCatalogAutocomplete'
+import type { MediaCatalogItemDetails } from '../../../services/mediaCatalogService'
 
 interface AddSeriesWithStructureModalProps {
   onClose: () => void
@@ -18,10 +21,13 @@ interface AddSeriesWithStructureModalProps {
 
 export function AddSeriesWithStructureModal({ onClose, onSubmit }: AddSeriesWithStructureModalProps) {
   const [step, setStep] = useState<1 | 2>(1)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false)
+  const titleContainerRef = useRef<HTMLDivElement>(null)
 
   const initialYear = useMemo(() => new Date().getFullYear(), [])
 
-  const form = useForm<AddSeriesWithStructureSchemaData>({
+  const form = useForm({
     defaultValues: {
       title: '',
       creator: '',
@@ -59,6 +65,36 @@ export function AddSeriesWithStructureModal({ onClose, onSubmit }: AddSeriesWith
 
   const totalEpisodes = form.state.values.seasons.reduce((sum, s) => sum + s.episode_count, 0)
 
+  const handleCatalogSelect = (details: MediaCatalogItemDetails) => {
+    form.setFieldValue('title', details.title)
+    setSearchQuery(details.title)
+    if (details.creator) {
+      form.setFieldValue('creator', details.creator)
+    }
+    if (details.year) {
+      form.setFieldValue('year', details.year)
+    }
+    if (details.genres && details.genres.length > 0) {
+      form.setFieldValue('genre', details.genres.join(', '))
+    }
+    if (details.seasons && details.seasons.length > 0) {
+      form.setFieldValue(
+        'seasons',
+        details.seasons.map((s) => ({
+          season_number: s.seasonNumber,
+          episode_count: s.episodeCount,
+          title: s.title || '',
+          year: s.year || details.year || initialYear,
+        }))
+      )
+    }
+    setIsAutocompleteOpen(false)
+    toast.success(
+      `Populated "${details.title}" with ${details.seasons?.length || 0} seasons from catalog`,
+      { icon: '✨' }
+    )
+  }
+
   return (
     <div className="modal modal-open">
       <div className="modal-box max-w-2xl">
@@ -92,27 +128,68 @@ export function AddSeriesWithStructureModal({ onClose, onSubmit }: AddSeriesWith
         {step === 1 ? (
           /* Step 1: Series Metadata */
           <div className="space-y-4">
-            <form.Field
-              name="title"
-              children={(field) => {
-                const error = field.state.meta.isTouched && !field.state.meta.isValid
-                  ? field.state.meta.errors.map(String).join(', ')
-                  : undefined
+            <div ref={titleContainerRef} className="relative z-30">
+              <div className="flex items-end gap-2">
+                <div className="flex-1">
+                  <form.Field
+                    name="title"
+                    children={(field) => {
+                      const error = field.state.meta.isTouched && !field.state.meta.isValid
+                        ? field.state.meta.errors.map(String).join(', ')
+                        : undefined
 
-                return (
-                  <Input
-                    label="Series Title *"
-                    type="text"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    onBlur={field.handleBlur}
-                    placeholder="e.g., Breaking Bad"
-                    autoFocus
-                    error={error}
+                      return (
+                        <Input
+                          label="Series Title *"
+                          type="text"
+                          value={field.state.value}
+                          onChange={(e) => {
+                            field.handleChange(e.target.value)
+                            setSearchQuery(e.target.value)
+                            setIsAutocompleteOpen(true)
+                          }}
+                          onFocus={() => {
+                            if (field.state.value && field.state.value.length >= 2) {
+                              setSearchQuery(field.state.value)
+                              setIsAutocompleteOpen(true)
+                            }
+                          }}
+                          onBlur={field.handleBlur}
+                          placeholder="e.g., Breaking Bad"
+                          autoFocus
+                          error={error}
+                        />
+                      )
+                    }}
                   />
-                )
-              }}
-            />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (searchQuery.length >= 2) {
+                      setIsAutocompleteOpen((prev) => !prev)
+                    } else {
+                      toast.info('Type at least 2 characters to search catalog')
+                    }
+                  }}
+                  className="mb-1 flex items-center gap-1.5 px-3 py-2 rounded-[6px] bg-[#14232a] hover:bg-[#1a2f38] border border-accent-cyan/30 text-accent-cyan text-xs font-mono transition-colors shrink-0 cursor-pointer shadow-sm"
+                  title="Search catalog to auto-fill details and seasons"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span className="hidden sm:inline">Auto-fill</span>
+                </button>
+              </div>
+
+              <MediaCatalogAutocomplete
+                query={searchQuery}
+                type="series"
+                isOpen={isAutocompleteOpen && step === 1}
+                anchorRef={titleContainerRef}
+                onClose={() => setIsAutocompleteOpen(false)}
+                onSelect={handleCatalogSelect}
+              />
+            </div>
 
             <form.Field
               name="creator"

@@ -1,5 +1,7 @@
+import { useState, useRef } from 'react'
 import { useForm } from '@tanstack/react-form'
-import { Trash2, Play, CheckCircle, Pause, RotateCcw, Plus, Film, User, Calendar, Image, Monitor, Tag, Star, Clock, AlignLeft, X } from 'lucide-react'
+import { toast } from 'sonner'
+import { Trash2, Play, CheckCircle, Pause, RotateCcw, Plus, Film, User, Calendar, Image, Monitor, Tag, Star, Clock, AlignLeft, X, Sparkles } from 'lucide-react'
 import { movieSchema, type MovieSchemaData, getDefaultMovieValues } from '../../../features/movies/schemas/movieSchema'
 import { platformOptions } from '../../../shared/constants/platformOptions'
 import { buildYearOptions } from '../../../shared/constants/yearOptions'
@@ -8,6 +10,8 @@ import { useConfirmation } from '../../hooks/useConfirmation'
 import { PropertyRow, GhostInput, GhostSelect, GhostTextArea } from '../common/property-sheet'
 import { RatingSlider } from '../common/form/RatingSlider'
 import { GenreSelector } from '../common/form/GenreSelector'
+import { MediaCatalogAutocomplete } from '../common/catalog/MediaCatalogAutocomplete'
+import type { MediaCatalogItemDetails } from '../../../services/mediaCatalogService'
 
 interface AddMovieModalContentProps {
   onClose: () => void
@@ -20,7 +24,9 @@ interface AddMovieModalContentProps {
 
 export function AddMovieModalContent({ onClose, onSubmit, onDelete, editingMovie, mode = 'add', type = 'movie' }: AddMovieModalContentProps) {
   const { confirm } = useConfirmation()
-  const form = useForm<MovieSchemaData>({
+  const [catalogDetails, setCatalogDetails] = useState<MediaCatalogItemDetails | null>(null)
+
+  const form = useForm({
     defaultValues: getDefaultMovieValues(editingMovie),
     validators: {
       onChange: movieSchema,
@@ -29,8 +35,10 @@ export function AddMovieModalContent({ onClose, onSubmit, onDelete, editingMovie
       const submissionData = {
         ...value,
         is_rewatch: value.status === 'rewatching',
+        externalId: catalogDetails?.id || (editingMovie as any)?.externalId || (editingMovie as any)?.external_id || undefined,
+        seasons: catalogDetails?.seasons || (editingMovie as any)?.seasons || undefined,
       }
-      await onSubmit(submissionData as MovieSchemaData)
+      await onSubmit(submissionData as any)
       if (!editingMovie) {
         form.reset()
       }
@@ -39,6 +47,33 @@ export function AddMovieModalContent({ onClose, onSubmit, onDelete, editingMovie
   })
 
   const yearOptions = buildYearOptions({ startYear: 1900 })
+
+  const [searchQuery, setSearchQuery] = useState(editingMovie?.title || '')
+  const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false)
+  const titleContainerRef = useRef<HTMLDivElement>(null)
+
+  const handleCatalogSelect = (details: MediaCatalogItemDetails) => {
+    setCatalogDetails(details)
+    form.setFieldValue('title', details.title)
+    setSearchQuery(details.title)
+    if (details.year) {
+      form.setFieldValue('year', details.year)
+    }
+    if (details.creator) {
+      form.setFieldValue('director', details.creator)
+    }
+    if (details.genres && details.genres.length > 0) {
+      form.setFieldValue('genre', details.genres.join(', '))
+    }
+    if (details.posterUrl) {
+      form.setFieldValue('poster_image', details.posterUrl)
+    }
+    if (details.overview && !form.state.values.notes) {
+      form.setFieldValue('notes', details.overview)
+    }
+    setIsAutocompleteOpen(false)
+    toast.success(`Populated "${details.title}" from catalog`, { icon: '✨' })
+  }
 
   return (
     <div className="flex flex-col h-full bg-[#1e2026]">
@@ -62,19 +97,60 @@ export function AddMovieModalContent({ onClose, onSubmit, onDelete, editingMovie
               </span>
             </div>
 
-            <form.Field
-              name="title"
-              children={(field) => (
-                <input
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  placeholder="Untitled Cinema Log"
-                  className="w-full text-2xl sm:text-4xl font-bold bg-transparent border-none outline-none focus:outline-none focus:ring-0 p-0 text-content-primary placeholder:text-content-muted/20"
-                  autoFocus
-                  required
+            <div ref={titleContainerRef} className="relative z-30">
+              <div className="flex items-center justify-between gap-2">
+                <form.Field
+                  name="title"
+                  children={(field) => (
+                    <input
+                      value={field.state.value}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value)
+                        setSearchQuery(e.target.value)
+                        setIsAutocompleteOpen(true)
+                      }}
+                      onFocus={() => {
+                        if (field.state.value && field.state.value.length >= 2) {
+                          setSearchQuery(field.state.value)
+                          setIsAutocompleteOpen(true)
+                        }
+                      }}
+                      placeholder={type === 'series' ? 'Untitled Television Log' : 'Untitled Cinema Log'}
+                      className="w-full text-2xl sm:text-4xl font-bold bg-transparent border-none outline-none focus:outline-none focus:ring-0 p-0 text-content-primary placeholder:text-content-muted/20"
+                      autoFocus
+                      required
+                    />
+                  )}
                 />
-              )}
-            />
+
+                {!editingMovie && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (searchQuery.length >= 2) {
+                        setIsAutocompleteOpen((prev) => !prev)
+                      } else {
+                        toast.info('Type at least 2 characters to search catalog')
+                      }
+                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] bg-[#14232a] hover:bg-[#1a2f38] border border-accent-cyan/30 text-accent-cyan text-[11px] font-mono transition-colors shrink-0 cursor-pointer shadow-sm"
+                    title="Search catalog to auto-fill details"
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Catalog Auto-fill</span>
+                  </button>
+                )}
+              </div>
+
+              <MediaCatalogAutocomplete
+                query={searchQuery}
+                type={type === 'series' ? 'series' : 'movie'}
+                isOpen={isAutocompleteOpen && !editingMovie}
+                anchorRef={titleContainerRef}
+                onClose={() => setIsAutocompleteOpen(false)}
+                onSelect={handleCatalogSelect}
+              />
+            </div>
           </div>
 
           {/* Properties Sheet */}

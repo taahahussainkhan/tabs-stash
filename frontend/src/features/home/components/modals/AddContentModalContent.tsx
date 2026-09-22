@@ -78,7 +78,7 @@ export function AddContentModalContent({
             <span className="text-[10px] text-content-muted uppercase tracking-wider">Medium Category</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-content-primary tracking-tight">
-            {isWatchlistMode ? 'Queue Media Entry' : 'Log New Chronicle Entry'}
+            {isWatchlistMode ? 'Queue Media Entry' : 'Log New Lore Entry'}
           </h2>
           <p className="text-xs text-content-secondary">
             Select the medium category to open its specialized specification sheet.

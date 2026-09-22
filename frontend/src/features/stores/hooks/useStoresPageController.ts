@@ -34,11 +34,15 @@ export function useStoresPageController() {
       })
     }, [createStore, openModal])
 
-    const handleEditStore = useCallback((store: StoreType) => {
+    const handleEditStore = useCallback((store: Store) => {
       const modalId = 'edit-store-modal'
       const initialData: StoreSchemaData = {
         name: store.name,
         type: store.type,
+        website: store.website || '',
+        physical_address: store.physical_address || '',
+        country: store.country || '',
+        notes: store.notes || '',
       }
 
       openModal({
@@ -48,17 +52,20 @@ export function useStoresPageController() {
         props: {
           modalId,
           onSubmit: async (data: StoreSchemaData) => {
-            await updateStore.mutateAsync({ id: store.id, data: data as StoreCreate })
+            await updateStore.mutateAsync({
+              id: store.id,
+              data: data as StoreCreate,
+            })
           },
           initialData,
-          title: 'Edit Store'
+          title: 'Edit Store',
         },
         size: 'xl',
         position: 'left',
       })
     }, [openModal, updateStore])
 
-  const handleDeleteStore = useCallback(async (store: StoreType) => {
+  const handleDeleteStore = useCallback(async (store: Store) => {
     await confirm({
       title: 'Delete Store',
       message: `Are you sure you want to delete "${store.name}"? This action cannot be undone.`,

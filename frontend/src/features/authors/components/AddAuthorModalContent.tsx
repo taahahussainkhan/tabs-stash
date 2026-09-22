@@ -14,14 +14,14 @@ interface AddAuthorModalContentProps {
 export function AddAuthorModalContent({ modalId, onSubmit, initialData }: AddAuthorModalContentProps) {
   const { closeModal } = useModal()
 
-  const form = useForm<AuthorSchemaData>({
+  const form = useForm({
     defaultValues: {
       name: initialData?.name || '',
       bio: initialData?.bio ?? '',
       country: initialData?.country ?? '',
       language: initialData?.language ?? '',
       birth_year: initialData?.birth_year,
-    },
+    } as AuthorSchemaData,
     validators: {
       onChange: authorSchema,
     },

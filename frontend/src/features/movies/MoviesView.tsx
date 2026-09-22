@@ -1,6 +1,6 @@
 import { MovieCard } from './components/MovieCard'
 import { Table } from '../../shared/components/Table/Table'
-import type { MovieLog } from '../types/movie'
+import type { MovieLog } from './types/movie'
 import { useNavigate } from 'react-router-dom'
 import { LayoutGrid, Table as TableIcon, Film, Search, ArrowUpDown, Plus, ExternalLink, Filter } from 'lucide-react'
 import { Pagination } from '../../shared/components/common/Pagination'

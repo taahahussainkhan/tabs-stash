@@ -84,8 +84,14 @@ export function useCreateWatchlistMovieMutation() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: { title: string; director?: string; year?: number; genre?: string }) =>
-      moviesApi.createWatchlist(data),
+    mutationFn: (data: {
+      title: string
+      director?: string
+      year?: number | null
+      genre?: string
+      posterImage?: string | null
+      externalId?: string | null
+    }) => moviesApi.createWatchlist(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: movieKeys.lists() })
       queryClient.invalidateQueries({ queryKey: movieKeys.stats() })

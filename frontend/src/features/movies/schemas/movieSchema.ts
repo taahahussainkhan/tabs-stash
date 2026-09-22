@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { MovieLog } from '../../features/movies/types/movie'
+import type { MovieLog } from '../types/movie'
 
 const commentSchema = z.object({
   id: z.string(),
@@ -18,7 +18,7 @@ export const movieSchema = z.object({
     platform: z.string().max(100, 'Platform must be less than 100 characters').optional(),
   rating: z.number().min(0, 'Rating must be at least 0').max(10, 'Rating must be at most 10').optional().nullable(),
   notes: z.string().max(1000, 'Notes must be less than 1000 characters').optional(),
-  status: z.enum(['watching', 'completed', 'paused', 'rewatching']),
+  status: z.enum(['to_watch', 'watching', 'completed', 'paused', 'rewatching']),
   start_date: z.string().min(1, 'Start date is required'),
   end_date: z.string().optional(),
   current_timestamp: z.number().min(0, 'Current timestamp must be positive').optional().nullable(),
@@ -39,7 +39,7 @@ export function getDefaultMovieValues(editingMovie?: MovieLog | null): MovieSche
     platform: editingMovie?.platform || '',
     rating: editingMovie?.rating ?? null,
     notes: editingMovie?.notes || '',
-    status: editingMovie?.status || 'watching',
+    status: editingMovie?.status || 'to_watch',
     start_date: editingMovie?.start_date
       ? new Date(editingMovie.start_date).toISOString().slice(0, 16)
       : new Date().toISOString().slice(0, 16),

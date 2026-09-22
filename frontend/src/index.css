@@ -359,45 +359,45 @@
   }
 
   .mono-badge-vermillion {
-    background: rgba(224, 90, 71, 0.12);
+    background: #3b1c18;
     color: #ff7b68;
-    border: 1px solid rgba(224, 90, 71, 0.3);
+    border: 1px solid #991b1b;
   }
 
   .mono-badge-ochre {
-    background: rgba(229, 168, 59, 0.12);
+    background: #3b2c12;
     color: #fbbf24;
-    border: 1px solid rgba(229, 168, 59, 0.3);
+    border: 1px solid #78350f;
   }
 
   .mono-badge-sage {
-    background: rgba(56, 161, 105, 0.12);
+    background: #143324;
     color: #4ade80;
-    border: 1px solid rgba(56, 161, 105, 0.3);
+    border: 1px solid #1e593a;
   }
 
   .mono-badge-cyan {
-    background: rgba(13, 148, 136, 0.12);
+    background: #0f2e2b;
     color: #2dd4bf;
-    border: 1px solid rgba(13, 148, 136, 0.3);
+    border: 1px solid #134e4a;
   }
 
   .mono-badge-indigo {
-    background: rgba(92, 103, 242, 0.12);
+    background: #1e1b4b;
     color: #a5b4fc;
-    border: 1px solid rgba(92, 103, 242, 0.3);
+    border: 1px solid #3730a3;
   }
 
   .mono-badge-danger {
-    background: rgba(229, 62, 62, 0.12);
+    background: #3b1818;
     color: #f87171;
-    border: 1px solid rgba(229, 62, 62, 0.3);
+    border: 1px solid #7f1d1d;
   }
 
   .mono-badge-neutral {
-    background: var(--surface-light);
-    color: var(--content-muted);
-    border: 1px solid var(--border-color);
+    background: #1e2026;
+    color: #9ca3af;
+    border: 1px solid #2e323c;
   }
 }
 

@@ -159,6 +159,7 @@ export interface BooksStats {
   total_items: number
   total_pages_read: number
   reading_now: number
+  reading?: number
   completed: number
   total: number
   owned: number

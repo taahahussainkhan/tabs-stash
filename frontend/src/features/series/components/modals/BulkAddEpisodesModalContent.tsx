@@ -1,7 +1,7 @@
 import { useForm } from '@tanstack/react-form'
-import { useBulkCreateEpisodesMutation, type EpisodeBulkCreate } from '../../../services/seasonEpisodeService'
+import { useBulkCreateEpisodesMutation, type EpisodeBulkCreate } from '../../../../services/seasonEpisodeService'
 import { PropertyRow, GhostInput } from '../../../../shared/components/common/property-sheet'
-import { bulkAddEpisodesSchema, type BulkAddEpisodesSchemaData } from '../schemas/bulkAddEpisodesSchema'
+import { bulkAddEpisodesSchema, type BulkAddEpisodesSchemaData } from '../../schemas/bulkAddEpisodesSchema'
 import { Plus, Hash, Layers, X } from 'lucide-react'
 
 interface BulkAddEpisodesModalContentProps {
@@ -13,11 +13,11 @@ interface BulkAddEpisodesModalContentProps {
 export function BulkAddEpisodesModalContent({ seasonPublicId, seriesPublicId, onClose }: BulkAddEpisodesModalContentProps) {
   const bulkCreateMutation = useBulkCreateEpisodesMutation(seasonPublicId, seriesPublicId)
 
-  const form = useForm<BulkAddEpisodesSchemaData>({
+  const form = useForm({
     defaultValues: {
       start_episode: 1,
       end_episode: 10,
-    } satisfies BulkAddEpisodesSchemaData,
+    } as BulkAddEpisodesSchemaData,
     validators: {
       onChange: bulkAddEpisodesSchema,
     },

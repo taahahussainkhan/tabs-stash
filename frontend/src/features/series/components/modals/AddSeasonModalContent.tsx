@@ -11,7 +11,7 @@ interface AddSeasonModalContentProps {
 }
 
 export function AddSeasonModalContent({ onClose, onSubmit, existingSeasonNumbers }: AddSeasonModalContentProps) {
-  const form = useForm<AddSeasonSchemaData>({
+  const form = useForm({
     defaultValues: {
       season_number: Math.max(0, ...existingSeasonNumbers) + 1,
       title: '',

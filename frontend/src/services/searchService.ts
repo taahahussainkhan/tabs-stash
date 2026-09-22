@@ -1,6 +1,5 @@
-import { movieService } from './movieService'
-import { seriesService } from './seriesService'
-// import { bookService } from './bookService' // Assuming this exists or will be created
+import { moviesApi } from '../features/movies/api/moviesApi'
+import { seriesApi } from '../features/series/api/seriesApi'
 
 export type SearchResultType = 'movie' | 'series' | 'book'
 
@@ -18,9 +17,8 @@ export const searchService = {
     if (!query || query.length < 2) return []
 
     const [movies, series] = await Promise.all([
-      movieService.getAll({ search: query, page_size: 5 }),
-      seriesService.getAll({ search: query, page_size: 5 }),
-      // bookService.getAll({ search: query, page_size: 5 }),
+      moviesApi.getMovies({ search: query, page_size: 5 }),
+      seriesApi.getAll({ search: query, page_size: 5 }),
     ])
 
     const results: SearchResult[] = [
@@ -37,6 +35,7 @@ export const searchService = {
         title: s.title,
         subtitle: s.creator,
         type: 'series' as const,
+        image: s.poster_image,
         status: s.status,
       })),
     ]

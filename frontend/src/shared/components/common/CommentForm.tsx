@@ -10,12 +10,12 @@ interface Props {
 }
 
 export function CommentForm({ onAdd, disabled = false }: Props) {
-  const form = useForm<CommentEntrySchemaData>({
+  const form = useForm({
     defaultValues: {
       timestamp: '',
       duration: '',
       text: '',
-    } satisfies CommentEntrySchemaData,
+    } as CommentEntrySchemaData,
     validators: {
       onChange: commentEntrySchema,
     },

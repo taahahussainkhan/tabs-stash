@@ -14,7 +14,7 @@ import type {
 import type { PaginatedResponse } from '../../../shared/types/pagination'
 
 // Convert form data to API format
-function convertFormDataToSeriesCreate(formData: MovieSchemaData): SeriesLogCreate {
+function convertFormDataToSeriesCreate(formData: MovieSchemaData): any {
   return {
     title: formData.title,
     creator: formData.director || undefined,
@@ -24,47 +24,71 @@ function convertFormDataToSeriesCreate(formData: MovieSchemaData): SeriesLogCrea
     rating: formData.rating || undefined,
     notes: formData.notes || undefined,
     status: formData.status,
+    startDate: formData.start_date,
     start_date: formData.start_date,
+    endDate: formData.end_date || null,
     end_date: formData.end_date || null,
+    currentTimestamp: formData.current_timestamp || undefined,
     current_timestamp: formData.current_timestamp || undefined,
+    stopReason: formData.stop_reason || undefined,
     stop_reason: formData.stop_reason || undefined,
+    isRewatch: formData.is_rewatch,
     is_rewatch: formData.is_rewatch,
+    posterImage: (formData as any).poster_image || (formData as any).posterImage || undefined,
+    externalId: (formData as any).externalId || (formData as any).external_id || undefined,
     seasons: (formData as any).seasons || undefined,
   }
 }
 
-function mapSeriesWithCurrentSessionToSeriesLog(item: SeriesWithCurrentSessionOut): SeriesLog {
-  const { series, current_session } = item
+function mapSeriesWithCurrentSessionToSeriesLog(item: any): SeriesLog {
+  const series = item.series || item
+  const current_session = item.current_session || item.currentSessionId || series?.currentSessionId
+
+  const id = series?.public_id || series?.publicId || series?.id || item?.public_id || item?.publicId || item?.id || ''
+
+  const allEpisodes = Array.isArray(series?.seasons)
+    ? series.seasons.flatMap((s: any) => s.episodes || [])
+    : []
+  const totalEpisodes = series?.total_episodes ?? item.total_episodes ?? allEpisodes.length
+  const watchedEpisodes = series?.episodes_watched ?? item.episodes_watched ?? allEpisodes.filter((e: any) => e.is_watched || e.isWatched).length
 
   return {
-    id: series.public_id, // Map public_id to id
-    title: series.title,
-    creator: series.creator ?? undefined,
-    year: series.year ?? undefined,
-    genre: series.genre ?? undefined,
-    platform: undefined,
+    id,
+    public_id: id,
+    title: series?.title || item.title || '',
+    creator: series?.creator ?? item.creator ?? undefined,
+    year: series?.year ?? item.year ?? undefined,
+    genre: series?.genre ?? item.genre ?? undefined,
+    poster_image: series?.poster_image || series?.posterImage || item.poster_image || item.posterImage || undefined,
+    platform: series?.platform || item.platform || undefined,
     rating: current_session?.rating ?? undefined,
     notes: current_session?.notes ?? undefined,
-    status: current_session?.status ?? 'watching',
-    start_date: current_session?.start_date ?? series.created_at,
-    end_date: current_session?.end_date ?? null,
-    current_timestamp: current_session?.current_position ?? undefined,
-    stop_reason: current_session?.stop_reason ?? undefined,
-    is_rewatch: current_session?.is_rewatch ?? false,
-    is_favorite: series.is_favorite ?? false,
-    is_watchlist: series.is_watchlist ?? false,
-    created_at: series.created_at,
-    updated_at: series.updated_at,
-    rewatch_count: item.rewatch_count,
+    status: current_session?.status ?? series?.status ?? 'to_watch',
+    start_date: current_session?.start_date || current_session?.startDate || series?.created_at || series?.createdAt || item.created_at || item.createdAt || new Date().toISOString(),
+    end_date: current_session?.end_date || current_session?.endDate || null,
+    current_timestamp: current_session?.current_position ?? current_session?.currentPosition ?? undefined,
+    stop_reason: current_session?.stop_reason || current_session?.stopReason || undefined,
+    is_rewatch: current_session?.is_rewatch ?? current_session?.isRewatch ?? false,
+    is_favorite: series?.is_favorite ?? series?.isFavorite ?? item.is_favorite ?? item.isFavorite ?? false,
+    is_watchlist: series?.is_watchlist ?? series?.isWatchlist ?? item.is_watchlist ?? item.isWatchlist ?? false,
+    created_at: series?.created_at || series?.createdAt || item.created_at || item.createdAt || new Date().toISOString(),
+    updated_at: series?.updated_at || series?.updatedAt || item.updated_at || item.updatedAt || new Date().toISOString(),
+    rewatch_count: item.rewatch_count || 0,
+    total_episodes: totalEpisodes > 0 ? totalEpisodes : undefined,
+    episodes_watched: watchedEpisodes,
   }
 }
 
-function mapSeriesWithSessionsToSeriesLog(item: SeriesWithSessionsOut): SeriesLog {
-  const { series, current_session, sessions } = item
-  const rewatch_count = sessions.reduce(
-    (count, s) => count + (s.is_rewatch ? 1 : 0),
-    0,
-  )
+function mapSeriesWithSessionsToSeriesLog(item: any): SeriesLog {
+  const series = item.series || item
+  const current_session = item.current_session || item.currentSessionId
+  const sessions = item.sessions || []
+  const rewatch_count = Array.isArray(sessions)
+    ? sessions.reduce(
+        (count: number, s: any) => count + (s.is_rewatch || s.isRewatch ? 1 : 0),
+        0,
+      )
+    : 0
   return mapSeriesWithCurrentSessionToSeriesLog({ series, current_session, rewatch_count })
 }
 
@@ -102,6 +126,7 @@ export const seriesApi = {
 
     const sessionHistories: SessionHistory[] = sessions.map(({ session, comments }) => {
       return {
+        sessionId: session.public_id,
         sessionPublicId: session.public_id,
         status: session.status,
         startDate: session.start_date,
@@ -125,31 +150,46 @@ export const seriesApi = {
     const seriesData = convertFormDataToSeriesCreate(series)
     const seriesDataWithDates = {
       ...seriesData,
-      start_date: new Date(seriesData.start_date).toISOString(),
+      startDate: seriesData.startDate ? new Date(seriesData.startDate).toISOString() : new Date().toISOString(),
+      endDate: seriesData.endDate ? new Date(seriesData.endDate).toISOString() : null,
+      start_date: seriesData.start_date ? new Date(seriesData.start_date).toISOString() : new Date().toISOString(),
       end_date: seriesData.end_date ? new Date(seriesData.end_date).toISOString() : null,
     }
     const response = await api.post<SeriesWithSessionsOut>('/logging/series', seriesDataWithDates)
     return mapSeriesWithSessionsToSeriesLog(response.data)
   },
 
-  createWatchlist: async (data: { title: string; creator?: string; year?: number; genre?: string }): Promise<SeriesLog> => {
+  createWatchlist: async (data: {
+    title: string
+    creator?: string
+    director?: string
+    year?: number
+    genre?: string
+    posterImage?: string
+    externalId?: string
+    seasons?: Array<{
+      seasonNumber: number
+      episodeCount: number
+      title?: string
+      year?: number
+      episodes?: any[]
+    }>
+  }): Promise<SeriesLog> => {
     const seriesData = {
       title: data.title,
-      creator: data.creator || undefined,
+      creator: data.creator || data.director || undefined,
       year: data.year || undefined,
       genre: data.genre || undefined,
+      posterImage: data.posterImage || undefined,
+      externalId: data.externalId || undefined,
       status: 'paused' as const,
-      start_date: new Date().toISOString(),
-      is_rewatch: false,
+      startDate: new Date().toISOString(),
+      isWatchlist: true,
+      isRewatch: false,
+      seasons: data.seasons && data.seasons.length > 0 ? data.seasons : undefined,
     }
     const response = await api.post<SeriesWithSessionsOut>('/logging/series', seriesData)
-    
-    await api.patch(`/logging/series/${response.data.series.public_id}/watchlist`, null, {
-      params: { is_watchlist: true }
-    })
-    
-    const updatedResponse = await api.get<SeriesWithSessionsOut>(`/logging/series/${response.data.series.public_id}`)
-    return mapSeriesWithSessionsToSeriesLog(updatedResponse.data)
+    return mapSeriesWithSessionsToSeriesLog(response.data)
   },
 
   update: async (id: string, series: MovieSchemaData): Promise<SeriesLog> => {

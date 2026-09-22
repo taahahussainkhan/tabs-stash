@@ -3,40 +3,83 @@ import { config } from '../config'
 
 export const api = axios.create({
   baseURL: config.API_URL,
-  withCredentials: true, // Enable sending cookies with requests
+  withCredentials: true,
 })
 
-// No manual Authorization header needed - cookies sent automatically
-// The backend sets httpOnly cookies which are handled by the browser
+// Request interceptor: attach Bearer token if available in localStorage
+api.interceptors.request.use((reqConfig) => {
+  const token = localStorage.getItem('tabvault_access_token')
+  if (token && reqConfig.headers) {
+    reqConfig.headers.Authorization = `Bearer ${token}`
+  }
+  return reqConfig
+})
+
+// Track in-flight refresh promise to deduplicate concurrent refresh requests across parallel queries
+let refreshPromise: Promise<unknown> | null = null
 
 // Handle token refresh
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Automatically capture tokens if returned in login/refresh response
+    if (response.data?.data?.accessToken) {
+      localStorage.setItem('tabvault_access_token', response.data.data.accessToken)
+    }
+    if (response.data?.data?.refreshToken) {
+      localStorage.setItem('tabvault_refresh_token', response.data.data.refreshToken)
+    }
+    return response
+  },
   async (error) => {
     const originalRequest = error.config
+
+    if (!originalRequest) {
+      return Promise.reject(error)
+    }
 
     // Don't try to refresh if we're already on an auth page or if this is an auth endpoint
     const isAuthPage = window.location.pathname.startsWith('/auth')
     const isAuthEndpoint = originalRequest.url?.includes('/auth/')
 
-    // If we get 401, try to refresh token via cookie (but not on auth pages/endpoints)
+    // If we get 401, try to refresh token via cookie or stored refreshToken
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthPage && !isAuthEndpoint) {
       originalRequest._retry = true
 
-      try {
-        // Refresh endpoint will use the refresh_token cookie automatically
-        await axios.post(
-          `${config.API_URL}/auth/refresh`,
-          {},
-          { withCredentials: true }
-        )
+      if (!refreshPromise) {
+        const storedRefreshToken = localStorage.getItem('tabvault_refresh_token')
+        refreshPromise = axios
+          .post(
+            `${config.API_URL}/auth/refresh`,
+            storedRefreshToken ? { refreshToken: storedRefreshToken } : {},
+            { withCredentials: true }
+          )
+          .then((res) => {
+            if (res.data?.data?.accessToken) {
+              localStorage.setItem('tabvault_access_token', res.data.data.accessToken)
+            }
+            if (res.data?.data?.refreshToken) {
+              localStorage.setItem('tabvault_refresh_token', res.data.data.refreshToken)
+            }
+            return res
+          })
+          .finally(() => {
+            refreshPromise = null
+          })
+      }
 
-        // New access token cookie has been set by the backend
-        // Retry the original request
+      try {
+        await refreshPromise
+        const newToken = localStorage.getItem('tabvault_access_token')
+        if (newToken && originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newToken}`
+        }
         return api(originalRequest)
-      } catch (refreshError) {
-        // Refresh failed, redirect to login (only if not already there)
-        if (!isAuthPage) {
+      } catch (refreshError: any) {
+        localStorage.removeItem('tabvault_access_token')
+        localStorage.removeItem('tabvault_refresh_token')
+        const isAuthFailure =
+          refreshError?.response?.status === 401 || refreshError?.response?.status === 403
+        if (!isAuthPage && isAuthFailure) {
           window.location.href = '/auth/login'
         }
         return Promise.reject(refreshError)

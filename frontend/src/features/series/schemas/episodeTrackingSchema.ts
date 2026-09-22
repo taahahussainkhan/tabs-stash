@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const episodeTrackingSchema = z.object({
-  status: z.enum(['watching', 'completed']),
+  status: z.enum(['to_watch', 'watching', 'completed']),
   start_date: z.string().min(1, 'Start date is required'),
   end_date: z.string().optional(),
   current_position: z.number().min(0, 'Current position must be positive'),

@@ -109,7 +109,9 @@ export const BookCard: React.FC<BookCardProps> = memo(({
 
         <div className="flex items-center justify-between pt-2 border-t border-[#242730] text-xs font-mono text-content-muted">
           <span>{edition?.publisher?.name || 'Publisher unlisted'}</span>
-          {edition?.pages_count && <span>{edition.pages_count}p</span>}
+          {(edition?.page_count || (edition as any)?.pages_count) && (
+            <span>{edition?.page_count || (edition as any)?.pages_count}p</span>
+          )}
         </div>
       </div>
     </CardContainer>

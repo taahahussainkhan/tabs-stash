@@ -24,12 +24,12 @@ export function AddCommentsModalContent({ onClose, movie, sessionId, existingCom
   const [comments, setComments] = useState<CommentFormData[]>(existingComments)
   const saveCommentsMutation = useSaveSessionCommentsMutation()
 
-  const form = useForm<CommentEntrySchemaData>({
+  const form = useForm({
     defaultValues: {
       timestamp: '',
       duration: '',
       text: '',
-    },
+    } as CommentEntrySchemaData,
     validators: {
       onChange: commentEntrySchema,
     },

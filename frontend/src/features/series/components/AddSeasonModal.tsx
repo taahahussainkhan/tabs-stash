@@ -12,7 +12,7 @@ interface AddSeasonModalProps {
 }
 
 export function AddSeasonModal({ onClose, onSubmit, existingSeasonNumbers }: AddSeasonModalProps) {
-  const form = useForm<AddSeasonSchemaData>({
+  const form = useForm({
     defaultValues: {
       season_number: Math.max(0, ...existingSeasonNumbers) + 1,
       title: '',

@@ -12,12 +12,12 @@ interface UpdateProgressModalContentProps {
 }
 
 export function UpdateProgressModalContent({ onClose, onSubmit, movie }: UpdateProgressModalContentProps) {
-  const form = useForm<UpdateProgressSchemaData>({
+  const form = useForm({
     defaultValues: {
       status: movie.status,
       current_timestamp: movie.current_timestamp ?? null,
       stop_reason: movie.stop_reason || '',
-    },
+    } as UpdateProgressSchemaData,
     validators: {
       onChange: updateProgressSchema,
     },

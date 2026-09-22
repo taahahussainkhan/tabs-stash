@@ -11,7 +11,7 @@ import {
   useCreateWatchlistMovieMutation, 
   useToggleFavoriteMutation, 
   useToggleWatchlistMutation 
-} from './useMovieQueries'
+} from './useMoviesQuery'
 import type { MovieLog, PaginationParams } from '../types/movie'
 import type { MovieSchemaData } from '../schemas/movieSchema'
 import { useFilterModal } from '../../../shared/hooks/useFilterModal'
@@ -22,7 +22,7 @@ import { useSettings } from '../../../shared/hooks/useSettings'
 import { useSearchParamsState } from '../../../shared/hooks/useSearchParamsState'
 import { toast } from 'sonner'
 import type { MoviePageConfig } from '../types/page'
-import { movieService } from '../../../services/movieService'
+import { moviesApi } from '../api/moviesApi'
 
 export function useMoviesPageController(args: { pathname: string; pageConfig: MoviePageConfig }) {
   const { pageConfig } = args
@@ -78,7 +78,8 @@ export function useMoviesPageController(args: { pathname: string; pageConfig: Mo
     )
   }, [updateMovieMutation, deleteMovieMutation, openAddMovieModal])
 
-  const handleDeleteMovie = useCallback((movieId: string) => {
+  const handleDeleteMovie = useCallback((movieOrId: MovieLog | string) => {
+    const movieId = typeof movieOrId === 'string' ? movieOrId : movieOrId.id
     confirm({
       title: 'Delete Movie',
       message: 'Are you sure you want to delete this movie? This action cannot be undone.',
@@ -105,7 +106,7 @@ export function useMoviesPageController(args: { pathname: string; pageConfig: Mo
 
   const handleAddComments = useCallback(async (movie: MovieLog) => {
     try {
-      const movieData = await movieService.getMovieSessionsWithComments(movie.id)
+      const movieData = await moviesApi.getMovieSessionsWithComments(movie.id)
       const sessions = movieData.sessions
       const currentSession = sessions[sessions.length - 1]
 

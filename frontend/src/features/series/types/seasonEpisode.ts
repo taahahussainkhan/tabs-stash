@@ -5,6 +5,7 @@ export interface Season {
   title?: string | null
   year?: number | null
   episode_count?: number | null
+  status?: 'to_watch' | 'watching' | 'completed'
   notes?: string | null
   created_at: string
   updated_at: string
@@ -15,6 +16,7 @@ export interface SeasonWithProgress {
   watched_episodes: number
   total_episodes: number
   progress_percentage: number
+  status?: 'to_watch' | 'watching' | 'completed'
   average_rating?: number | null
 }
 
@@ -25,6 +27,7 @@ export interface Episode {
   title?: string | null
   duration?: number | null
   is_watched: boolean
+  status?: 'to_watch' | 'watching' | 'completed'
   watched_date?: string | null
   current_timestamp?: number | null
   rating?: number | null

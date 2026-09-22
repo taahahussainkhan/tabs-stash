@@ -1,7 +1,7 @@
 import { useForm } from '@tanstack/react-form'
-import { useCreateEpisodeMutation, type EpisodeCreate } from '../../../services/seasonEpisodeService'
+import { useCreateEpisodeMutation, type EpisodeCreate } from '../../../../services/seasonEpisodeService'
 import { PropertyRow, GhostInput } from '../../../../shared/components/common/property-sheet'
-import { addEpisodeSchema, type AddEpisodeSchemaData } from '../schemas/addEpisodeSchema'
+import { addEpisodeSchema, type AddEpisodeSchemaData } from '../../schemas/addEpisodeSchema'
 import { Plus, Hash, Clock, X } from 'lucide-react'
 
 interface AddEpisodeModalContentProps {
@@ -13,12 +13,12 @@ interface AddEpisodeModalContentProps {
 export function AddEpisodeModalContent({ seasonPublicId, seriesPublicId, onClose }: AddEpisodeModalContentProps) {
   const createEpisodeMutation = useCreateEpisodeMutation(seasonPublicId, seriesPublicId)
 
-  const form = useForm<AddEpisodeSchemaData>({
+  const form = useForm({
     defaultValues: {
       episode_number: 1,
       title: '',
       duration: undefined,
-    } satisfies AddEpisodeSchemaData,
+    } as AddEpisodeSchemaData,
     validators: {
       onChange: addEpisodeSchema,
     },

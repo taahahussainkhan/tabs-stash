@@ -12,10 +12,10 @@ export function SignUpPage() {
             <Bookmark className="w-6 h-6 text-accent-vermillion" />
           </div>
           <h1 className="text-2xl font-bold text-content-primary tracking-tight">
-            Create Chronicle Archive
+            Create Lore Archive
           </h1>
           <p className="text-content-muted font-mono text-xs uppercase tracking-wider">
-            Establish your local personal logs
+            Establish your personal assistant &amp; life archive
           </p>
         </div>
 
@@ -49,7 +49,7 @@ export function SignUpPage() {
 
         {/* Footer text */}
         <p className="text-center text-[10px] font-mono text-content-muted uppercase tracking-widest">
-          Personal Media &amp; Literature Chronicle
+          Lore &bull; Personal Assistant &amp; Life Archive
         </p>
       </div>
     </div>

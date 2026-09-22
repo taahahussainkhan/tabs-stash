@@ -26,7 +26,7 @@ export function useCreateStoreMutation() {
 export function useUpdateStoreMutation() {
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: ({ id, data }: { id: number; data: StoreCreate }) => storesApi.update(id, data),
+        mutationFn: ({ id, data }: { id: number | string; data: StoreCreate }) => storesApi.update(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: storeKeys.all })
         }
@@ -36,7 +36,7 @@ export function useUpdateStoreMutation() {
 export function useDeleteStoreMutation() {
     const queryClient = useQueryClient()
     return useMutation({
-        mutationFn: (id: number) => storesApi.delete(id),
+        mutationFn: (id: number | string) => storesApi.delete(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: storeKeys.all })
         }

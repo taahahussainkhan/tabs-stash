@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useGenresQuery, useCreateGenreMutation } from './useGenresQuery'
+import { useGenresQuery, useGenreNetworkQuery, useCreateGenreMutation } from './useGenresQuery'
 
 export function useGenresPageController() {
     const { data: genres, isLoading } = useGenresQuery()

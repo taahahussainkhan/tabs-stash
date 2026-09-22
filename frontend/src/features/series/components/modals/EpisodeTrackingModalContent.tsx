@@ -43,10 +43,17 @@ export function EpisodeTrackingModalContent({
   const { closeModal } = useModal()
   const queryClient = useQueryClient()
   const [activeTab, setActiveTab] = useState<'details' | 'comments'>('details')
+  const initialStatus: 'to_watch' | 'watching' | 'completed' = episode.is_watched
+    ? 'completed'
+    : (episode.current_timestamp && episode.current_timestamp > 0)
+    ? 'watching'
+    : 'to_watch'
 
-  const form = useForm<EpisodeTrackingSchemaData>({
+  const [status, setStatus] = useState<'to_watch' | 'watching' | 'completed'>(initialStatus)
+
+  const form = useForm({
     defaultValues: {
-      status: episode.is_watched ? 'completed' : 'watching',
+      status: initialStatus,
       start_date: new Date().toISOString().slice(0, 16),
       end_date: episode.is_watched && episode.watched_date
         ? new Date(episode.watched_date).toISOString().slice(0, 16)
@@ -56,26 +63,26 @@ export function EpisodeTrackingModalContent({
       notes: episode.notes || '',
       title: episode.title || '',
       duration: episode.duration || 0,
-    } satisfies EpisodeTrackingSchemaData,
+    } as EpisodeTrackingSchemaData,
     validators: {
       onChange: episodeTrackingSchema,
     },
     onSubmit: async ({ value }) => {
       try {
-        if (value.title !== episode.title || value.duration !== episode.duration) {
-          await api.put(`/logging/episodes/${episode.public_id}`, {
-            title: value.title || null,
-            duration: value.duration || null,
-          })
-        }
+        const isWatched = status === 'completed' || value.status === 'completed'
+        const effectiveStatus = isWatched ? 'completed' : status
 
-        await api.post(`/logging/episodes/${episode.public_id}/session`, {
-          status: value.status,
-          start_date: new Date(value.start_date).toISOString(),
-          end_date: value.end_date ? new Date(value.end_date).toISOString() : null,
-          current_position: value.current_position,
+        await api.put(`/logging/episodes/${episode.public_id}`, {
+          title: value.title || null,
+          duration: value.duration ? Number(value.duration) : null,
+          isWatched,
+          is_watched: isWatched,
+          status: effectiveStatus,
+          current_position: effectiveStatus === 'to_watch' ? 0 : (value.current_position || 0),
+          currentTimestamp: effectiveStatus === 'to_watch' ? 0 : (value.current_position || 0),
           rating: value.rating || null,
           notes: value.notes || null,
+          watchedDate: isWatched && value.end_date ? new Date(value.end_date).toISOString() : (isWatched ? new Date().toISOString() : null),
         })
 
         if (JSON.stringify(comments) !== JSON.stringify(existingComments)) {
@@ -87,11 +94,12 @@ export function EpisodeTrackingModalContent({
 
         queryClient.invalidateQueries({ queryKey: seasonEpisodeKeys.episodes(seasonPublicId) })
         queryClient.invalidateQueries({ queryKey: seasonEpisodeKeys.seasons(seriesPublicId) })
+        queryClient.invalidateQueries({ queryKey: ['series', seriesPublicId] })
 
-        toast.success('Episode updated successfully')
+        toast.success(isWatched ? 'Episode marked as watched' : 'Episode updated successfully')
         closeModal(`episode-tracking-${episode.public_id}`)
-      } catch (error) {
-        toast.error('Failed to update episode')
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || 'Failed to update episode')
       }
     },
   })
@@ -115,14 +123,23 @@ export function EpisodeTrackingModalContent({
     setComments(comments.filter((_, i) => i !== index))
   }
 
-  const handleMarkWatched = () => {
-    form.setFieldValue('status', 'completed')
-    form.setFieldValue('end_date', new Date().toISOString().slice(0, 16))
+  const handleMarkToWatch = () => {
+    setStatus('to_watch')
+    form.setFieldValue('status', 'to_watch')
+    form.setFieldValue('end_date', '')
+    form.setFieldValue('current_position', 0)
   }
 
-  const handleMarkUnwatched = () => {
+  const handleMarkInProgress = () => {
+    setStatus('watching')
     form.setFieldValue('status', 'watching')
     form.setFieldValue('end_date', '')
+  }
+
+  const handleMarkWatched = () => {
+    setStatus('completed')
+    form.setFieldValue('status', 'completed')
+    form.setFieldValue('end_date', new Date().toISOString().slice(0, 16))
   }
 
   return (
@@ -155,7 +172,7 @@ export function EpisodeTrackingModalContent({
                   type="button"
                   className={`px-2.5 py-0.5 font-semibold rounded-[3px] transition-colors cursor-pointer ${
                     activeTab === 'details' 
-                      ? 'bg-[#1e2026] text-accent-cyan border border-accent-cyan/30' 
+                      ? 'bg-[#0f2e2b] text-[#2dd4bf] border border-[#134e4a]' 
                       : 'text-content-muted hover:text-white'
                   }`}
                   onClick={() => setActiveTab('details')}
@@ -166,7 +183,7 @@ export function EpisodeTrackingModalContent({
                   type="button"
                   className={`px-2.5 py-0.5 font-semibold rounded-[3px] transition-colors flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'comments' 
-                      ? 'bg-[#1e2026] text-accent-cyan border border-accent-cyan/30' 
+                      ? 'bg-[#0f2e2b] text-[#2dd4bf] border border-[#134e4a]' 
                       : 'text-content-muted hover:text-white'
                   }`}
                   onClick={() => setActiveTab('comments')}
@@ -184,7 +201,7 @@ export function EpisodeTrackingModalContent({
                   value={field.state.value || ''}
                   onChange={(e) => field.handleChange(e.target.value)}
                   placeholder={`Episode ${episode.episode_number}`}
-                  className="w-full text-2xl sm:text-4xl font-bold bg-transparent border-none outline-none focus:outline-none focus:ring-0 p-0 text-content-primary placeholder:text-content-muted/20"
+                  className="w-full text-2xl sm:text-4xl font-bold bg-transparent border-none outline-none focus:outline-none focus:ring-0 p-0 text-content-primary placeholder:text-[#6b7280]"
                   autoFocus
                 />
               )}
@@ -195,16 +212,40 @@ export function EpisodeTrackingModalContent({
             <div className="space-y-6">
               {/* Properties Sheet */}
               <div className="space-y-0.5">
-                <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-content-muted/40 mb-2 px-1">
+                <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#6b7280] mb-2 px-1">
                   Properties
                 </div>
 
                 <PropertyRow icon={<Play className="w-4 h-4" />} label="Status">
-                  <div className="flex items-center gap-2 py-1">
+                  <div className="flex flex-wrap items-center gap-2 py-1">
                     <button
                       type="button"
                       className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] border font-mono text-xs font-semibold transition-colors cursor-pointer ${
-                        form.state.values.status === 'completed'
+                        status === 'to_watch'
+                          ? 'bg-[#1e1b4b] border-[#3730a3] text-[#a5b4fc]'
+                          : 'bg-[#15161a] border-[#2e323c] text-content-muted hover:text-white'
+                      }`}
+                      onClick={handleMarkToWatch}
+                    >
+                      <Clock className="w-3.5 h-3.5" />
+                      <span>To Watch</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] border font-mono text-xs font-semibold transition-colors cursor-pointer ${
+                        status === 'watching'
+                          ? 'bg-[#0f2e2b] border-[#134e4a] text-[#2dd4bf]'
+                          : 'bg-[#15161a] border-[#2e323c] text-content-muted hover:text-white'
+                      }`}
+                      onClick={handleMarkInProgress}
+                    >
+                      <Play className="w-3.5 h-3.5" />
+                      <span>In Progress</span>
+                    </button>
+                    <button
+                      type="button"
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] border font-mono text-xs font-semibold transition-colors cursor-pointer ${
+                        status === 'completed'
                           ? 'bg-[#143324] border-[#1e593a] text-[#4ade80]'
                           : 'bg-[#15161a] border-[#2e323c] text-content-muted hover:text-white'
                       }`}
@@ -212,18 +253,6 @@ export function EpisodeTrackingModalContent({
                     >
                       <Check className="w-3.5 h-3.5" />
                       <span>Watched</span>
-                    </button>
-                    <button
-                      type="button"
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] border font-mono text-xs font-semibold transition-colors cursor-pointer ${
-                        form.state.values.status === 'watching'
-                          ? 'bg-[#0f2e2b] border-[#134e4a] text-[#2dd4bf]'
-                          : 'bg-[#15161a] border-[#2e323c] text-content-muted hover:text-white'
-                      }`}
-                      onClick={handleMarkUnwatched}
-                    >
-                      <Play className="w-3.5 h-3.5" />
-                      <span>In Progress</span>
                     </button>
                   </div>
                 </PropertyRow>
@@ -256,7 +285,7 @@ export function EpisodeTrackingModalContent({
                   />
                 </PropertyRow>
 
-                {form.state.values.status === 'completed' && (
+                {status === 'completed' && (
                   <PropertyRow icon={<Clock className="w-4 h-4" />} label="Session End">
                     <form.Field
                       name="end_date"
@@ -271,7 +300,7 @@ export function EpisodeTrackingModalContent({
                   </PropertyRow>
                 )}
 
-                {form.state.values.status === 'watching' && (
+                {status === 'watching' && (
                   <PropertyRow icon={<Clock className="w-4 h-4" />} label="Pause Position">
                     <form.Field
                       name="current_position"
@@ -304,7 +333,7 @@ export function EpisodeTrackingModalContent({
 
               {/* Notes */}
               <div className="space-y-2 pt-4 border-t border-[#242730]">
-                <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-content-muted/40 px-1">
+                <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#6b7280] px-1">
                   <AlignLeft className="w-3.5 h-3.5" />
                   <span>Episode Thoughts</span>
                 </div>

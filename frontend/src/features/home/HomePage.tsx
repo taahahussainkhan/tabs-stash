@@ -2,13 +2,56 @@ import { useNavigate } from 'react-router-dom'
 import { useDashboardQuery } from '../../services/dashboardService'
 import { ItemSummaryCard } from './components/ItemSummaryCard'
 import { useAddContentModal } from './hooks/useAddContentModal'
-import { useCreateMovieMutation, useCreateWatchlistMovieMutation } from '../movies/hooks/useMovieQueries'
-import { useCreateSeriesMutation } from '../series/hooks/useSeriesQueries'
+import { useCreateMovieMutation, useCreateWatchlistMovieMutation } from '../movies/hooks/useMoviesQuery'
+import { useCreateSeriesMutation, useCreateWatchlistSeriesMutation } from '../series/hooks/useSeriesQuery'
 import { Play, Star, Bookmark, Plus, BookOpen, Film, Tv, ArrowRight, Layers } from 'lucide-react'
 import type { MovieSchemaData } from '../movies/schemas/movieSchema'
 import { AddContentModal } from './components/AddContentModal'
-import type { AddToWatchlistSchemaData } from '../movies/schemas/addToWatchlistSchema'
+import type { WatchlistMovieData } from '../../shared/components/modals/AddToWatchlistModalContent'
+import { mediaCatalogService } from '../../services/mediaCatalogService'
 import { EmptyState } from '../../shared/components/common/EmptyState'
+
+function DashboardSkeleton() {
+  return (
+    <div className="w-full space-y-8 page-fade-in animate-pulse">
+      {/* Top Banner Skeleton */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#2e323c]">
+        <div className="space-y-2">
+          <div className="h-3.5 w-36 bg-[#1e2026] rounded" />
+          <div className="h-8 w-72 bg-[#1e2026] rounded" />
+          <div className="h-3 w-56 bg-[#1e2026] rounded" />
+        </div>
+        <div className="flex gap-2.5">
+          <div className="h-8 w-28 bg-[#1e2026] rounded" />
+          <div className="h-8 w-28 bg-[#1e2026] rounded" />
+        </div>
+      </div>
+
+      {/* Stats Grid Skeleton */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="bg-[#1e2026] border border-[#2e323c] rounded-[6px] p-4 flex items-center justify-between h-20">
+            <div className="space-y-2">
+              <div className="h-2.5 w-24 bg-[#262830] rounded" />
+              <div className="h-6 w-12 bg-[#262830] rounded" />
+            </div>
+            <div className="w-9 h-9 rounded-[4px] bg-[#121316] border border-[#2e323c]" />
+          </div>
+        ))}
+      </div>
+
+      {/* Media Cards Skeleton */}
+      <div className="space-y-4 pt-4">
+        <div className="h-5 w-48 bg-[#1e2026] rounded" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="h-28 bg-[#1e2026] border border-[#2e323c] rounded-[6px]" />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export function HomePage() {
   const navigate = useNavigate()
@@ -25,6 +68,7 @@ export function HomePage() {
   const createMovieMutation = useCreateMovieMutation()
   const createSeriesMutation = useCreateSeriesMutation()
   const createWatchlistMovieMutation = useCreateWatchlistMovieMutation()
+  const createWatchlistSeriesMutation = useCreateWatchlistSeriesMutation()
 
   const handleAddMovie = async (movieData: MovieSchemaData) => {
     await createMovieMutation.mutateAsync(movieData)
@@ -37,7 +81,7 @@ export function HomePage() {
       creator: data.creator,
       year: data.year,
       genre: data.genre,
-      status: 'watching',
+      status: data.status || 'to_watch',
       start_date: new Date().toISOString().slice(0, 16),
       is_rewatch: false,
       seasons: data.seasons,
@@ -45,8 +89,66 @@ export function HomePage() {
     refetch() 
   }
 
-  const handleAddToWatchlist = async (data: AddToWatchlistSchemaData) => {
-    await createWatchlistMovieMutation.mutateAsync(data)
+  const handleAddMovieToWatchlist = async (data: WatchlistMovieData) => {
+    await createWatchlistMovieMutation.mutateAsync({
+      title: data.title,
+      director: data.director || '',
+      year: data.year ?? null,
+      genre: data.genre || '',
+      posterImage: data.posterImage,
+      externalId: data.externalId,
+    })
+    refetch() 
+  }
+
+  const handleAddSeriesToWatchlist = async (data: WatchlistMovieData) => {
+    let seasons = data.seasons?.map((s) => ({
+      seasonNumber: s.seasonNumber,
+      episodeCount: s.episodeCount,
+      title: s.title || `Season ${s.seasonNumber}`,
+      year: s.year || data.year,
+      episodes: s.episodes,
+    }))
+
+    let posterImage = data.posterImage
+    let externalId = data.externalId
+
+    if (!seasons || seasons.length === 0) {
+      try {
+        const searchResults = await mediaCatalogService.search(data.title, 'series')
+        if (searchResults && searchResults.length > 0) {
+          const match = searchResults.find(r => r.title.toLowerCase() === data.title.toLowerCase()) || searchResults[0]
+          const details = await mediaCatalogService.getDetails(match.id, 'series')
+          if (details?.seasons && details.seasons.length > 0) {
+            seasons = details.seasons.map((s) => ({
+              seasonNumber: s.seasonNumber,
+              episodeCount: s.episodeCount,
+              title: s.title || `Season ${s.seasonNumber}`,
+              year: s.year || data.year,
+              episodes: s.episodes,
+            }))
+          }
+          if (!posterImage && details?.posterUrl) {
+            posterImage = details.posterUrl
+          }
+          if (!externalId && details?.id) {
+            externalId = details.id
+          }
+        }
+      } catch (err) {
+        console.warn('[HomePage] Auto-fetch seasons fallback error:', err)
+      }
+    }
+
+    await createWatchlistSeriesMutation.mutateAsync({
+      title: data.title,
+      creator: data.director,
+      year: data.year,
+      genre: data.genre,
+      posterImage,
+      externalId,
+      seasons: seasons && seasons.length > 0 ? seasons : undefined,
+    })
     refetch() 
   }
 
@@ -61,20 +163,15 @@ export function HomePage() {
     } else {
       openContentSelector(
         'watchlist',
-        () => handleSelectMovieWatchlist(handleAddToWatchlist),
-        () => handleSelectSeriesWatchlist(handleAddToWatchlist),
+        () => handleSelectMovieWatchlist(handleAddMovieToWatchlist),
+        () => handleSelectSeriesWatchlist(handleAddSeriesToWatchlist),
         () => handleSelectBook()
       )
     }
   }
 
   if (loading) {
-    return (
-      <div className="w-full py-32 flex flex-col items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#2e323c] border-t-accent-vermillion rounded-full animate-spin mb-4" />
-        <p className="text-xs font-mono text-content-muted uppercase tracking-widest">Accessing Archives...</p>
-      </div>
-    )
+    return <DashboardSkeleton />
   }
 
   if (error || !dashboardData) {
@@ -99,7 +196,7 @@ export function HomePage() {
           <div className="flex items-center gap-2 mb-2">
             <span className="w-2 h-2 rounded-full bg-accent-vermillion"></span>
             <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-accent-ochre">
-              Chronicle Archive &bull; Dashboard
+              Lore Archive &bull; Dashboard
             </span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-content-primary">
@@ -193,8 +290,8 @@ export function HomePage() {
           <EmptyState
             icon={Layers}
             badge="DASHBOARD ARCHIVE"
-            title="Your Chronicle is Waiting"
-            description="Your media vault currently has no active in-progress sessions, completions, or queued items. Begin chronicling your collection across books, films, and series."
+            title="Your Lore is Waiting"
+            description="Your media vault currently has no active in-progress sessions, completions, or queued items. Begin building your collection across tabs, books, films, and series."
             accent="vermillion"
             actionText="Log Content"
             onAction={() => openAddSelector('add')}

@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { MessageSquare, Info, Plus, Tv } from 'lucide-react'
+import { MessageSquare, Info, Plus, Tv, Sparkles } from 'lucide-react'
 import { Breadcrumbs } from '../../shared/components/common/Breadcrumbs'
-import { seriesService } from '../../services/seriesService'
-import { useSeasonsQuery, useCreateSeasonMutation } from '../../services/seasonEpisodeService'
+import { seriesApi } from './api/seriesApi'
+import { useSeasonsQuery, useCreateSeasonMutation, useSyncCatalogMutation } from '../../services/seasonEpisodeService'
 import { LoadingSpinner } from '../../shared/components/common/LoadingSpinner'
 import { SeasonAccordion } from './components/SeasonAccordion'
 import { useModal } from '../../shared/hooks/useModal'
@@ -21,12 +21,13 @@ export function SeriesDetailPage() {
 
   const { data: seriesData, isLoading: seriesLoading } = useQuery({
     queryKey: ['series', seriesId],
-    queryFn: () => seriesService.getById(seriesId!),
+    queryFn: () => seriesApi.getOne(seriesId!),
     enabled: !!seriesId,
   })
 
   const { data: seasons, isLoading: seasonsLoading, error } = useSeasonsQuery(seriesId!)
   const createSeasonMutation = useCreateSeasonMutation(seriesId!)
+  const syncCatalogMutation = useSyncCatalogMutation(seriesId!)
 
   const isLoading = seriesLoading || seasonsLoading
 
@@ -81,7 +82,7 @@ export function SeriesDetailPage() {
       async (data) => {
         await createSeasonMutation.mutateAsync(data)
       },
-      seasons?.map(s => s.season.season_number) || []
+      seasons?.map(s => s.season?.season_number || (s as any).season_number || 1) || []
     )
   }
 
@@ -97,6 +98,16 @@ export function SeriesDetailPage() {
           ]}
         />
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => syncCatalogMutation.mutate()}
+            disabled={syncCatalogMutation.isPending}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-[#1e2026] hover:bg-[#262830] border border-[#2e323c] text-xs font-semibold text-accent-ochre hover:text-white transition-colors disabled:opacity-50"
+            title="Fetch latest seasons & episodes from media catalog"
+          >
+            <Sparkles className={`w-3.5 h-3.5 ${syncCatalogMutation.isPending ? 'animate-spin' : ''}`} />
+            <span>{syncCatalogMutation.isPending ? 'Syncing...' : 'Sync Catalog'}</span>
+          </button>
+
           <button
             onClick={handleShowComments}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-[#1e2026] hover:bg-[#262830] border border-[#2e323c] text-xs font-semibold text-content-secondary hover:text-white transition-colors"
@@ -117,20 +128,29 @@ export function SeriesDetailPage() {
 
       {/* Series Hero Card */}
       <div className="bg-[#1e2026] border border-[#2e323c] rounded-[6px] p-5 space-y-4">
-        <div>
-          <div className="flex flex-wrap items-center gap-1.5 font-mono mb-2">
-            <span className="mono-badge mono-badge-ochre text-[10px]">SERIES</span>
-            {seriesData.genre && (
-              <span className="mono-badge mono-badge-neutral text-[10px]">{seriesData.genre}</span>
-            )}
-            {seriesData.year && (
-              <span className="mono-badge mono-badge-neutral text-[10px]">{seriesData.year}</span>
+        <div className="flex flex-col sm:flex-row gap-5 items-start">
+          {(seriesData.poster_image || seriesData.posterImage) && (
+            <img
+              src={seriesData.poster_image || seriesData.posterImage}
+              alt={seriesData.title}
+              className="w-24 h-36 object-cover rounded-[4px] border border-[#2e323c] shadow-md flex-shrink-0"
+            />
+          )}
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 font-mono mb-2">
+              <span className="mono-badge mono-badge-ochre text-[10px]">SERIES</span>
+              {seriesData.genre && (
+                <span className="mono-badge mono-badge-neutral text-[10px]">{seriesData.genre}</span>
+              )}
+              {seriesData.year && (
+                <span className="mono-badge mono-badge-neutral text-[10px]">{seriesData.year}</span>
+              )}
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-content-primary tracking-tight">{seriesData.title}</h1>
+            {seriesData.creator && (
+              <p className="text-xs font-mono text-content-muted mt-1">Creator: {seriesData.creator}</p>
             )}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-content-primary tracking-tight">{seriesData.title}</h1>
-          {seriesData.creator && (
-            <p className="text-xs font-mono text-content-muted mt-1">Creator: {seriesData.creator}</p>
-          )}
         </div>
 
         {/* Stats Grid */}
@@ -181,22 +201,27 @@ export function SeriesDetailPage() {
           icon={Tv}
           badge="SEASON REGISTRY"
           title="No Seasons Cataloged"
-          description="This series is waiting for its first season structure and episode logs."
+          description="This series is waiting for its season structure and episode logs. You can auto-fill all seasons from the media catalog or add them manually."
           accent="ochre"
-          actionText="Add Season 1"
-          onAction={handleAddSeason}
+          actionText={syncCatalogMutation.isPending ? 'Syncing Seasons...' : 'Auto-Fill from Catalog'}
+          onAction={() => syncCatalogMutation.mutate()}
+          secondaryActionText="Add Season Manually"
+          onSecondaryAction={handleAddSeason}
           compact={true}
         />
       ) : (
         <div className="space-y-3">
-          {seasons.map((seasonWithProgress) => (
-            <SeasonAccordion
-              key={seasonWithProgress.season.public_id}
-              seasonWithProgress={seasonWithProgress}
-              seriesPublicId={seriesId!}
-              seriesTitle={seriesData.title}
-            />
-          ))}
+          {seasons.map((seasonWithProgress, idx) => {
+            const seasonKey = seasonWithProgress.season?.public_id || (seasonWithProgress as any).public_id || `season-${idx}`
+            return (
+              <SeasonAccordion
+                key={seasonKey}
+                seasonWithProgress={seasonWithProgress}
+                seriesPublicId={seriesId!}
+                seriesTitle={seriesData.title}
+              />
+            )
+          })}
         </div>
       )}
     </div>

@@ -12,10 +12,10 @@ export function LoginPage() {
             <Bookmark className="w-6 h-6 text-accent-vermillion" />
           </div>
           <h1 className="text-2xl font-bold text-content-primary tracking-tight">
-            Chronicle Vault
+            Lore Archive
           </h1>
           <p className="text-content-muted font-mono text-xs uppercase tracking-wider">
-            Sign in to access your personal archive
+            Sign in to access your personal assistant &amp; archive
           </p>
         </div>
 
@@ -49,7 +49,7 @@ export function LoginPage() {
 
         {/* Footer text */}
         <p className="text-center text-[10px] font-mono text-content-muted uppercase tracking-widest">
-          Personal Media &amp; Literature Chronicle
+          Lore &bull; Personal Assistant &amp; Life Archive
         </p>
       </div>
     </div>

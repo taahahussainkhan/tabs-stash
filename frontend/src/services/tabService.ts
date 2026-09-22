@@ -46,7 +46,30 @@ export interface SavedLink {
   updatedAt?: number;
 }
 
-const LOCAL_LINKS_KEY = 'tabvault_saved_links';
+const LOCAL_LINKS_KEY = 'lore_saved_links';
+const LEGACY_LOCAL_LINKS_KEY = 'tabvault_saved_links';
+const LOCAL_SESSIONS_KEY = 'lore_saved_sessions';
+const LEGACY_LOCAL_SESSIONS_KEY = 'tabvault_saved_sessions';
+
+function getStoredSessions(): StashedSession[] {
+  const local = localStorage.getItem(LOCAL_SESSIONS_KEY) || localStorage.getItem(LEGACY_LOCAL_SESSIONS_KEY);
+  return local ? JSON.parse(local) : [];
+}
+
+function setStoredSessions(sessions: StashedSession[]): void {
+  localStorage.setItem(LOCAL_SESSIONS_KEY, JSON.stringify(sessions));
+  localStorage.setItem(LEGACY_LOCAL_SESSIONS_KEY, JSON.stringify(sessions));
+}
+
+function getStoredLinks(): SavedLink[] {
+  const local = localStorage.getItem(LOCAL_LINKS_KEY) || localStorage.getItem(LEGACY_LOCAL_LINKS_KEY);
+  return local ? JSON.parse(local) : [];
+}
+
+function setStoredLinks(links: SavedLink[]): void {
+  localStorage.setItem(LOCAL_LINKS_KEY, JSON.stringify(links));
+  localStorage.setItem(LEGACY_LOCAL_LINKS_KEY, JSON.stringify(links));
+}
 
 export const tabService = {
   // --- Sessions ---
@@ -62,8 +85,7 @@ export const tabService = {
       return [];
     } catch {
       // Fallback local storage if offline / not logged in
-      const local = localStorage.getItem('tabvault_saved_sessions');
-      return local ? JSON.parse(local) : [];
+      return getStoredSessions();
     }
   },
 
@@ -72,14 +94,8 @@ export const tabService = {
       await api.delete(`/sync/sessions/${sessionId}`);
     } catch {
       // Fallback local storage
-      const local = localStorage.getItem('tabvault_saved_sessions');
-      if (local) {
-        const sessions: StashedSession[] = JSON.parse(local);
-        localStorage.setItem(
-          'tabvault_saved_sessions',
-          JSON.stringify(sessions.filter((s) => s.id !== sessionId && s.sessionId !== sessionId))
-        );
-      }
+      const sessions = getStoredSessions();
+      setStoredSessions(sessions.filter((s) => s.id !== sessionId && s.sessionId !== sessionId));
     }
   },
 
@@ -87,8 +103,10 @@ export const tabService = {
     try {
       await api.delete('/sync/clear-all');
     } catch {
-      localStorage.removeItem('tabvault_saved_sessions');
+      localStorage.removeItem(LOCAL_SESSIONS_KEY);
+      localStorage.removeItem(LEGACY_LOCAL_SESSIONS_KEY);
       localStorage.removeItem(LOCAL_LINKS_KEY);
+      localStorage.removeItem(LEGACY_LOCAL_LINKS_KEY);
     }
   },
 
@@ -102,8 +120,7 @@ export const tabService = {
       return [];
     } catch {
       // Fallback local storage
-      const local = localStorage.getItem(LOCAL_LINKS_KEY);
-      return local ? JSON.parse(local) : [];
+      return getStoredLinks();
     }
   },
 
@@ -132,7 +149,7 @@ export const tabService = {
       // Fallback local storage
       const current = await this.getSavedLinks();
       current.unshift(newLink);
-      localStorage.setItem(LOCAL_LINKS_KEY, JSON.stringify(current));
+      setStoredLinks(current);
     }
 
     return newLink;
@@ -148,7 +165,7 @@ export const tabService = {
         target.isRead = isRead;
         target.readAt = isRead ? Date.now() : null;
         target.updatedAt = Date.now();
-        localStorage.setItem(LOCAL_LINKS_KEY, JSON.stringify(current));
+        setStoredLinks(current);
       }
     }
   },
@@ -159,7 +176,7 @@ export const tabService = {
     } catch {
       const current = await this.getSavedLinks();
       const filtered = current.filter((l) => l.id !== linkId);
-      localStorage.setItem(LOCAL_LINKS_KEY, JSON.stringify(filtered));
+      setStoredLinks(filtered);
     }
   },
 
@@ -201,7 +218,7 @@ export const tabService = {
     } catch {
       const sessions = await this.getSessions();
       sessions.unshift(newSession);
-      localStorage.setItem('tabvault_saved_sessions', JSON.stringify(sessions));
+      setStoredSessions(sessions);
     }
 
     // Mark converted links as read
@@ -212,6 +229,6 @@ export const tabService = {
         l.readAt = Date.now();
       }
     });
-    localStorage.setItem(LOCAL_LINKS_KEY, JSON.stringify(links));
+    setStoredLinks(links);
   },
 };

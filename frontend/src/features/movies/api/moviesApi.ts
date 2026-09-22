@@ -14,43 +14,51 @@ import type {
 import type { MovieSchemaData } from '../schemas/movieSchema'
 
 // Mappers
-function mapMovieWithCurrentSessionToMovieLog(item: MovieWithCurrentSessionOut): MovieLog {
-  const { movie, current_session } = item
+function mapMovieWithCurrentSessionToMovieLog(item: any): MovieLog {
+  const movie = item.movie || item
+  const current_session = item.current_session || item.currentSessionId || movie?.currentSessionId
+
+  const id = movie?.public_id || movie?.publicId || movie?.id || item?.public_id || item?.publicId || item?.id || ''
 
   return {
-    id: movie.public_id, // Map public_id to id
-    title: movie.title,
-    director: movie.director ?? undefined,
-    year: movie.year ?? undefined,
-    genre: movie.genre ?? undefined,
-    poster_image: movie.poster_image ?? undefined,
-    platform: undefined,
+    id,
+    public_id: id,
+    title: movie?.title || item.title || '',
+    director: movie?.director ?? item.director ?? undefined,
+    year: movie?.year ?? item.year ?? undefined,
+    genre: movie?.genre ?? item.genre ?? undefined,
+    poster_image: movie?.poster_image || movie?.posterImage || item.poster_image || item.posterImage || undefined,
+    platform: movie?.platform || item.platform || undefined,
     rating: current_session?.rating ?? undefined,
     notes: current_session?.notes ?? undefined,
-    status: current_session?.status ?? 'watching',
-    start_date: current_session?.start_date ?? movie.created_at,
-    end_date: current_session?.end_date ?? null,
-    current_timestamp: current_session?.current_position ?? undefined,
-    stop_reason: current_session?.stop_reason ?? undefined,
-    is_rewatch: current_session?.is_rewatch ?? false,
-    is_favorite: movie.is_favorite ?? false,
-    is_watchlist: movie.is_watchlist ?? false,
-    created_at: movie.created_at,
-    updated_at: movie.updated_at,
-    rewatch_count: item.rewatch_count,
+    status: current_session?.status ?? movie?.status ?? 'to_watch',
+    start_date: current_session?.start_date || current_session?.startDate || movie?.created_at || movie?.createdAt || item.created_at || item.createdAt || new Date().toISOString(),
+    end_date: current_session?.end_date || current_session?.endDate || null,
+    current_timestamp: current_session?.current_position ?? current_session?.currentPosition ?? undefined,
+    stop_reason: current_session?.stop_reason || current_session?.stopReason || undefined,
+    is_rewatch: current_session?.is_rewatch ?? current_session?.isRewatch ?? false,
+    is_favorite: movie?.is_favorite ?? movie?.isFavorite ?? item.is_favorite ?? item.isFavorite ?? false,
+    is_watchlist: movie?.is_watchlist ?? movie?.isWatchlist ?? item.is_watchlist ?? item.isWatchlist ?? false,
+    created_at: movie?.created_at || movie?.createdAt || item.created_at || item.createdAt || new Date().toISOString(),
+    updated_at: movie?.updated_at || movie?.updatedAt || item.updated_at || item.updatedAt || new Date().toISOString(),
+    rewatch_count: item.rewatch_count || 0,
   }
 }
 
-function mapMovieWithSessionsToMovieLog(item: MovieWithSessionsOut): MovieLog {
-  const { movie, current_session, sessions } = item
-  const rewatch_count = sessions.reduce(
-    (count, s) => count + (s.is_rewatch ? 1 : 0),
-    0,
-  )
+function mapMovieWithSessionsToMovieLog(item: any): MovieLog {
+  const movie = item.movie || item
+  const current_session = item.current_session || item.currentSessionId
+  const sessions = item.sessions || []
+  const rewatch_count = Array.isArray(sessions)
+    ? sessions.reduce(
+        (count: number, s: any) => count + (s.is_rewatch || s.isRewatch ? 1 : 0),
+        0,
+      )
+    : 0
   return mapMovieWithCurrentSessionToMovieLog({ movie, current_session, rewatch_count })
 }
 
-function convertFormDataToMovieCreate(formData: MovieSchemaData): MovieLogCreate {
+function convertFormDataToMovieCreate(formData: MovieSchemaData): any {
   return {
     title: formData.title,
     director: formData.director || undefined,
@@ -60,11 +68,19 @@ function convertFormDataToMovieCreate(formData: MovieSchemaData): MovieLogCreate
     rating: formData.rating || undefined,
     notes: formData.notes || undefined,
     status: formData.status,
+    startDate: formData.start_date,
     start_date: formData.start_date,
+    endDate: formData.end_date || null,
     end_date: formData.end_date || null,
+    currentTimestamp: formData.current_timestamp || undefined,
     current_timestamp: formData.current_timestamp || undefined,
+    stopReason: formData.stop_reason || undefined,
     stop_reason: formData.stop_reason || undefined,
+    isRewatch: formData.is_rewatch,
     is_rewatch: formData.is_rewatch,
+    posterImage: (formData as any).poster_image || (formData as any).posterImage || undefined,
+    durationMinutes: (formData as any).duration_minutes || (formData as any).durationMinutes || undefined,
+    externalId: (formData as any).externalId || (formData as any).external_id || undefined,
   }
 }
 
@@ -120,28 +136,37 @@ export const moviesApi = {
     const movieData = convertFormDataToMovieCreate(movie)
     const movieDataWithDates = {
       ...movieData,
-      start_date: new Date(movieData.start_date).toISOString(),
+      startDate: movieData.startDate ? new Date(movieData.startDate).toISOString() : new Date().toISOString(),
+      endDate: movieData.endDate ? new Date(movieData.endDate).toISOString() : null,
+      start_date: movieData.start_date ? new Date(movieData.start_date).toISOString() : new Date().toISOString(),
       end_date: movieData.end_date ? new Date(movieData.end_date).toISOString() : null,
     }
     const { data } = await api.post<MovieWithSessionsOut>('/logging/movies', movieDataWithDates)
     return mapMovieWithSessionsToMovieLog(data)
   },
 
-  createWatchlist: async (data: { title: string; director?: string; year?: number; genre?: string }): Promise<MovieLog> => {
+  createWatchlist: async (data: {
+    title: string
+    director?: string
+    year?: number
+    genre?: string
+    posterImage?: string
+    externalId?: string
+  }): Promise<MovieLog> => {
     const movieData = {
-      ...data,
+      title: data.title,
+      director: data.director || undefined,
+      year: data.year || undefined,
+      genre: data.genre || undefined,
+      posterImage: data.posterImage || undefined,
+      externalId: data.externalId || undefined,
       status: 'paused' as const,
-      start_date: new Date().toISOString(),
-      is_rewatch: false,
+      startDate: new Date().toISOString(),
+      isWatchlist: true,
+      isRewatch: false,
     }
     const { data: response } = await api.post<MovieWithSessionsOut>('/logging/movies', movieData)
-    
-    await api.patch(`/logging/movies/${response.movie.public_id}/watchlist`, null, {
-      params: { is_watchlist: true }
-    })
-    
-    const { data: updated } = await api.get<MovieWithSessionsOut>(`/logging/movies/${response.movie.public_id}`)
-    return mapMovieWithSessionsToMovieLog(updated)
+    return mapMovieWithSessionsToMovieLog(response)
   },
 
   update: async (id: string, movie: MovieSchemaData): Promise<MovieLog> => {

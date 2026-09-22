@@ -10,12 +10,12 @@ interface PasswordChangeModalContentProps {
 }
 
 export function PasswordChangeModalContent({ onClose }: PasswordChangeModalContentProps) {
-  const form = useForm<PasswordChangeSchemaData>({
+  const form = useForm({
     defaultValues: {
       current_password: '',
       new_password: '',
       confirm_password: '',
-    } satisfies PasswordChangeSchemaData,
+    } as PasswordChangeSchemaData,
     validators: {
       onChange: passwordChangeSchema,
     },

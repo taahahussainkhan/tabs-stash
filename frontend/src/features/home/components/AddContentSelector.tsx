@@ -46,7 +46,7 @@ export function AddContentSelector({
   return (
     <div className="space-y-4">
       <p className="text-xs text-content-secondary font-sans">
-        Select media type to record into your local chronicle:
+        Select media type to record into your personal lore:
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">

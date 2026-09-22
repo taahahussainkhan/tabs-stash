@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useMovieWithSessionsQuery, useSessionCommentsQuery } from '../hooks/useMovieQueries'
+import { useMovieWithSessionsQuery, useSessionCommentsQuery } from '../hooks/useMoviesQuery'
 import { CommentItem } from '../../../shared/components/common/CommentItem'
 import { ChevronDown, ChevronRight, Calendar, Star, MessageCircle, Clock, Film, X } from 'lucide-react'
 import { formatDateTime } from '../../../shared/utils/date'

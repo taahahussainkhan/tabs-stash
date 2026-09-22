@@ -24,7 +24,7 @@ export function AddContentModal({
 
   const isWatchlistMode = mode === 'watchlist'
   const title = isWatchlistMode ? 'The Queue' : 'New Entry'
-  const subtitle = isWatchlistMode ? 'Save a narrative for a future chapter' : 'Select a medium to chronicle your journey'
+  const subtitle = isWatchlistMode ? 'Save a narrative for a future chapter' : 'Select a medium to record in your personal lore'
 
   const contentTypes = [
     {

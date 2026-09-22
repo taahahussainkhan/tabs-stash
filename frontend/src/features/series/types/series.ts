@@ -34,6 +34,8 @@ export interface SeriesLog {
   creator?: string
   year?: number
   genre?: string
+  poster_image?: string
+  posterImage?: string
   platform?: string
   rating?: number
   notes?: string
@@ -82,6 +84,7 @@ export interface SeriesStats {
 
 export interface SessionHistory {
   sessionId: string // Renamed from sessionPublicId for consistency
+  sessionPublicId?: string
   status: SeriesStatus
   startDate: string
   endDate?: string | null
@@ -103,6 +106,8 @@ export interface SeriesOut {
   creator?: string | null
   year?: number | null
   genre?: string | null
+  poster_image?: string | null
+  posterImage?: string | null
   is_favorite?: boolean
   is_watchlist?: boolean
   created_at: string

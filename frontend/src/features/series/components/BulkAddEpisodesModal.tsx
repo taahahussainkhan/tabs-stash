@@ -13,11 +13,11 @@ interface BulkAddEpisodesModalProps {
 export function BulkAddEpisodesModal({ seasonPublicId, seriesPublicId, onClose }: BulkAddEpisodesModalProps) {
   const bulkCreateMutation = useBulkCreateEpisodesMutation(seasonPublicId, seriesPublicId)
 
-  const form = useForm<BulkAddEpisodesSchemaData>({
+  const form = useForm({
     defaultValues: {
       start_episode: 1,
       end_episode: 10,
-    } satisfies BulkAddEpisodesSchemaData,
+    } as BulkAddEpisodesSchemaData,
     validators: {
       onChange: bulkAddEpisodesSchema,
     },

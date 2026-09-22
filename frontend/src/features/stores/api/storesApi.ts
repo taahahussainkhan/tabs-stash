@@ -10,11 +10,11 @@ export const storesApi = {
         const { data: response } = await api.post<Store>('/stores', data)
         return response
     },
-    update: async (id: number, data: StoreCreate) => {
+    update: async (id: number | string, data: StoreCreate) => {
         const { data: response } = await api.put<Store>(`/stores/${id}`, data)
         return response
     },
-    delete: async (id: number) => {
+    delete: async (id: number | string) => {
         await api.delete(`/stores/${id}`)
     }
 }

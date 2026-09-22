@@ -11,7 +11,7 @@ import {
   useCreateWatchlistSeriesMutation, 
   useToggleFavoriteSeriesMutation, 
   useToggleWatchlistSeriesMutation 
-} from './useSeriesQueries'
+} from './useSeriesQuery'
 import type { SeriesLog, PaginationParams } from '../types/series'
 import type { MovieSchemaData } from '../../movies/schemas/movieSchema'
 import { useFilterModal } from '../../../shared/hooks/useFilterModal'
@@ -21,7 +21,8 @@ import { useSettings } from '../../../shared/hooks/useSettings'
 import { useConfirmation } from '../../../shared/hooks/useConfirmation'
 import { useSearchParamsState } from '../../../shared/hooks/useSearchParamsState'
 import { useAddSeriesModal } from './useAddSeriesModal'
-import { seriesService } from '../../../services/seriesService'
+import { seriesApi } from '../api/seriesApi'
+import { mediaCatalogService } from '../../../services/mediaCatalogService'
 import { toast } from 'sonner'
 
 type PageConfig = {
@@ -78,6 +79,7 @@ export function useSeriesPageController(args: { pathname: string; pageConfig: Pa
     creator?: string
     year?: number
     genre?: string
+    status?: string
     seasons: Array<{ season_number: number; episode_count: number; title?: string; year?: number }>
   }) => {
     await createSeriesMutation.mutateAsync({
@@ -85,7 +87,7 @@ export function useSeriesPageController(args: { pathname: string; pageConfig: Pa
       creator: data.creator,
       year: data.year,
       genre: data.genre,
-      status: 'watching',
+      status: data.status || 'to_watch',
       start_date: new Date().toISOString().slice(0, 16),
       is_rewatch: false,
       seasons: data.seasons,
@@ -128,8 +130,8 @@ export function useSeriesPageController(args: { pathname: string; pageConfig: Pa
   const handleRewatchSeries = useCallback((seriesItem: SeriesLog) => {
     openAddMovieModal(async (seriesData: MovieSchemaData) => {
       await startRewatchMutation.mutateAsync({
-        seriesId: seriesItem.id,
-        seriesData: {
+        id: seriesItem.id,
+        data: {
           ...seriesData,
           is_rewatch: true,
           status: seriesData.status || 'rewatching',
@@ -143,7 +145,7 @@ export function useSeriesPageController(args: { pathname: string; pageConfig: Pa
 
   const handleAddComments = useCallback(async (seriesItem: SeriesLog) => {
     try {
-      const seriesData = await seriesService.getSeriesSessionsWithComments(seriesItem.id)
+      const seriesData = await seriesApi.getSessionsWithComments(seriesItem.id)
       const sessions = seriesData.sessions
       const currentSession = sessions[sessions.length - 1]
 
@@ -184,20 +186,59 @@ export function useSeriesPageController(args: { pathname: string; pageConfig: Pa
 
   const handleAddToWatchlist = useCallback(() => {
     openAddToWatchlistModal(async (data) => {
-      await createWatchlistSeriesMutation.mutateAsync(data)
+      let seasons = data.seasons?.map((s) => ({
+        seasonNumber: s.seasonNumber,
+        episodeCount: s.episodeCount,
+        title: s.title || `Season ${s.seasonNumber}`,
+        year: s.year || data.year,
+      }))
+
+      let posterImage = data.posterImage
+
+      if (!seasons || seasons.length === 0) {
+        try {
+          const searchResults = await mediaCatalogService.search(data.title, 'series')
+          if (searchResults.length > 0) {
+            const match = searchResults.find(r => r.title.toLowerCase() === data.title.toLowerCase()) || searchResults[0]
+            const details = await mediaCatalogService.getDetails(match.id, 'series')
+            if (details?.seasons && details.seasons.length > 0) {
+              seasons = details.seasons.map((s) => ({
+                seasonNumber: s.seasonNumber,
+                episodeCount: s.episodeCount,
+                title: s.title || `Season ${s.seasonNumber}`,
+                year: s.year || data.year,
+              }))
+            }
+            if (!posterImage && details?.posterUrl) {
+              posterImage = details.posterUrl
+            }
+          }
+        } catch (err) {
+          console.warn('[useSeriesPageController] Auto-fetch seasons fallback error:', err)
+        }
+      }
+
+      await createWatchlistSeriesMutation.mutateAsync({
+        title: data.title,
+        creator: data.director,
+        year: data.year,
+        genre: data.genre,
+        posterImage,
+        seasons: seasons && seasons.length > 0 ? seasons : undefined,
+      })
     }, 'series')
   }, [createWatchlistSeriesMutation, openAddToWatchlistModal])
 
   const handleToggleFavorite = useCallback(async (seriesItem: SeriesLog) => {
     await toggleFavoriteMutation.mutateAsync({
-      seriesId: seriesItem.id,
+      id: seriesItem.id,
       isFavorite: !seriesItem.is_favorite,
     })
   }, [toggleFavoriteMutation])
 
   const handleToggleWatchlist = useCallback(async (seriesItem: SeriesLog) => {
     await toggleWatchlistMutation.mutateAsync({
-      seriesId: seriesItem.id,
+      id: seriesItem.id,
       isWatchlist: !seriesItem.is_watchlist,
     })
   }, [toggleWatchlistMutation])

@@ -6,6 +6,7 @@ import { Input } from '../../../shared/components/common/form/Input'
 import { PasswordInput } from '../../../shared/components/common/form/PasswordInput'
 import { Mail, User, ArrowRight, CheckCircle2, Lock } from 'lucide-react'
 import { signUpSchema, type SignUpSchemaData } from '../schemas/signUpSchema'
+import { formatFieldError } from '../../../shared/utils/errorUtils'
 
 interface Props {
   onSignedUp?: () => void
@@ -15,14 +16,14 @@ export function SignUpForm({ onSignedUp }: Props) {
   const [success, setSuccess] = useState<string | null>(null)
   const { signup } = useAuth()
 
-  const form = useForm<SignUpSchemaData>({
+  const form = useForm({
     defaultValues: {
       first_name: '',
       last_name: '',
       username: '',
       email: '',
       password: '',
-    } satisfies SignUpSchemaData,
+    } as SignUpSchemaData,
     validators: {
       onChange: signUpSchema,
     },
@@ -120,7 +121,7 @@ export function SignUpForm({ onSignedUp }: Props) {
           name="email"
           children={(field) => {
             const error = field.state.meta.isTouched && !field.state.meta.isValid
-              ? field.state.meta.errors.map(String).join(', ')
+              ? formatFieldError(field.state.meta.errors)
               : undefined
 
             return (
@@ -146,7 +147,7 @@ export function SignUpForm({ onSignedUp }: Props) {
             name="password"
             children={(field) => {
               const error = field.state.meta.isTouched && !field.state.meta.isValid
-                ? field.state.meta.errors.map(String).join(', ')
+                ? formatFieldError(field.state.meta.errors)
                 : undefined
 
               return (

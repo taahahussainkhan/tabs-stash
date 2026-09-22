@@ -42,7 +42,11 @@ export function Input({
     rounded === 'full' ? 'rounded-full' :
     'rounded-[4px]'
   
-  const inputBaseClass = `input-modern w-full bg-[#15161a] border border-[#2e323c] focus:border-accent-vermillion text-content-primary transition-colors ${sizeClass} ${roundedClass} ${error ? 'border-danger/60 focus:border-danger' : ''} ${className}`
+  const errorText = typeof error === 'object' && error !== null
+    ? ((error as any).message || (error as any).error || String(error))
+    : error
+
+  const inputBaseClass = `input-modern w-full bg-[#15161a] border border-[#2e323c] focus:border-accent-vermillion text-content-primary transition-colors ${sizeClass} ${roundedClass} ${errorText ? 'border-danger/60 focus:border-danger' : ''} ${className}`
 
   const Label = () => label ? (
     <label className={`label ${labelSize === 'sm' ? 'py-1' : 'pb-1.5'} px-0.5`} htmlFor={inputId}>
@@ -50,9 +54,9 @@ export function Input({
     </label>
   ) : null
 
-  const Error = () => error ? (
+  const Error = () => errorText ? (
     <label className="label pt-1 px-0.5">
-      <span className="text-[11px] font-mono text-danger">{error}</span>
+      <span className="text-[11px] font-mono text-danger">{String(errorText)}</span>
     </label>
   ) : null
 

@@ -3,7 +3,7 @@ import { ShoppingCart, Globe, MapPin, AlignLeft, Plus, X } from 'lucide-react'
 import { PropertyRow, GhostInput, GhostSelect, GhostTextArea } from '../../../shared/components/common/property-sheet'
 import { useModal } from '../../../shared/hooks/useModal'
 import { storeSchema, type StoreSchemaData } from '../schemas/storeSchema'
-import { storeTypeOptions } from '../constants/storeOptions'
+import { storeTypeOptions } from '../constants/storeTypeOptions'
 
 interface AddStoreModalContentProps {
   modalId: string
@@ -14,7 +14,7 @@ interface AddStoreModalContentProps {
 export function AddStoreModalContent({ modalId, onSubmit, initialData }: AddStoreModalContentProps) {
   const { closeModal } = useModal()
 
-  const form = useForm<StoreSchemaData>({
+  const form = useForm({
     defaultValues: {
       name: initialData?.name || '',
       type: initialData?.type || 'PhysicalOnly',
@@ -22,7 +22,7 @@ export function AddStoreModalContent({ modalId, onSubmit, initialData }: AddStor
       physical_address: initialData?.physical_address || '',
       country: initialData?.country || '',
       notes: initialData?.notes || '',
-    },
+    } as StoreSchemaData,
     validators: {
       onChange: storeSchema,
     },

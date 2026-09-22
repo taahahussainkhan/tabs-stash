@@ -13,12 +13,12 @@ interface AddEpisodeModalProps {
 export function AddEpisodeModal({ seasonPublicId, seriesPublicId, onClose }: AddEpisodeModalProps) {
   const createEpisodeMutation = useCreateEpisodeMutation(seasonPublicId, seriesPublicId)
 
-  const form = useForm<AddEpisodeSchemaData>({
+  const form = useForm({
     defaultValues: {
       episode_number: 1,
       title: '',
       duration: undefined,
-    } satisfies AddEpisodeSchemaData,
+    } as AddEpisodeSchemaData,
     validators: {
       onChange: addEpisodeSchema,
     },

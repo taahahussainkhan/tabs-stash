@@ -24,12 +24,12 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-mono text-content-muted">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#38a169]"></span>
-            <span>CHRONICLE PERSONAL LOGGER</span>
+            <span>LORE PERSONAL ASSISTANT &amp; ARCHIVE</span>
             <span className="text-[#2e323c]">/</span>
             <span>LOCAL ARCHIVE ACTIVE</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-accent-ochre font-semibold">EDITION v2.0</span>
+            <span className="text-accent-ochre font-semibold">EDITION v3.0</span>
             <span className="text-[#2e323c]">/</span>
             <span>NO GRADIENTS &bull; EDITORIAL MINIMAL</span>
           </div>

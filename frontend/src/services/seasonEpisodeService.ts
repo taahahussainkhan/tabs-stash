@@ -16,11 +16,68 @@ import type {
   SeasonWithProgress,
 } from '../features/series/types/seasonEpisode'
 
+export type {
+  Comment,
+  CommentCreate,
+  Episode,
+  EpisodeBulkCreate,
+  EpisodeCommentData,
+  EpisodeCreate,
+  EpisodeUpdate,
+  EpisodeWithComments,
+  Season,
+  SeasonCreate,
+  SeasonUpdate,
+  SeasonWithProgress,
+}
+
 // Service
 export const seasonEpisodeService = {
   // Season methods
   async getSeasons(seriesPublicId: string): Promise<SeasonWithProgress[]> {
-    const response = await api.get<SeasonWithProgress[]>(`/logging/series/${seriesPublicId}/seasons`)
+    const response = await api.get<any[]>(`/logging/series/${seriesPublicId}/seasons`)
+    return (response.data || []).map((item: any) => {
+      const total_episodes = item.total_episodes ?? item.episode_count ?? item.episodeCount ?? (item.episodes?.length || 0)
+      const watched_episodes = item.watched_episodes ?? (item.episodes ? item.episodes.filter((e: any) => e.isWatched || e.is_watched).length : 0)
+      const progress_percentage = item.progress_percentage ?? (total_episodes > 0 ? Math.round((watched_episodes / total_episodes) * 100) : 0)
+      const status: 'to_watch' | 'watching' | 'completed' = item.status || (
+        total_episodes > 0 && watched_episodes === total_episodes
+          ? 'completed'
+          : watched_episodes > 0
+          ? 'watching'
+          : 'to_watch'
+      )
+
+      const season: Season = item.season || {
+        public_id: item.public_id || item.publicId || '',
+        series_id: item.series_id || 0,
+        season_number: item.season_number || item.seasonNumber || 1,
+        title: item.title || `Season ${item.season_number || item.seasonNumber || 1}`,
+        year: item.year || null,
+        episode_count: total_episodes,
+        status,
+        notes: item.notes || null,
+        created_at: item.created_at || '',
+        updated_at: item.updated_at || '',
+      }
+
+      return {
+        season: { ...season, status },
+        watched_episodes,
+        total_episodes,
+        progress_percentage,
+        status,
+        average_rating: item.average_rating ?? null,
+      }
+    })
+  },
+
+  async markSeasonWatched(seasonPublicId: string, isWatched: boolean): Promise<{ message: string; is_watched: boolean; count: number }> {
+    const response = await api.patch<{ message: string; is_watched: boolean; count: number }>(
+      `/logging/seasons/${seasonPublicId}/watched`,
+      null,
+      { params: { is_watched: isWatched } }
+    )
     return response.data
   },
 
@@ -36,6 +93,11 @@ export const seasonEpisodeService = {
 
   async deleteSeason(seasonPublicId: string): Promise<void> {
     await api.delete(`/logging/seasons/${seasonPublicId}`)
+  },
+
+  async syncCatalog(seriesPublicId: string): Promise<{ message: string; addedSeasonsCount: number; addedEpisodesCount: number }> {
+    const response = await api.post(`/logging/series/${seriesPublicId}/sync-catalog`)
+    return response.data
   },
 
   // Episode methods
@@ -178,6 +240,26 @@ export function useDeleteSeasonMutation(seriesPublicId: string) {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.detail || 'Failed to delete season')
+    },
+  })
+}
+
+export function useMarkSeasonWatchedMutation(seriesPublicId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ seasonPublicId, isWatched }: { seasonPublicId: string; isWatched: boolean }) =>
+      seasonEpisodeService.markSeasonWatched(seasonPublicId, isWatched),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: seasonEpisodeKeys.seasons(seriesPublicId) })
+      queryClient.invalidateQueries({ queryKey: seasonEpisodeKeys.episodes(variables.seasonPublicId) })
+      queryClient.invalidateQueries({ queryKey: seasonEpisodeKeys.nextUnwatched(seriesPublicId) })
+      queryClient.invalidateQueries({ queryKey: ['series', seriesPublicId] })
+      queryClient.invalidateQueries({ queryKey: ['series'] })
+      toast.success(variables.isWatched ? 'Season marked as completed' : 'Season marked as to watch')
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.detail || error.response?.data?.message || 'Failed to update season status')
     },
   })
 }
@@ -345,6 +427,23 @@ export function useSaveEpisodeCommentsMutation() {
     },
     onError: (error: any) => {
       toast.error(error.response?.data?.detail || 'Failed to save comments')
+    },
+  })
+}
+
+export function useSyncCatalogMutation(seriesPublicId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => seasonEpisodeService.syncCatalog(seriesPublicId),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: seasonEpisodeKeys.seasons(seriesPublicId) })
+      queryClient.invalidateQueries({ queryKey: ['series', seriesPublicId] })
+      queryClient.invalidateQueries({ queryKey: ['series'] })
+      toast.success(data.message || 'Seasons synced from catalog', { icon: '✨' })
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || error.response?.data?.error?.message || 'Failed to sync with catalog')
     },
   })
 }
