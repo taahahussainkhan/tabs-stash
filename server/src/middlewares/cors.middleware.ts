@@ -20,7 +20,15 @@ export const corsMiddleware = cors({
       return callback(null, true);
     }
 
-    // You can also whitelist specific production web dashboard domains here
+    // Whitelist known web and extension protocols
+    if (
+      process.env.NODE_ENV !== 'production' ||
+      origin.includes('amazonaws.com') ||
+      origin.includes('localhost')
+    ) {
+      return callback(null, true);
+    }
+
     return callback(null, true);
   },
   credentials: true,

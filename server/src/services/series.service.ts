@@ -1,9 +1,11 @@
 import { SeriesModel, ISeries, ISeason, IEpisode } from '../models/series.model';
 import { MediaSessionModel, IMediaSession } from '../models/media-session.model';
 import { ActivityLogModel } from '../models/activity-log.model';
+import { CatalogMediaModel } from '../models/catalog-media.model';
 import { AppError } from '../middlewares/error.middleware';
 import { Types } from 'mongoose';
 import { randomUUID } from 'crypto';
+import { mediaCatalogService } from './catalog/media-catalog.service';
 
 export class SeriesService {
   static async getPaginatedSeries(userId: string, options: {
@@ -64,8 +66,47 @@ export class SeriesService {
 
     const totalPages = Math.ceil(total / pageSize) || 1;
 
+    const formattedItems = items.map(s => {
+      const sObj = (s as any).toObject ? (s as any).toObject() : s;
+      const currentSession = sObj.currentSessionId;
+      const allEpisodes = (sObj.seasons || []).flatMap((season: any) => season.episodes || []);
+      const totalEpisodes = allEpisodes.length;
+      const watchedEpisodes = allEpisodes.filter((e: any) => e.isWatched).length;
+
+      const normalizedSeries = {
+        ...sObj,
+        public_id: sObj.publicId,
+        is_favorite: sObj.isFavorite,
+        is_watchlist: sObj.isWatchlist,
+        poster_image: sObj.posterImage,
+        created_at: sObj.createdAt,
+        updated_at: sObj.updatedAt,
+        total_episodes: totalEpisodes,
+        episodes_watched: watchedEpisodes,
+      };
+
+      const normalizedSession = currentSession ? {
+        ...(currentSession.toObject ? currentSession.toObject() : currentSession),
+        public_id: currentSession.publicId,
+        status: currentSession.status,
+        start_date: currentSession.startDate,
+        end_date: currentSession.endDate,
+        current_position: currentSession.currentPosition,
+        stop_reason: currentSession.stopReason,
+        is_rewatch: currentSession.isRewatch,
+        created_at: currentSession.createdAt,
+        updated_at: currentSession.updatedAt,
+      } : null;
+
+      return {
+        ...normalizedSeries,
+        series: normalizedSeries,
+        current_session: normalizedSession,
+      };
+    });
+
     return {
-      items,
+      items: formattedItems,
       total,
       page,
       pageSize,
@@ -93,10 +134,17 @@ export class SeriesService {
       status: 'completed',
     });
 
+    const to_watch = await MediaSessionModel.countDocuments({
+      userId: uId,
+      mediaType: 'series',
+      status: 'to_watch',
+    });
+
     return {
       total,
       watching,
       completed,
+      to_watch,
       watchlist,
       favorites,
     };
@@ -155,17 +203,78 @@ export class SeriesService {
       throw new AppError(`Series '${data.title}' already exists with status: ${check.status}`, 400);
     }
 
+    // Auto-enrich series with catalog seasons & metadata from canonical catalog or provider
+    let catalogDoc = null;
+    if (data.title || data.externalId) {
+      try {
+        let details: any = null;
+
+        // 1. Direct external ID if provided
+        if (data.externalId) {
+          details = await mediaCatalogService.getDetails(String(data.externalId), 'series');
+        }
+
+        // 2. Fast local canonical hit by title (0 external TMDB calls)
+        if (!details && data.title) {
+          details = await mediaCatalogService.findCanonicalByTitle(data.title, 'series');
+        }
+
+        // 3. Fallback search
+        if (!details && data.title) {
+          const searchResults = await mediaCatalogService.search(data.title, 'series');
+          if (searchResults && searchResults.length > 0) {
+            const match = searchResults.find(r => r.title.toLowerCase() === data.title.toLowerCase()) || searchResults[0];
+            details = await mediaCatalogService.getDetails(match.id, 'series');
+          }
+        }
+
+        if (details) {
+          if ((!data.seasons || data.seasons.length === 0 || !data.seasons[0]?.episodes?.length) && details.seasons && details.seasons.length > 0) {
+            data.seasons = details.seasons;
+          }
+          if (!data.posterImage && details.posterUrl) {
+            data.posterImage = details.posterUrl;
+          }
+          if (!data.creator && details.creator) {
+            data.creator = details.creator;
+          }
+          if (!data.year && details.year) {
+            data.year = details.year;
+          }
+          if (!data.genre && details.genres?.length) {
+            data.genre = details.genres.join(', ');
+          }
+          if (!data.externalId && details.id) {
+            data.externalId = details.id;
+          }
+
+          catalogDoc = await CatalogMediaModel.findOne({ externalId: details.id, type: 'series' });
+        }
+      } catch (err) {
+        console.warn('[SeriesService] Auto-enrich series from catalog failed:', err);
+      }
+    }
+
+    if (!catalogDoc && data.externalId) {
+      catalogDoc = await CatalogMediaModel.findOne({ externalId: String(data.externalId), type: 'series' });
+    }
+    if (!catalogDoc && data.title) {
+      catalogDoc = await CatalogMediaModel.findOne({ titleLower: data.title.trim().toLowerCase(), type: 'series' });
+    }
+
     // Build seasons and auto-generate episodes
     const seasons: ISeason[] = [];
     if (data.seasons && Array.isArray(data.seasons)) {
       for (const s of data.seasons) {
         const episodes: IEpisode[] = [];
-        const epCount = s.episodeCount || 0;
+        const epCount = s.episodeCount || s.episodes?.length || 0;
         for (let i = 1; i <= epCount; i++) {
+          const catEp = s.episodes?.find((e: any) => (e.episodeNumber || e.episode_number) === i) || s.episodes?.[i - 1];
           episodes.push({
             publicId: randomUUID(),
             episodeNumber: i,
-            title: `Episode ${i}`,
+            title: catEp?.title || `Episode ${i}`,
+            duration: catEp?.duration || null,
             isWatched: false,
             currentTimestamp: 0,
             rating: null,
@@ -195,6 +304,8 @@ export class SeriesService {
       platform: data.platform || null,
       isFavorite: data.isFavorite || false,
       isWatchlist: data.isWatchlist || false,
+      catalogId: catalogDoc?._id || undefined,
+      externalId: data.externalId || catalogDoc?.externalId || undefined,
       seasons,
       linkedTabSessions: data.linkedTabSessions || [],
       referenceUrls: data.referenceUrls || [],
@@ -207,7 +318,7 @@ export class SeriesService {
       userId: uId,
       mediaType: 'series',
       mediaId: series._id,
-      status: data.status || 'watching',
+      status: data.status || 'to_watch',
       startDate: data.startDate ? new Date(data.startDate) : new Date(),
       endDate: data.endDate ? new Date(data.endDate) : null,
       currentPosition: data.currentTimestamp || 0,
@@ -274,22 +385,214 @@ export class SeriesService {
   }
 
   // --- Granular Seasons & Episodes APIs ---
-  static async getSeasons(userId: string, seriesPublicId: string) {
+  static async syncCatalog(userId: string, seriesPublicId: string) {
     const series = await SeriesModel.findOne({
       userId: new Types.ObjectId(userId),
       publicId: seriesPublicId,
     });
     if (!series) throw new AppError('Series not found', 404);
 
+    let details: any = null;
+
+    // 1. Direct external ID if already linked
+    if (series.externalId) {
+      details = await mediaCatalogService.getDetails(series.externalId, 'series');
+    }
+
+    // 2. Fast local canonical hit by title
+    if (!details && series.title) {
+      details = await mediaCatalogService.findCanonicalByTitle(series.title, 'series');
+    }
+
+    // 3. Fallback search
+    if (!details) {
+      const searchResults = await mediaCatalogService.search(series.title, 'series');
+      if (!searchResults || searchResults.length === 0) {
+        throw new AppError(`No catalog matches found for series '${series.title}'`, 404);
+      }
+
+      const match = searchResults.find(r => r.title.toLowerCase() === series.title.toLowerCase()) || searchResults[0];
+      details = await mediaCatalogService.getDetails(match.id, 'series');
+    }
+
+    if (!details) {
+      throw new AppError(`Failed to fetch catalog details for '${series.title}'`, 404);
+    }
+
+    const catalogDoc = await CatalogMediaModel.findOne({ externalId: details.id, type: 'series' });
+    if (catalogDoc && !series.catalogId) {
+      series.catalogId = catalogDoc._id;
+    }
+    if (details.id && !series.externalId) {
+      series.externalId = details.id;
+    }
+
+    let addedSeasonsCount = 0;
+    let addedEpisodesCount = 0;
+
+    if (details.seasons && Array.isArray(details.seasons)) {
+      for (const s of details.seasons) {
+        const existingSeason = series.seasons.find(ex => ex.seasonNumber === s.seasonNumber);
+        if (!existingSeason) {
+          const episodes: IEpisode[] = [];
+          const epCount = s.episodeCount || s.episodes?.length || 0;
+          for (let i = 1; i <= epCount; i++) {
+            const catEp = s.episodes?.find((e: any) => (e.episodeNumber || e.episode_number) === i) || s.episodes?.[i - 1];
+            episodes.push({
+              publicId: randomUUID(),
+              episodeNumber: i,
+              title: catEp?.title || `Episode ${i}`,
+              duration: catEp?.duration || details.runtimeMinutes || null,
+              isWatched: false,
+              currentTimestamp: 0,
+              rating: null,
+              notes: null,
+            });
+            addedEpisodesCount++;
+          }
+
+          series.seasons.push({
+            publicId: randomUUID(),
+            seasonNumber: s.seasonNumber,
+            title: s.title || `Season ${s.seasonNumber}`,
+            year: s.year || null,
+            episodeCount: epCount,
+            notes: null,
+            episodes,
+          });
+          addedSeasonsCount++;
+        } else {
+          // Backfill missing titles & durations on existing seasons
+          if (s.title && (!existingSeason.title || existingSeason.title === `Season ${existingSeason.seasonNumber}`)) {
+            existingSeason.title = s.title;
+          }
+          if (s.year && !existingSeason.year) {
+            existingSeason.year = s.year;
+          }
+          if (s.episodes && Array.isArray(s.episodes)) {
+            for (const catEp of s.episodes) {
+              const existingEp = existingSeason.episodes.find(e => e.episodeNumber === catEp.episodeNumber);
+              if (existingEp) {
+                if (catEp.title && (!existingEp.title || existingEp.title === `Episode ${existingEp.episodeNumber}`)) {
+                  existingEp.title = catEp.title;
+                }
+                if (catEp.duration && (!existingEp.duration || existingEp.duration === 0)) {
+                  existingEp.duration = catEp.duration;
+                }
+              } else {
+                existingSeason.episodes.push({
+                  publicId: randomUUID(),
+                  episodeNumber: catEp.episodeNumber,
+                  title: catEp.title || `Episode ${catEp.episodeNumber}`,
+                  duration: catEp.duration || details.runtimeMinutes || null,
+                  isWatched: false,
+                  currentTimestamp: 0,
+                  rating: null,
+                  notes: null,
+                });
+                addedEpisodesCount++;
+              }
+            }
+            existingSeason.episodes.sort((a, b) => a.episodeNumber - b.episodeNumber);
+            existingSeason.episodeCount = existingSeason.episodes.length;
+          }
+        }
+      }
+    }
+
+    if (!series.posterImage && details.posterUrl) {
+      series.posterImage = details.posterUrl;
+    }
+    if (!series.creator && details.creator) {
+      series.creator = details.creator;
+    }
+    if (!series.year && details.year) {
+      series.year = details.year;
+    }
+    if (!series.genre && details.genres?.length) {
+      series.genre = details.genres.join(', ');
+    }
+
+    series.seasons.sort((a, b) => a.seasonNumber - b.seasonNumber);
+    series.markModified('seasons');
+    await series.save();
+
+    return {
+      message: `Synchronized ${addedSeasonsCount} seasons and ${addedEpisodesCount} episodes from catalog.`,
+      addedSeasonsCount,
+      addedEpisodesCount,
+      series: await this.getSeriesWithSessions(userId, series.publicId),
+    };
+  }
+
+  static async getSeasons(userId: string, seriesPublicId: string) {
+    let series = await SeriesModel.findOne({
+      userId: new Types.ObjectId(userId),
+      publicId: seriesPublicId,
+    });
+    if (!series) throw new AppError('Series not found', 404);
+
+    // Auto-fill seasons or missing episode titles/durations from catalog
+    const hasMissingSeasons = series.seasons.length === 0;
+    const hasUnenrichedEpisodes = series.seasons.some(s => 
+      s.episodes.length > 0 && s.episodes.some(e => (!e.duration || e.duration === 0) || e.title === `Episode ${e.episodeNumber}`)
+    );
+
+    if ((hasMissingSeasons || hasUnenrichedEpisodes) && series.title) {
+      try {
+        await this.syncCatalog(userId, seriesPublicId);
+        series = await SeriesModel.findOne({
+          userId: new Types.ObjectId(userId),
+          publicId: seriesPublicId,
+        });
+        if (!series) throw new AppError('Series not found', 404);
+      } catch (err) {
+        console.warn('[SeriesService] Auto-populate seasons during getSeasons failed:', err);
+      }
+    }
+
+    if (!series) throw new AppError('Series not found', 404);
+
     return series.seasons.map(s => {
       const watchedCount = s.episodes.filter(e => e.isWatched).length;
+      const totalEpisodes = s.episodes.length;
+      const inProgressCount = s.episodes.filter(e => !e.isWatched && (e.currentTimestamp || 0) > 0).length;
+      let status: 'to_watch' | 'watching' | 'completed' = 'to_watch';
+      if (totalEpisodes > 0 && watchedCount === totalEpisodes) {
+        status = 'completed';
+      } else if (watchedCount > 0 || inProgressCount > 0) {
+        status = 'watching';
+      }
+
+      const ratedEpisodes = s.episodes.filter(e => e.rating != null);
+      const avgRating = ratedEpisodes.length > 0
+        ? ratedEpisodes.reduce((sum, e) => sum + (e.rating || 0), 0) / ratedEpisodes.length
+        : null;
+
+      const seasonObj = {
+        public_id: s.publicId,
+        series_id: series._id,
+        season_number: s.seasonNumber,
+        title: s.title || `Season ${s.seasonNumber}`,
+        year: s.year || null,
+        episode_count: s.episodes.length,
+        status,
+        notes: s.notes || null,
+        created_at: (series as any).createdAt?.toISOString?.() || new Date().toISOString(),
+        updated_at: (series as any).updatedAt?.toISOString?.() || new Date().toISOString(),
+      };
+
       return {
         ...s,
         public_id: s.publicId,
         season_number: s.seasonNumber,
         episode_count: s.episodes.length,
+        total_episodes: s.episodes.length,
         watched_episodes: watchedCount,
+        status,
         progress_percentage: s.episodes.length ? Math.round((watchedCount / s.episodes.length) * 100) : 0,
+        average_rating: avgRating,
+        season: seasonObj,
       };
     });
   }
@@ -340,14 +643,22 @@ export class SeriesService {
     if (!series) throw new AppError('Season not found', 404);
 
     const season = series.seasons.find(s => s.publicId === seasonPublicId);
-    return (season?.episodes || []).map(ep => ({
-      ...ep,
-      public_id: ep.publicId,
-      episode_number: ep.episodeNumber,
-      is_watched: ep.isWatched,
-      watched_date: ep.watchedDate,
-      current_timestamp: ep.currentTimestamp,
-    }));
+    return (season?.episodes || []).map(ep => {
+      const epObj = (ep as any).toObject ? (ep as any).toObject() : ep;
+      return {
+        ...epObj,
+        public_id: ep.publicId,
+        episode_number: ep.episodeNumber,
+        title: ep.title,
+        duration: ep.duration,
+        is_watched: ep.isWatched,
+        status: ep.isWatched ? 'completed' : ((ep.currentTimestamp || 0) > 0 ? 'watching' : 'to_watch'),
+        watched_date: ep.watchedDate,
+        current_timestamp: ep.currentTimestamp,
+        rating: ep.rating,
+        notes: ep.notes,
+      };
+    });
   }
 
   static async createEpisode(userId: string, seasonPublicId: string, data: any) {
@@ -373,11 +684,73 @@ export class SeriesService {
     };
 
     season.episodes.push(newEpisode);
-    season.episodeCount = season.episodes.length;
     series.markModified('seasons');
     await series.save();
 
-    return newEpisode;
+    return {
+      ...newEpisode,
+      public_id: newEpisode.publicId,
+      episode_number: newEpisode.episodeNumber,
+      title: newEpisode.title,
+      duration: newEpisode.duration,
+      is_watched: newEpisode.isWatched,
+      status: newEpisode.isWatched ? 'completed' : ((newEpisode.currentTimestamp || 0) > 0 ? 'watching' : 'to_watch'),
+      watched_date: newEpisode.watchedDate,
+      current_timestamp: newEpisode.currentTimestamp,
+      rating: newEpisode.rating,
+      notes: newEpisode.notes,
+    };
+  }
+
+  static async markSeasonWatched(userId: string, seasonPublicId: string, isWatched: boolean) {
+    const series = await SeriesModel.findOne({
+      userId: new Types.ObjectId(userId),
+      'seasons.publicId': seasonPublicId,
+    });
+    if (!series) throw new AppError('Season not found', 404);
+
+    const season = series.seasons.find(s => s.publicId === seasonPublicId);
+    if (!season) throw new AppError('Season not found', 404);
+
+    const watchedDate = isWatched ? new Date() : null;
+    for (const ep of season.episodes) {
+      ep.isWatched = isWatched;
+      ep.watchedDate = watchedDate;
+      if (!isWatched) {
+        ep.currentTimestamp = 0;
+      }
+    }
+
+    series.markModified('seasons');
+    await series.save();
+
+    // Synchronize media session status if present
+    if (series.currentSessionId) {
+      const allEpisodes = series.seasons.flatMap(s => s.episodes);
+      const watchedCount = allEpisodes.filter(e => e.isWatched).length;
+      const totalCount = allEpisodes.length;
+
+      let newSessionStatus: 'to_watch' | 'watching' | 'completed';
+      if (totalCount > 0 && watchedCount === totalCount) {
+        newSessionStatus = 'completed';
+      } else if (watchedCount > 0) {
+        newSessionStatus = 'watching';
+      } else {
+        newSessionStatus = 'to_watch';
+      }
+
+      await MediaSessionModel.findByIdAndUpdate(series.currentSessionId, {
+        status: newSessionStatus,
+        progress: totalCount > 0 ? Math.round((watchedCount / totalCount) * 100) : 0,
+        completedAt: newSessionStatus === 'completed' ? new Date() : null,
+      });
+    }
+
+    return {
+      message: `Season ${isWatched ? 'marked as watched' : 'marked as unwatched'}`,
+      is_watched: isWatched,
+      count: season.episodes.length,
+    };
   }
 
   static async markEpisodeWatched(userId: string, episodePublicId: string, isWatched: boolean) {
@@ -393,6 +766,9 @@ export class SeriesService {
       if (ep) {
         ep.isWatched = isWatched;
         ep.watchedDate = isWatched ? new Date() : null;
+        if (!isWatched) {
+          ep.currentTimestamp = 0;
+        }
         targetEp = ep;
         break;
       }
@@ -401,30 +777,71 @@ export class SeriesService {
     series.markModified('seasons');
     await series.save();
 
+    // Synchronize media session status if present
+    if (series.currentSessionId) {
+      const allEpisodes = series.seasons.flatMap(s => s.episodes);
+      const watchedCount = allEpisodes.filter(e => e.isWatched).length;
+      const totalCount = allEpisodes.length;
+
+      let newSessionStatus: 'to_watch' | 'watching' | 'completed';
+      if (totalCount > 0 && watchedCount === totalCount) {
+        newSessionStatus = 'completed';
+      } else if (watchedCount > 0) {
+        newSessionStatus = 'watching';
+      } else {
+        newSessionStatus = 'to_watch';
+      }
+
+      await MediaSessionModel.findByIdAndUpdate(series.currentSessionId, {
+        status: newSessionStatus,
+        progress: totalCount > 0 ? Math.round((watchedCount / totalCount) * 100) : 0,
+        completedAt: newSessionStatus === 'completed' ? new Date() : null,
+      });
+    }
+
     return { message: 'Episode watch status updated', is_watched: isWatched };
   }
 
-  static async updateEpisode(userId: string, seriesPublicId: string, episodePublicId: string, data: any) {
-    const series = await SeriesModel.findOne({
-      userId: new Types.ObjectId(userId),
-      publicId: seriesPublicId,
-    });
+  static async updateEpisode(userId: string, seriesPublicId: string | undefined, episodePublicId: string, data: any) {
+    let series: any = null;
+    if (seriesPublicId) {
+      series = await SeriesModel.findOne({
+        userId: new Types.ObjectId(userId),
+        publicId: seriesPublicId,
+      });
+    }
 
     if (!series) {
-      throw new AppError('Series not found', 404);
+      series = await SeriesModel.findOne({
+        userId: new Types.ObjectId(userId),
+        'seasons.episodes.publicId': episodePublicId,
+      });
+    }
+
+    if (!series) {
+      throw new AppError('Episode not found', 404);
     }
 
     let foundEpisode: IEpisode | null = null;
     for (const season of series.seasons) {
-      const ep = season.episodes.find(e => e.publicId === episodePublicId);
+      const ep = season.episodes.find((e: any) => e.publicId === episodePublicId);
       if (ep) {
         if (data.title !== undefined) ep.title = data.title;
         if (data.duration !== undefined) ep.duration = data.duration;
-        if (data.isWatched !== undefined) {
-          ep.isWatched = data.isWatched;
-          ep.watchedDate = data.isWatched ? (data.watchedDate ? new Date(data.watchedDate) : new Date()) : null;
+        if (data.isWatched !== undefined || data.is_watched !== undefined || data.status !== undefined) {
+          const isWatched = data.isWatched ?? data.is_watched ?? (data.status === 'completed');
+          ep.isWatched = Boolean(isWatched);
+          if (ep.isWatched) {
+            ep.watchedDate = data.watchedDate || data.watched_date || data.end_date
+              ? new Date(data.watchedDate || data.watched_date || data.end_date)
+              : new Date();
+          } else {
+            ep.watchedDate = null;
+          }
         }
-        if (data.currentTimestamp !== undefined) ep.currentTimestamp = data.currentTimestamp;
+        if (data.currentTimestamp !== undefined || data.current_timestamp !== undefined || data.current_position !== undefined) {
+          ep.currentTimestamp = data.currentTimestamp ?? data.current_timestamp ?? data.current_position ?? 0;
+        }
         if (data.rating !== undefined) ep.rating = data.rating;
         if (data.notes !== undefined) ep.notes = data.notes;
         foundEpisode = ep;
@@ -439,7 +856,16 @@ export class SeriesService {
     series.markModified('seasons');
     await series.save();
 
-    return foundEpisode;
+    return {
+      ...foundEpisode,
+      public_id: foundEpisode.publicId,
+      episode_number: foundEpisode.episodeNumber,
+      title: foundEpisode.title,
+      duration: foundEpisode.duration,
+      is_watched: foundEpisode.isWatched,
+      watched_date: foundEpisode.watchedDate,
+      current_timestamp: foundEpisode.currentTimestamp,
+    };
   }
 
   static async getNextUnwatched(userId: string, seriesPublicId: string) {

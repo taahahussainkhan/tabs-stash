@@ -28,6 +28,7 @@ seriesRouter.post('/:id/rewatch', validate(rewatchMovieSchema), SeriesController
 seriesRouter.get('/:id/sessions/comments', SeriesController.getSeriesSessionsWithComments);
 
 // Nested Season & Episode routes
+seriesRouter.post('/:seriesPublicId/sync-catalog', SeriesController.syncCatalog);
 seriesRouter.get('/:seriesPublicId/seasons', SeriesController.getSeasons);
 seriesRouter.post('/:seriesPublicId/seasons', SeriesController.createSeason);
 seriesRouter.get('/:seriesPublicId/next-unwatched', SeriesController.getNextUnwatched);
@@ -37,5 +38,7 @@ seasonEpisodeRouter.use(authenticate);
 
 seasonEpisodeRouter.get('/seasons/:seasonPublicId/episodes', SeriesController.getEpisodes);
 seasonEpisodeRouter.post('/seasons/:seasonPublicId/episodes', SeriesController.createEpisode);
+seasonEpisodeRouter.patch('/seasons/:seasonPublicId/watched', SeriesController.markSeasonWatched);
 seasonEpisodeRouter.patch('/episodes/:episodePublicId/watched', SeriesController.markEpisodeWatched);
 seasonEpisodeRouter.put('/episodes/:episodePublicId', SeriesController.updateEpisode);
+seasonEpisodeRouter.post('/episodes/:episodePublicId/session', SeriesController.updateEpisode);

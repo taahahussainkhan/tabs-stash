@@ -6,7 +6,7 @@ async function bootstrap() {
   await connectDatabase();
 
   const server = app.listen(env.PORT, () => {
-    console.log(`🚀 TabVault Server running on http://localhost:${env.PORT}`);
+    console.log(`🚀 Lore Server running on http://localhost:${env.PORT}`);
     console.log(`🔒 Environment: ${env.NODE_ENV}`);
     console.log(`📡 Health Check: http://localhost:${env.PORT}/api/v1/health`);
   });

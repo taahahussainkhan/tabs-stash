@@ -13,7 +13,7 @@ export interface IMediaSession extends Document {
   userId: Types.ObjectId;
   mediaType: 'movie' | 'series' | 'book' | 'article';
   mediaId: Types.ObjectId;
-  status: 'watching' | 'reading' | 'completed' | 'paused' | 'dropped' | 'rewatching';
+  status: 'to_watch' | 'watching' | 'reading' | 'completed' | 'paused' | 'dropped' | 'rewatching';
   startDate: Date;
   endDate?: Date | null;
   currentPosition?: number | null; // Seconds for movies/series, pages for books
@@ -63,8 +63,8 @@ const MediaSessionSchema = new Schema<IMediaSession>(
     status: {
       type: String,
       required: true,
-      enum: ['watching', 'reading', 'completed', 'paused', 'dropped', 'rewatching'],
-      default: 'watching',
+      enum: ['to_watch', 'watching', 'reading', 'completed', 'paused', 'dropped', 'rewatching'],
+      default: 'to_watch',
       index: true,
     },
     startDate: {

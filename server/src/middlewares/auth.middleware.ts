@@ -3,6 +3,8 @@ import { verifyAccessToken, AccessTokenPayload } from '../utils/jwt';
 import { UserModel } from '../models/user.model';
 import { AppError } from './error.middleware';
 
+import { CacheService } from '../services/cache.service';
+
 declare global {
   namespace Express {
     interface Request {
@@ -46,13 +48,20 @@ export async function authenticate(
   try {
     const payload = verifyAccessToken(token);
 
-    // Verify user still exists and tokenVersion matches
-    const user = await UserModel.findById(payload.userId).select('tokenVersion');
-    if (!user) {
-      return next(new AppError('User belonging to this token no longer exists.', 401));
+    // Fast-path: Check in-memory cache first (< 0.01ms)
+    let currentVersion = CacheService.getTokenVersion(payload.userId);
+
+    // Cache-miss fallback: Fetch from DB and populate cache
+    if (currentVersion === null) {
+      const user = await UserModel.findById(payload.userId).select('tokenVersion').lean();
+      if (!user) {
+        return next(new AppError('User belonging to this token no longer exists.', 401));
+      }
+      currentVersion = user.tokenVersion;
+      CacheService.setTokenVersion(payload.userId, currentVersion);
     }
 
-    if (user.tokenVersion !== payload.tokenVersion) {
+    if (currentVersion !== payload.tokenVersion) {
       return next(new AppError('Session has been revoked. Please log in again.', 401));
     }
 

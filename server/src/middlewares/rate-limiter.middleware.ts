@@ -6,6 +6,10 @@ export const generalLimiter = rateLimit({
   max: env.RATE_LIMIT_MAX_REQUESTS,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    const url = req.originalUrl || req.path || '';
+    return url.includes('/auth/refresh') || url.includes('/health');
+  },
   message: {
     success: false,
     error: {

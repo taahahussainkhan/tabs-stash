@@ -104,6 +104,15 @@ export class SeriesController {
     }
   }
 
+  static async syncCatalog(req: Request, res: Response, next: NextFunction) {
+    try {
+      const result = await SeriesService.syncCatalog(req.user!.userId, req.params.seriesPublicId as string);
+      res.status(200).json(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getSeasons(req: Request, res: Response, next: NextFunction) {
     try {
       const seasons = await SeriesService.getSeasons(req.user!.userId, req.params.seriesPublicId as string);
@@ -135,6 +144,16 @@ export class SeriesController {
     try {
       const episode = await SeriesService.createEpisode(req.user!.userId, req.params.seasonPublicId as string, req.body);
       res.status(201).json(episode);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async markSeasonWatched(req: Request, res: Response, next: NextFunction) {
+    try {
+      const isWatched = req.query.is_watched !== undefined ? req.query.is_watched === 'true' : (req.body.is_watched ?? true);
+      const result = await SeriesService.markSeasonWatched(req.user!.userId, req.params.seasonPublicId as string, isWatched);
+      res.status(200).json(result);
     } catch (error) {
       next(error);
     }

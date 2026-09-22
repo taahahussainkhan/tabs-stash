@@ -44,6 +44,11 @@ export const createStoreSchema = z.object({
   body: z.object({
     name: z.string().min(1, 'Store name is required').max(255),
     type: z.enum(['OnlineOnly', 'PhysicalOnly', 'Hybrid']).default('Hybrid'),
+    website: z.string().url().or(z.literal('')).nullable().optional(),
+    physicalAddress: z.string().nullable().optional(),
+    physical_address: z.string().nullable().optional(),
+    country: z.string().max(100).nullable().optional(),
+    notes: z.string().nullable().optional(),
   }),
 });
 
@@ -54,5 +59,10 @@ export const updateStoreSchema = z.object({
   body: z.object({
     name: z.string().min(1).max(255).optional(),
     type: z.enum(['OnlineOnly', 'PhysicalOnly', 'Hybrid']).optional(),
+    website: z.string().url().or(z.literal('')).nullable().optional(),
+    physicalAddress: z.string().nullable().optional(),
+    physical_address: z.string().nullable().optional(),
+    country: z.string().max(100).nullable().optional(),
+    notes: z.string().nullable().optional(),
   }),
 });

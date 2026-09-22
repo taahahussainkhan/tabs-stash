@@ -7,6 +7,10 @@ export interface IStore extends Document {
   userId: Types.ObjectId;
   name: string;
   type: 'OnlineOnly' | 'PhysicalOnly' | 'Hybrid';
+  website?: string | null;
+  physicalAddress?: string | null;
+  country?: string | null;
+  notes?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,6 +38,26 @@ const StoreSchema = new Schema<IStore>(
       type: String,
       enum: ['OnlineOnly', 'PhysicalOnly', 'Hybrid'],
       default: 'Hybrid',
+    },
+    website: {
+      type: String,
+      default: null,
+      trim: true,
+    },
+    physicalAddress: {
+      type: String,
+      default: null,
+      trim: true,
+    },
+    country: {
+      type: String,
+      default: null,
+      trim: true,
+    },
+    notes: {
+      type: String,
+      default: null,
+      trim: true,
     },
   },
   {

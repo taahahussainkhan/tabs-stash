@@ -1,8 +1,15 @@
-import { MovieModel, IMovie } from '../models/movie.model';
-import { MediaSessionModel, IMediaSession } from '../models/media-session.model';
-import { ActivityLogModel } from '../models/activity-log.model';
-import { AppError } from '../middlewares/error.middleware';
 import { Types } from 'mongoose';
+import { MovieModel, IMovie } from '../models/movie.model';
+import { MediaSessionModel } from '../models/media-session.model';
+import { ActivityLogModel } from '../models/activity-log.model';
+import { AppError, NotFoundError, BadRequestError } from '../errors/AppError';
+import { enrichMediaFromCatalog } from './helpers/catalog-enrichment';
+import {
+  CreateMovieDTO,
+  CreateWatchlistMovieDTO,
+  UpdateMovieDTO,
+  RewatchMovieDTO,
+} from '../types/movie.types';
 
 export interface PaginatedMoviesResult {
   items: any[];
@@ -15,23 +22,26 @@ export interface PaginatedMoviesResult {
 }
 
 export class MovieService {
-  static async getPaginatedMovies(userId: string, options: {
-    page?: number;
-    pageSize?: number;
-    sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
-    search?: string;
-    status?: string;
-    director?: string;
-    genre?: string;
-    platform?: string;
-    yearMin?: number;
-    yearMax?: number;
-    ratingMin?: number;
-    ratingMax?: number;
-    isFavorite?: boolean;
-    isWatchlist?: boolean;
-  }): Promise<PaginatedMoviesResult> {
+  static async getPaginatedMovies(
+    userId: string,
+    options: {
+      page?: number;
+      pageSize?: number;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+      search?: string;
+      status?: string;
+      director?: string;
+      genre?: string;
+      platform?: string;
+      yearMin?: number;
+      yearMax?: number;
+      ratingMin?: number;
+      ratingMax?: number;
+      isFavorite?: boolean;
+      isWatchlist?: boolean;
+    }
+  ): Promise<PaginatedMoviesResult> {
     const page = Math.max(1, options.page || 1);
     const pageSize = Math.min(100, Math.max(1, options.pageSize || 10));
     const skip = (page - 1) * pageSize;
@@ -71,11 +81,44 @@ export class MovieService {
       .skip(skip)
       .limit(pageSize);
 
-    // If filtering by session status or rating, we can filter or post-process if needed
     const totalPages = Math.ceil(total / pageSize) || 1;
 
+    const formattedMovies = movies.map(m => {
+      const mObj = (m as any).toObject ? (m as any).toObject() : m;
+      const currentSession = mObj.currentSessionId;
+      const normalizedMovie = {
+        ...mObj,
+        public_id: mObj.publicId,
+        is_favorite: mObj.isFavorite,
+        is_watchlist: mObj.isWatchlist,
+        poster_image: mObj.posterImage,
+        duration_minutes: mObj.durationMinutes,
+        created_at: mObj.createdAt,
+        updated_at: mObj.updatedAt,
+      };
+
+      const normalizedSession = currentSession ? {
+        ...(currentSession.toObject ? currentSession.toObject() : currentSession),
+        public_id: currentSession.publicId,
+        status: currentSession.status,
+        start_date: currentSession.startDate,
+        end_date: currentSession.endDate,
+        current_position: currentSession.currentPosition,
+        stop_reason: currentSession.stopReason,
+        is_rewatch: currentSession.isRewatch,
+        created_at: currentSession.createdAt,
+        updated_at: currentSession.updatedAt,
+      } : null;
+
+      return {
+        ...normalizedMovie,
+        movie: normalizedMovie,
+        current_session: normalizedSession,
+      };
+    });
+
     return {
-      items: movies,
+      items: formattedMovies,
       total,
       page,
       pageSize,
@@ -91,28 +134,13 @@ export class MovieService {
     const favorites = await MovieModel.countDocuments({ userId: uId, isFavorite: true });
     const watchlist = await MovieModel.countDocuments({ userId: uId, isWatchlist: true });
 
-    const watching = await MediaSessionModel.countDocuments({
-      userId: uId,
-      mediaType: 'movie',
-      status: 'watching',
-    });
-
-    const completed = await MediaSessionModel.countDocuments({
-      userId: uId,
-      mediaType: 'movie',
-      status: 'completed',
-    });
-
-    return {
-      total,
-      watching,
-      completed,
-      watchlist,
-      favorites,
-    };
+    return { total, favorites, watchlist };
   }
 
-  static async checkExists(userId: string, title: string): Promise<{ exists: boolean; status?: string; movie?: IMovie }> {
+  static async checkExists(
+    userId: string,
+    title: string
+  ): Promise<{ exists: boolean; status?: string; movie?: IMovie }> {
     const movie = await MovieModel.findOne({
       userId: new Types.ObjectId(userId),
       title: new RegExp(`^${title.trim()}$`, 'i'),
@@ -122,27 +150,68 @@ export class MovieService {
       return { exists: false };
     }
 
-    const session = movie.currentSessionId as unknown as IMediaSession;
+    const session = movie.currentSessionId as any;
+    const status = session ? session.status : movie.isWatchlist ? 'watchlist' : 'unknown';
+
     return {
       exists: true,
-      status: session ? session.status : (movie.isWatchlist ? 'watchlist' : 'logged'),
+      status,
       movie,
     };
   }
 
-  static async getMovieWithSessions(userId: string, moviePublicId: string): Promise<{
+  static async findMovie(userId: string, idOrPublicId: string): Promise<IMovie | null> {
+    const query: any = { userId: new Types.ObjectId(userId) };
+    if (Types.ObjectId.isValid(idOrPublicId)) {
+      query._id = new Types.ObjectId(idOrPublicId);
+    } else {
+      query.publicId = idOrPublicId;
+    }
+    return MovieModel.findOne(query).populate('currentSessionId').populate('tags');
+  }
+
+  static async getMovieById(userId: string, idOrPublicId: string): Promise<any> {
+    const movie = await this.findMovie(userId, idOrPublicId);
+    if (!movie) throw new NotFoundError('Movie not found');
+
+    const sessions = await MediaSessionModel.find({
+      userId: new Types.ObjectId(userId),
+      mediaType: 'movie',
+      mediaId: movie._id,
+    }).sort({ sessionNumber: -1 });
+
+    const comments = await ActivityLogModel.find({
+      userId: new Types.ObjectId(userId),
+      entityType: 'movie',
+      entityId: movie._id,
+      action: 'comment',
+    }).sort({ createdAt: -1 });
+
+    return {
+      ...movie.toObject(),
+      sessions,
+      comments,
+    };
+  }
+
+  static async getMovieWithSessions(
+    userId: string,
+    moviePublicId: string
+  ): Promise<{
     movie: IMovie;
-    sessions: IMediaSession[];
-    current_session: IMediaSession | null;
+    sessions: any[];
+    current_session: any | null;
     rewatch_count: number;
   }> {
     const movie = await MovieModel.findOne({
       userId: new Types.ObjectId(userId),
       publicId: moviePublicId,
-    }).populate('tags').populate('linkedTabSessions');
+    })
+      .populate('tags')
+      .populate('linkedTabSessions');
 
     if (!movie) {
-      throw new AppError('Movie not found', 404);
+      throw new NotFoundError('Movie not found');
     }
 
     const sessions = await MediaSessionModel.find({
@@ -153,9 +222,11 @@ export class MovieService {
 
     const currentSession = movie.currentSessionId
       ? await MediaSessionModel.findById(movie.currentSessionId)
-      : (sessions.length > 0 ? sessions[0] : null);
+      : sessions.length > 0
+      ? sessions[0]
+      : null;
 
-    const rewatchCount = sessions.filter(s => s.isRewatch).length;
+    const rewatchCount = sessions.filter((s) => s.isRewatch).length;
 
     return {
       movie,
@@ -165,28 +236,32 @@ export class MovieService {
     };
   }
 
-  static async createMovieWithSession(userId: string, data: any): Promise<any> {
+  static async createMovieWithSession(userId: string, data: CreateMovieDTO): Promise<any> {
     const uId = new Types.ObjectId(userId);
 
     const check = await this.checkExists(userId, data.title);
     if (check.exists) {
-      throw new AppError(`Movie '${data.title}' already exists with status: ${check.status}`, 400);
+      throw new BadRequestError(`Movie '${data.title}' already exists with status: ${check.status}`);
     }
+
+    const { enrichedData, catalogDoc } = await enrichMediaFromCatalog(data, 'movie');
 
     const movie = new MovieModel({
       userId: uId,
-      title: data.title,
-      director: data.director || null,
-      year: data.year || null,
-      genre: data.genre || null,
-      posterImage: data.posterImage || null,
-      platform: data.platform || null,
-      durationMinutes: data.durationMinutes || null,
-      isFavorite: data.isFavorite || false,
-      isWatchlist: data.isWatchlist || false,
-      linkedTabSessions: data.linkedTabSessions || [],
-      referenceUrls: data.referenceUrls || [],
-      tags: data.tags || [],
+      title: enrichedData.title,
+      director: enrichedData.director || null,
+      year: enrichedData.year || null,
+      genre: enrichedData.genre || null,
+      posterImage: enrichedData.posterImage || null,
+      platform: enrichedData.platform || null,
+      durationMinutes: enrichedData.durationMinutes || null,
+      isFavorite: enrichedData.isFavorite || false,
+      isWatchlist: enrichedData.isWatchlist || false,
+      catalogId: catalogDoc?._id || undefined,
+      externalId: enrichedData.externalId || catalogDoc?.externalId || undefined,
+      linkedTabSessions: (enrichedData.linkedTabSessions || []).map((id) => new Types.ObjectId(id)),
+      referenceUrls: enrichedData.referenceUrls || [],
+      tags: (enrichedData.tags || []).map((id) => new Types.ObjectId(id)),
     });
 
     await movie.save();
@@ -196,14 +271,14 @@ export class MovieService {
       userId: uId,
       mediaType: 'movie',
       mediaId: movie._id,
-      status: data.status || 'watching',
-      startDate: data.startDate ? new Date(data.startDate) : new Date(),
-      endDate: data.endDate ? new Date(data.endDate) : null,
-      currentPosition: data.currentTimestamp || 0,
-      stopReason: data.stopReason || null,
-      isRewatch: data.isRewatch || false,
-      rating: data.rating || null,
-      notes: data.notes || null,
+      status: enrichedData.status || 'to_watch',
+      startDate: enrichedData.startDate ? new Date(enrichedData.startDate) : new Date(),
+      endDate: enrichedData.endDate ? new Date(enrichedData.endDate) : null,
+      currentPosition: enrichedData.currentTimestamp || 0,
+      stopReason: enrichedData.stopReason || null,
+      isRewatch: enrichedData.isRewatch || false,
+      rating: enrichedData.rating || null,
+      notes: enrichedData.notes || null,
     });
 
     movie.currentSessionId = session._id;
@@ -221,38 +296,46 @@ export class MovieService {
     return this.getMovieWithSessions(userId, movie.publicId);
   }
 
-  static async createWatchlistMovie(userId: string, data: any): Promise<any> {
+  static async createWatchlistMovie(userId: string, data: CreateWatchlistMovieDTO): Promise<any> {
     const uId = new Types.ObjectId(userId);
 
     const check = await this.checkExists(userId, data.title);
     if (check.exists) {
-      throw new AppError(`Movie '${data.title}' already exists with status: ${check.status}`, 400);
+      throw new BadRequestError(`Movie '${data.title}' already exists with status: ${check.status}`);
     }
+
+    const { enrichedData, catalogDoc } = await enrichMediaFromCatalog(data, 'movie');
 
     const movie = await MovieModel.create({
       userId: uId,
-      title: data.title,
-      director: data.director || null,
-      year: data.year || null,
-      genre: data.genre || null,
-      posterImage: data.posterImage || null,
-      platform: data.platform || null,
-      durationMinutes: data.durationMinutes || null,
+      title: enrichedData.title,
+      director: enrichedData.director || null,
+      year: enrichedData.year || null,
+      genre: enrichedData.genre || null,
+      posterImage: enrichedData.posterImage || null,
+      platform: enrichedData.platform || null,
+      durationMinutes: enrichedData.durationMinutes || null,
       isWatchlist: true,
-      tags: data.tags || [],
+      catalogId: catalogDoc?._id || undefined,
+      externalId: enrichedData.externalId || catalogDoc?.externalId || undefined,
+      tags: (enrichedData.tags || []).map((id) => new Types.ObjectId(id)),
     });
 
     return this.getMovieWithSessions(userId, movie.publicId);
   }
 
-  static async updateMovieAndSession(userId: string, moviePublicId: string, data: any): Promise<any> {
+  static async updateMovieAndSession(
+    userId: string,
+    moviePublicId: string,
+    data: UpdateMovieDTO
+  ): Promise<any> {
     const movie = await MovieModel.findOne({
       userId: new Types.ObjectId(userId),
       publicId: moviePublicId,
     });
 
     if (!movie) {
-      throw new AppError('Movie not found', 404);
+      throw new NotFoundError('Movie not found');
     }
 
     if (data.title !== undefined) movie.title = data.title;
@@ -264,9 +347,13 @@ export class MovieService {
     if (data.durationMinutes !== undefined) movie.durationMinutes = data.durationMinutes;
     if (data.isFavorite !== undefined) movie.isFavorite = data.isFavorite;
     if (data.isWatchlist !== undefined) movie.isWatchlist = data.isWatchlist;
-    if (data.linkedTabSessions !== undefined) movie.linkedTabSessions = data.linkedTabSessions;
+    if (data.linkedTabSessions !== undefined) {
+      movie.linkedTabSessions = data.linkedTabSessions.map((id) => new Types.ObjectId(id));
+    }
     if (data.referenceUrls !== undefined) movie.referenceUrls = data.referenceUrls;
-    if (data.tags !== undefined) movie.tags = data.tags;
+    if (data.tags !== undefined) {
+      movie.tags = data.tags.map((id) => new Types.ObjectId(id));
+    }
 
     await movie.save();
 
@@ -276,7 +363,8 @@ export class MovieService {
       if (session) {
         if (data.status !== undefined) session.status = data.status;
         if (data.startDate !== undefined) session.startDate = new Date(data.startDate);
-        if (data.endDate !== undefined) session.endDate = data.endDate ? new Date(data.endDate) : null;
+        if (data.endDate !== undefined)
+          session.endDate = data.endDate ? new Date(data.endDate) : null;
         if (data.currentTimestamp !== undefined) session.currentPosition = data.currentTimestamp;
         if (data.stopReason !== undefined) session.stopReason = data.stopReason;
         if (data.isRewatch !== undefined) session.isRewatch = data.isRewatch;
@@ -289,14 +377,18 @@ export class MovieService {
     return this.getMovieWithSessions(userId, movie.publicId);
   }
 
-  static async startRewatch(userId: string, moviePublicId: string, data: any): Promise<any> {
+  static async startRewatch(
+    userId: string,
+    moviePublicId: string,
+    data: RewatchMovieDTO
+  ): Promise<any> {
     const movie = await MovieModel.findOne({
       userId: new Types.ObjectId(userId),
       publicId: moviePublicId,
     });
 
     if (!movie) {
-      throw new AppError('Movie not found', 404);
+      throw new NotFoundError('Movie not found');
     }
 
     const session = await MediaSessionModel.create({
@@ -316,23 +408,31 @@ export class MovieService {
     return this.getMovieWithSessions(userId, movie.publicId);
   }
 
-  static async toggleFavorite(userId: string, moviePublicId: string, isFavorite: boolean): Promise<IMovie> {
+  static async toggleFavorite(
+    userId: string,
+    moviePublicId: string,
+    isFavorite: boolean
+  ): Promise<IMovie> {
     const movie = await MovieModel.findOneAndUpdate(
       { userId: new Types.ObjectId(userId), publicId: moviePublicId },
       { isFavorite },
       { new: true }
     );
-    if (!movie) throw new AppError('Movie not found', 404);
+    if (!movie) throw new NotFoundError('Movie not found');
     return movie;
   }
 
-  static async toggleWatchlist(userId: string, moviePublicId: string, isWatchlist: boolean): Promise<IMovie> {
+  static async toggleWatchlist(
+    userId: string,
+    moviePublicId: string,
+    isWatchlist: boolean
+  ): Promise<IMovie> {
     const movie = await MovieModel.findOneAndUpdate(
       { userId: new Types.ObjectId(userId), publicId: moviePublicId },
       { isWatchlist },
       { new: true }
     );
-    if (!movie) throw new AppError('Movie not found', 404);
+    if (!movie) throw new NotFoundError('Movie not found');
     return movie;
   }
 
@@ -343,7 +443,7 @@ export class MovieService {
     });
 
     if (!movie) {
-      throw new AppError('Movie not found', 404);
+      throw new NotFoundError('Movie not found');
     }
 
     await MediaSessionModel.deleteMany({ mediaType: 'movie', mediaId: movie._id });

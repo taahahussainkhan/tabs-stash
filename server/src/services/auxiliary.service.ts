@@ -87,11 +87,26 @@ export class StoreService {
     return StoreModel.find({ userId: new Types.ObjectId(userId) }).sort({ name: 1 });
   }
 
-  static async create(userId: string, data: { name: string; type?: 'OnlineOnly' | 'PhysicalOnly' | 'Hybrid' }): Promise<IStore> {
+  static async create(
+    userId: string,
+    data: {
+      name: string;
+      type?: 'OnlineOnly' | 'PhysicalOnly' | 'Hybrid';
+      website?: string | null;
+      physicalAddress?: string | null;
+      physical_address?: string | null;
+      country?: string | null;
+      notes?: string | null;
+    }
+  ): Promise<IStore> {
     return StoreModel.create({
       userId: new Types.ObjectId(userId),
       name: data.name,
       type: data.type || 'Hybrid',
+      website: data.website ?? null,
+      physicalAddress: data.physicalAddress ?? data.physical_address ?? null,
+      country: data.country ?? null,
+      notes: data.notes ?? null,
     });
   }
 
@@ -105,6 +120,11 @@ export class StoreService {
 
     if (data.name !== undefined) store.name = data.name;
     if (data.type !== undefined) store.type = data.type;
+    if (data.website !== undefined) store.website = data.website;
+    if (data.physicalAddress !== undefined) store.physicalAddress = data.physicalAddress;
+    if (data.physical_address !== undefined) store.physicalAddress = data.physical_address;
+    if (data.country !== undefined) store.country = data.country;
+    if (data.notes !== undefined) store.notes = data.notes;
 
     return store.save();
   }

@@ -11,6 +11,7 @@ import { genreRouter, publisherRouter, storeRouter } from './auxiliary.routes';
 import { commentRouter, sessionCommentRouter } from './comment.routes';
 import { userSettingsRouter, loggingCategoriesRouter } from './settings.routes';
 import { dashboardRouter } from './dashboard.routes';
+import { mediaCatalogRouter } from './media-catalog.routes';
 
 export const apiRouter = Router();
 
@@ -18,8 +19,8 @@ apiRouter.get('/health', (req, res) => {
   res.status(200).json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'TabVault & Personal Assistant API',
-    version: '2.0.0',
+    service: 'Lore Personal Assistant & Life Archive API',
+    version: '3.0.0',
   });
 });
 
@@ -52,6 +53,9 @@ apiRouter.use('/sessions', sessionCommentRouter);
 // User UI Settings & Category Preferences
 apiRouter.use('/user', userSettingsRouter);
 apiRouter.use('/logging', loggingCategoriesRouter);
+
+// External Media Catalog / Metadata Lookup
+apiRouter.use('/catalog', mediaCatalogRouter);
 
 // Dashboard & Search
 apiRouter.use('/', dashboardRouter);

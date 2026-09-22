@@ -35,6 +35,8 @@ export interface ISeries extends Document {
   genre?: string | null;
   posterImage?: string | null;
   platform?: string | null;
+  catalogId?: Types.ObjectId | null;
+  externalId?: string | null;
   isFavorite: boolean;
   isWatchlist: boolean;
   currentSessionId?: Types.ObjectId | null;
@@ -170,6 +172,17 @@ const SeriesSchema = new Schema<ISeries>(
     platform: {
       type: String,
       default: null,
+    },
+    catalogId: {
+      type: Schema.Types.ObjectId,
+      ref: 'CatalogMedia',
+      default: null,
+      index: true,
+    },
+    externalId: {
+      type: String,
+      default: null,
+      index: true,
     },
     isFavorite: {
       type: Boolean,

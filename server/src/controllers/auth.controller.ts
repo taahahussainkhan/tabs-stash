@@ -1,6 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/auth.service';
 import { parseCookies } from '../middlewares/auth.middleware';
+import { env } from '../config/env';
+
+const ACCESS_TOKEN_MAX_AGE = 60 * 60 * 1000; // 1 hour
+const REFRESH_TOKEN_MAX_AGE = env.JWT_REFRESH_EXPIRES_DAYS * 24 * 60 * 60 * 1000; // e.g. 30 days
+
+const cookieOptions = {
+  httpOnly: true,
+  sameSite: 'none' as const,
+  secure: true,
+};
 
 export class AuthController {
   static async register(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -15,14 +25,12 @@ export class AuthController {
       });
 
       res.cookie('access_token', result.accessToken, {
-        httpOnly: true,
-        sameSite: 'lax',
-        maxAge: 15 * 60 * 1000,
+        ...cookieOptions,
+        maxAge: ACCESS_TOKEN_MAX_AGE,
       });
       res.cookie('refresh_token', result.refreshToken, {
-        httpOnly: true,
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        ...cookieOptions,
+        maxAge: REFRESH_TOKEN_MAX_AGE,
       });
 
       res.status(201).json({
@@ -46,14 +54,12 @@ export class AuthController {
       });
 
       res.cookie('access_token', result.accessToken, {
-        httpOnly: true,
-        sameSite: 'lax',
-        maxAge: 15 * 60 * 1000,
+        ...cookieOptions,
+        maxAge: ACCESS_TOKEN_MAX_AGE,
       });
       res.cookie('refresh_token', result.refreshToken, {
-        httpOnly: true,
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        ...cookieOptions,
+        maxAge: REFRESH_TOKEN_MAX_AGE,
       });
 
       res.status(200).json({
@@ -86,14 +92,12 @@ export class AuthController {
       });
 
       res.cookie('access_token', result.accessToken, {
-        httpOnly: true,
-        sameSite: 'lax',
-        maxAge: 15 * 60 * 1000,
+        ...cookieOptions,
+        maxAge: ACCESS_TOKEN_MAX_AGE,
       });
       res.cookie('refresh_token', result.refreshToken, {
-        httpOnly: true,
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000,
+        ...cookieOptions,
+        maxAge: REFRESH_TOKEN_MAX_AGE,
       });
 
       res.status(200).json({
@@ -115,8 +119,8 @@ export class AuthController {
         await AuthService.logout(refreshToken);
       }
 
-      res.clearCookie('access_token');
-      res.clearCookie('refresh_token');
+      res.clearCookie('access_token', cookieOptions);
+      res.clearCookie('refresh_token', cookieOptions);
 
       res.status(200).json({
         success: true,

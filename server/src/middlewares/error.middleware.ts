@@ -2,17 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import { env } from '../config/env';
 import { logger } from '../utils/logger';
 
-export class AppError extends Error {
-  public statusCode: number;
-  public isOperational: boolean;
-
-  constructor(message: string, statusCode = 400) {
-    super(message);
-    this.statusCode = statusCode;
-    this.isOperational = true;
-    Error.captureStackTrace(this, this.constructor);
-  }
-}
+import { AppError } from '../errors/AppError';
+export { AppError };
 
 export function errorHandler(
   err: any,

@@ -9,9 +9,10 @@ export const createMovieSchema = z.object({
     posterImage: z.string().nullable().optional(),
     platform: z.string().max(100).nullable().optional(),
     durationMinutes: z.number().int().min(1).nullable().optional(),
+    externalId: z.string().nullable().optional(),
     
     // Initial session info
-    status: z.enum(['watching', 'completed', 'paused', 'rewatching']).default('watching'),
+    status: z.enum(['to_watch', 'watching', 'completed', 'paused', 'rewatching']).default('to_watch'),
     startDate: z.string().datetime().or(z.date()).optional(),
     endDate: z.string().datetime().or(z.date()).nullable().optional(),
     currentTimestamp: z.number().int().min(0).nullable().optional(),
@@ -41,6 +42,7 @@ export const createWatchlistMovieSchema = z.object({
     posterImage: z.string().nullable().optional(),
     platform: z.string().max(100).nullable().optional(),
     durationMinutes: z.number().int().min(1).nullable().optional(),
+    externalId: z.string().nullable().optional(),
     tags: z.array(z.string()).optional(),
   }),
 });
@@ -61,7 +63,7 @@ export const updateMovieSchema = z.object({
     isWatchlist: z.boolean().optional(),
     
     // Session updates
-    status: z.enum(['watching', 'completed', 'paused', 'rewatching']).optional(),
+    status: z.enum(['to_watch', 'watching', 'completed', 'paused', 'rewatching']).optional(),
     startDate: z.string().datetime().or(z.date()).optional(),
     endDate: z.string().datetime().or(z.date()).nullable().optional(),
     currentTimestamp: z.number().int().min(0).nullable().optional(),

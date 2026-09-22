@@ -8,6 +8,7 @@ export interface IRefreshToken extends Document {
   userAgent?: string;
   ipAddress?: string;
   isRevoked: boolean;
+  revokedAt?: Date | null;
   expiresAt: Date;
   createdAt: Date;
 }
@@ -46,6 +47,10 @@ const RefreshTokenSchema = new Schema<IRefreshToken>(
     isRevoked: {
       type: Boolean,
       default: false,
+    },
+    revokedAt: {
+      type: Date,
+      default: null,
     },
     expiresAt: {
       type: Date,

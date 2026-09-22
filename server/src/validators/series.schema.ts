@@ -4,8 +4,9 @@ export const seasonStructureSchema = z.object({
   seasonNumber: z.number().int().min(1),
   title: z.string().nullable().optional(),
   year: z.number().int().min(1900).max(2100).nullable().optional(),
-  episodeCount: z.number().int().min(1).nullable().optional(),
+  episodeCount: z.number().int().min(0).nullable().optional(),
   notes: z.string().nullable().optional(),
+  episodes: z.array(z.any()).optional(),
 });
 
 export const createSeriesSchema = z.object({
@@ -16,9 +17,10 @@ export const createSeriesSchema = z.object({
     genre: z.string().max(100).nullable().optional(),
     posterImage: z.string().nullable().optional(),
     platform: z.string().max(100).nullable().optional(),
+    externalId: z.string().nullable().optional(),
 
     // Initial session info
-    status: z.enum(['watching', 'completed', 'paused', 'rewatching']).default('watching'),
+    status: z.enum(['to_watch', 'watching', 'completed', 'paused', 'rewatching']).default('to_watch'),
     startDate: z.string().datetime().or(z.date()).optional(),
     endDate: z.string().datetime().or(z.date()).nullable().optional(),
     currentTimestamp: z.number().int().min(0).nullable().optional(),
@@ -55,7 +57,7 @@ export const updateSeriesSchema = z.object({
     isWatchlist: z.boolean().optional(),
 
     // Session updates
-    status: z.enum(['watching', 'completed', 'paused', 'rewatching']).optional(),
+    status: z.enum(['to_watch', 'watching', 'completed', 'paused', 'rewatching']).optional(),
     startDate: z.string().datetime().or(z.date()).optional(),
     endDate: z.string().datetime().or(z.date()).nullable().optional(),
     currentTimestamp: z.number().int().min(0).nullable().optional(),

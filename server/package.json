@@ -1,7 +1,7 @@
 {
-  "name": "tabvault-server",
-  "version": "1.0.0",
-  "description": "High-security Express and MongoDB backend for TabVault extension",
+  "name": "lore-server",
+  "version": "3.0.0",
+  "description": "High-performance Express and MongoDB backend for Lore personal assistant platform",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",

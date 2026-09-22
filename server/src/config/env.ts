@@ -8,11 +8,12 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   MONGODB_URI: z.string().min(1, 'MONGODB_URI is required'),
   JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters'),
-  JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
+  JWT_ACCESS_EXPIRES_IN: z.string().default('1h'),
   JWT_REFRESH_EXPIRES_DAYS: z.string().default('30').transform(Number),
   RATE_LIMIT_WINDOW_MS: z.string().default('900000').transform(Number),
-  RATE_LIMIT_MAX_REQUESTS: z.string().default('100').transform(Number),
-  AUTH_RATE_LIMIT_MAX_REQUESTS: z.string().default('10').transform(Number),
+  RATE_LIMIT_MAX_REQUESTS: z.string().default('1500').transform(Number),
+  AUTH_RATE_LIMIT_MAX_REQUESTS: z.string().default('30').transform(Number),
+  MEDIA_CATALOG_API_KEY: z.string().optional().default(''),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);

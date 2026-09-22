@@ -1,7 +1,8 @@
 import { UserModel, IUser } from '../models/user.model';
 import { RefreshTokenModel } from '../models/refresh-token.model';
-import { SecurityAuditLogModel } from '../models/audit-log.model';
 import { StashedSessionModel } from '../models/session.model';
+import { AuditService } from './audit.service';
+import { CacheService } from './cache.service';
 import {
   hashPassword,
   verifyPassword,
@@ -56,7 +57,7 @@ export class AuthService {
       userAgent: data.userAgent,
     });
 
-    await SecurityAuditLogModel.create({
+    AuditService.record({
       userId: user._id,
       event: 'REGISTER_SUCCESS',
       ipAddress: data.ipAddress,
@@ -78,7 +79,7 @@ export class AuthService {
   }): Promise<AuthTokens> {
     const user = await UserModel.findOne({ email: data.email });
     if (!user) {
-      await SecurityAuditLogModel.create({
+      AuditService.record({
         event: 'LOGIN_FAILED_NO_USER',
         ipAddress: data.ipAddress,
         userAgent: data.userAgent,
@@ -89,7 +90,7 @@ export class AuthService {
 
     const isMatch = await verifyPassword(data.password, user.passwordHash);
     if (!isMatch) {
-      await SecurityAuditLogModel.create({
+      AuditService.record({
         userId: user._id,
         event: 'LOGIN_FAILED_WRONG_PASSWORD',
         ipAddress: data.ipAddress,
@@ -104,7 +105,7 @@ export class AuthService {
       userAgent: data.userAgent,
     });
 
-    await SecurityAuditLogModel.create({
+    AuditService.record({
       userId: user._id,
       event: 'LOGIN_SUCCESS',
       ipAddress: data.ipAddress,
@@ -132,13 +133,65 @@ export class AuthService {
 
     // Check if token has been revoked - REUSE DETECTED!
     if (tokenDoc.isRevoked) {
-      // Malicious replay attack detected! Revoke the entire token family
+      // Allow a 30-second grace window for concurrent requests from the same client
+      const GRACE_PERIOD_MS = 30 * 1000;
+      const isWithinGrace =
+        tokenDoc.revokedAt &&
+        Date.now() - new Date(tokenDoc.revokedAt).getTime() < GRACE_PERIOD_MS;
+
+      if (isWithinGrace) {
+        // Find the active token in the same family
+        const activeToken = await RefreshTokenModel.findOne({
+          familyId: tokenDoc.familyId,
+          isRevoked: false,
+          expiresAt: { $gt: new Date() },
+        }).sort({ createdAt: -1 });
+
+        if (activeToken) {
+          const user = await UserModel.findById(tokenDoc.userId);
+          if (user) {
+            // Rotate forward safely within the family
+            activeToken.isRevoked = true;
+            activeToken.revokedAt = new Date();
+            await activeToken.save();
+
+            const rawRefreshToken = generateRandomToken(64);
+            const newRefreshTokenHash = hashToken(rawRefreshToken);
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + env.JWT_REFRESH_EXPIRES_DAYS);
+
+            await RefreshTokenModel.create({
+              userId: user._id,
+              tokenHash: newRefreshTokenHash,
+              familyId: tokenDoc.familyId,
+              deviceName: tokenDoc.deviceName,
+              userAgent: data.userAgent || tokenDoc.userAgent,
+              ipAddress: data.ipAddress || tokenDoc.ipAddress,
+              isRevoked: false,
+              expiresAt,
+            });
+
+            const accessToken = signAccessToken({
+              userId: user._id.toString(),
+              email: user.email,
+              tokenVersion: user.tokenVersion,
+            });
+
+            return {
+              accessToken,
+              refreshToken: rawRefreshToken,
+            };
+          }
+        }
+      }
+
+      // Malicious replay attack detected outside grace period! Revoke the entire token family
       await RefreshTokenModel.updateMany(
         { familyId: tokenDoc.familyId },
-        { isRevoked: true }
+        { isRevoked: true, revokedAt: new Date() }
       );
 
-      await SecurityAuditLogModel.create({
+      AuditService.record({
         userId: tokenDoc.userId,
         event: 'TOKEN_REUSE_DETECTED',
         ipAddress: data.ipAddress,
@@ -155,6 +208,7 @@ export class AuthService {
     // Check if expired
     if (new Date() > tokenDoc.expiresAt) {
       tokenDoc.isRevoked = true;
+      tokenDoc.revokedAt = new Date();
       await tokenDoc.save();
       throw new AppError('Refresh token has expired. Please log in again.', 401);
     }
@@ -167,6 +221,7 @@ export class AuthService {
 
     // Mark current refresh token as revoked (used)
     tokenDoc.isRevoked = true;
+    tokenDoc.revokedAt = new Date();
     await tokenDoc.save();
 
     // Issue new refresh token in the SAME family
@@ -204,7 +259,7 @@ export class AuthService {
   static async logout(refreshToken: string): Promise<void> {
     if (!refreshToken) return;
     const tokenHash = hashToken(refreshToken);
-    await RefreshTokenModel.updateOne({ tokenHash }, { isRevoked: true });
+    await RefreshTokenModel.updateOne({ tokenHash }, { isRevoked: true, revokedAt: new Date() });
   }
 
   /**
@@ -272,6 +327,9 @@ export class AuthService {
       email: user.email,
       tokenVersion: user.tokenVersion,
     });
+
+    // Populate in-memory cache immediately so first request skips DB
+    CacheService.setTokenVersion(user._id.toString(), user.tokenVersion);
 
     return {
       accessToken,

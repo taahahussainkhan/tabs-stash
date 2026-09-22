@@ -159,7 +159,7 @@ export class MovieController {
           pause_resume: s.pauseLogs?.length
             ? {
                 pause_count: s.pauseLogs.length,
-                resume_count: s.pauseLogs.filter(p => p.resumedAt).length,
+                resume_count: s.pauseLogs.filter((p: any) => p.resumedAt).length,
                 first_paused_at: s.pauseLogs[0]?.pausedAt,
                 last_resumed_at: s.pauseLogs[s.pauseLogs.length - 1]?.resumedAt,
               }

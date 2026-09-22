@@ -18,6 +18,8 @@ export interface IMovie extends Document {
   posterImage?: string | null;
   platform?: string | null;
   durationMinutes?: number | null;
+  catalogId?: Types.ObjectId | null;
+  externalId?: string | null;
   isFavorite: boolean;
   isWatchlist: boolean;
   currentSessionId?: Types.ObjectId | null;
@@ -82,6 +84,17 @@ const MovieSchema = new Schema<IMovie>(
     durationMinutes: {
       type: Number,
       default: null,
+    },
+    catalogId: {
+      type: Schema.Types.ObjectId,
+      ref: 'CatalogMedia',
+      default: null,
+      index: true,
+    },
+    externalId: {
+      type: String,
+      default: null,
+      index: true,
     },
     isFavorite: {
       type: Boolean,
