@@ -13,12 +13,15 @@ if (!fs.existsSync(releasesDir)) {
   fs.mkdirSync(releasesDir, { recursive: true });
 }
 
+const manifestRaw = fs.readFileSync(path.join(extensionDir, 'manifest.json'), 'utf8');
+const currentVersion = JSON.parse(manifestRaw).version || '3.1.0';
+
 function packageTarget(browserName) {
   const pkgName = `lore-${browserName}`;
   const stagingDir = path.join(distPkgDir, pkgName);
-  const zipPath = path.join(releasesDir, `${pkgName}-v3.0.0.zip`);
+  const zipPath = path.join(releasesDir, `${pkgName}-v${currentVersion}.zip`);
 
-  console.log(`\n📦 Packaging ${browserName.toUpperCase()} extension...`);
+  console.log(`\n📦 Packaging ${browserName.toUpperCase()} extension (v${currentVersion})...`);
 
   // Clean staging
   if (fs.existsSync(stagingDir)) {

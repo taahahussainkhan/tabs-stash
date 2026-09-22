@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Lore - Personal Assistant & Tab Stash",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": "Save tabs instantly, free up memory, build your reading shelf, and sync with your Lore personal assistant.",
   "permissions": [
     "tabs",
