@@ -75,7 +75,17 @@ resource "aws_apigatewayv2_api" "http_api" {
 
   cors_configuration {
     allow_credentials = true
-    allow_headers     = ["*"]
+    allow_headers     = [
+      "content-type",
+      "authorization",
+      "x-requested-with",
+      "accept",
+      "origin",
+      "x-api-key",
+      "x-client-version",
+      "cache-control",
+      "pragma"
+    ]
     allow_methods     = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"]
     allow_origins     = [
       "http://localhost:5173",
@@ -90,6 +100,7 @@ resource "aws_apigatewayv2_api" "http_api" {
       "https://d31f2v0n3tseq0.amplifyapp.com",
       "https://main.d31f2v0n3tseq0.amplifyapp.com"
     ]
+    expose_headers    = ["set-cookie", "authorization"]
     max_age           = 86400
   }
 }
