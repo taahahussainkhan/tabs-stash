@@ -57,8 +57,9 @@ resource "aws_lambda_function" "tabvault_api" {
       JWT_ACCESS_EXPIRES_IN        = "15m"
       JWT_REFRESH_EXPIRES_DAYS     = "30"
       RATE_LIMIT_WINDOW_MS         = "900000"
-      RATE_LIMIT_MAX_REQUESTS      = "100"
-      AUTH_RATE_LIMIT_MAX_REQUESTS = "10"
+      RATE_LIMIT_MAX_REQUESTS      = "1500"
+      AUTH_RATE_LIMIT_MAX_REQUESTS = "30"
+      MEDIA_CATALOG_API_KEY        = var.media_catalog_api_key
     }
   }
 
@@ -73,10 +74,19 @@ resource "aws_apigatewayv2_api" "http_api" {
   protocol_type = "HTTP"
 
   cors_configuration {
-    allow_headers = ["*"]
-    allow_methods = ["*"]
-    allow_origins = ["*"]
-    max_age       = 86400
+    allow_credentials = true
+    allow_headers     = ["*"]
+    allow_methods     = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"]
+    allow_origins     = [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:5175",
+      "http://localhost:3000",
+      "http://127.0.0.1:5173",
+      "http://127.0.0.1:5174",
+      "http://127.0.0.1:5175"
+    ]
+    max_age           = 86400
   }
 }
 

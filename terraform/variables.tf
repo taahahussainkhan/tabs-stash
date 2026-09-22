@@ -21,3 +21,10 @@ variable "jwt_access_secret" {
   type        = string
   default     = "tabvault_super_secure_access_secret_min_32_characters"
 }
+
+variable "media_catalog_api_key" {
+  description = "API key for external media catalog lookups"
+  type        = string
+  default     = ""
+}
+

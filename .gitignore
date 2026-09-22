@@ -10,6 +10,8 @@ server/build_lambda/
 .env.local
 server/.env
 server/.env.local
+frontend/.env
+frontend/.env.local
 *.pem
 *.key
 

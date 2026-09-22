@@ -1,18 +1,19 @@
 {
-  "name": "tabvault-all-in-one",
-  "version": "2.1.0",
+  "name": "lore",
+  "version": "3.0.0",
   "private": true,
-  "description": "TabVault & Personal Assistant - All-in-One Life & Knowledge Management Platform",
+  "description": "Lore — Personal Assistant & All-in-One Life, Media, and Knowledge Platform",
   "scripts": {
     "dev": "concurrently -n \"server,web\" -c \"blue,magenta\" \"npm run dev:server\" \"npm run dev:frontend\"",
-    "dev:server": "powershell -Command \"Get-NetTCPConnection -LocalPort 5000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; npm --prefix server run dev\"",
+    "dev:server": "npm --prefix server run dev",
     "dev:frontend": "npm --prefix frontend run dev",
     "build:server": "npm --prefix server run build",
     "build:frontend": "npm --prefix frontend run build",
     "build": "npm run build:server && npm run build:frontend",
-    "package:chrome": "powershell -Command \"if (Test-Path dist_pkg) { Remove-Item -Recurse -Force dist_pkg }; New-Item -ItemType Directory -Path dist_pkg/tabvault-chrome, releases -Force; Copy-Item extension/* -Destination dist_pkg/tabvault-chrome -Recurse; tar -a -c -f releases/tabvault-chrome-v2.1.0.zip -C dist_pkg tabvault-chrome; Remove-Item -Recurse -Force dist_pkg\"",
-    "package:firefox": "powershell -Command \"if (Test-Path dist_pkg) { Remove-Item -Recurse -Force dist_pkg }; New-Item -ItemType Directory -Path dist_pkg/tabvault-firefox, releases -Force; Copy-Item extension/* -Destination dist_pkg/tabvault-firefox -Recurse; tar -a -c -f releases/tabvault-firefox-v2.1.0.zip -C dist_pkg tabvault-firefox; Remove-Item -Recurse -Force dist_pkg\"",
-    "package:all": "npm run package:chrome && npm run package:firefox",
+    "package:chrome": "node scripts/package-extensions.js chrome",
+    "package:firefox": "node scripts/package-extensions.js firefox",
+    "package:all": "node scripts/package-extensions.js all",
+    "package:lambda": "node scripts/package-lambda.js",
     "build:all": "npm run build && npm run package:all"
   },
   "devDependencies": {
