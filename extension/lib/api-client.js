@@ -21,14 +21,14 @@
       if (data && data.tabvault_api_url) {
         return data.tabvault_api_url.replace(/\/$/, '');
       }
-      return LOCAL_API_URL;
+      return CLOUD_API_URL;
     }
 
     /**
      * Set active backend API URL
      */
     async setBaseUrl(url) {
-      const cleanUrl = url ? url.trim().replace(/\/$/, '') : LOCAL_API_URL;
+      const cleanUrl = url ? url.trim().replace(/\/$/, '') : CLOUD_API_URL;
       await TabVaultAPI.storage.local.set({ tabvault_api_url: cleanUrl });
     }
 

@@ -6,7 +6,8 @@ try {
     'lib/device-manager.js',
     'lib/api-client.js',
     'lib/sync-engine.js',
-    'lib/links-manager.js'
+    'lib/links-manager.js',
+    'lib/session-actions.js'
   );
 } catch (e) {
   console.warn('TabVault: importScripts skipped or running in module environment', e);
@@ -50,13 +51,13 @@ chrome.runtime.onInstalled.addListener(() => {
   // New Right-Click Link Saver Context Menu
   chrome.contextMenus.create({
     id: "save_link_to_tabvault",
-    title: "Save Link to TabVault Reading List",
+    title: "Save Link to Lore Reading List",
     contexts: ["link"]
   });
 
   chrome.contextMenus.create({
     id: "open_dashboard",
-    title: "Open TabVault Dashboard",
+    title: "Open Lore Dashboard",
     contexts: ["action", "page"]
   });
 

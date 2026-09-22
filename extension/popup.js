@@ -1008,156 +1008,53 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Session Renaming
   async function handleRenameSession(sessionId, newTitle) {
+    await TabVaultSessionActions.renameSession(sessionId, newTitle);
     const data = await TabVaultAPI.storage.local.get(['savedSessions']);
-    let sessions = data.savedSessions || [];
-    const index = sessions.findIndex((s) => s.id === sessionId);
-    if (index !== -1) {
-      sessions[index].title = newTitle;
-      sessions[index].clientUpdatedAt = Date.now();
-      await TabVaultAPI.storage.local.set({ savedSessions: sessions });
-      allSessions = sessions;
-      TabVaultSyncEngine.onLocalDataChanged();
-    }
+    allSessions = data.savedSessions || [];
   }
 
   // Toggle Pin
   async function handleTogglePin(sessionId) {
-    const data = await TabVaultAPI.storage.local.get(['savedSessions']);
-    let sessions = data.savedSessions || [];
-    const index = sessions.findIndex((s) => s.id === sessionId);
-    if (index !== -1) {
-      sessions[index].isPinned = !sessions[index].isPinned;
-      sessions[index].clientUpdatedAt = Date.now();
-      await TabVaultAPI.storage.local.set({ savedSessions: sessions });
-      loadAndRenderSessions();
-      TabVaultSyncEngine.onLocalDataChanged();
-    }
+    await TabVaultSessionActions.togglePin(sessionId);
+    loadAndRenderSessions();
   }
 
   // Archive Session
   async function handleArchiveSession(sessionId) {
-    const data = await TabVaultAPI.storage.local.get(['savedSessions']);
-    let sessions = data.savedSessions || [];
-    const index = sessions.findIndex((s) => s.id === sessionId);
-    if (index !== -1) {
-      sessions[index].isArchived = true;
-      sessions[index].archivedAt = Date.now();
-      sessions[index].clientUpdatedAt = Date.now();
-      await TabVaultAPI.storage.local.set({ savedSessions: sessions });
-      loadAndRenderSessions();
-      TabVaultSyncEngine.onLocalDataChanged();
-    }
+    await TabVaultSessionActions.archiveSession(sessionId);
+    loadAndRenderSessions();
   }
 
   // Unarchive Session
   async function handleUnarchiveSession(sessionId) {
-    const data = await TabVaultAPI.storage.local.get(['savedSessions']);
-    let sessions = data.savedSessions || [];
-    const index = sessions.findIndex((s) => s.id === sessionId);
-    if (index !== -1) {
-      sessions[index].isArchived = false;
-      sessions[index].archivedAt = null;
-      sessions[index].clientUpdatedAt = Date.now();
-      await TabVaultAPI.storage.local.set({ savedSessions: sessions });
-      loadAndRenderSessions();
-      TabVaultSyncEngine.onLocalDataChanged();
-    }
+    await TabVaultSessionActions.unarchiveSession(sessionId);
+    loadAndRenderSessions();
   }
 
   // Restore Session
   async function handleRestoreSession(sessionId, inNewWindow = false) {
-    const data = await TabVaultAPI.storage.local.get(['savedSessions']);
-    let sessions = data.savedSessions || [];
-    const sessionIndex = sessions.findIndex((s) => s.id === sessionId);
-    if (sessionIndex !== -1) {
-      const session = sessions[sessionIndex];
-      const tabsToOpen = session.tabs || [];
-      if (tabsToOpen.length > 0) {
-        const urls = tabsToOpen.map((t) => t.url);
-        if (inNewWindow) {
-          await TabVaultAPI.windows.create({ url: urls });
-        } else {
-          for (const url of urls) {
-            await TabVaultAPI.tabs.create({ url });
-          }
-        }
-
-        tabsToOpen.forEach((t) => {
-          t.isPopped = true;
-          t.poppedAt = Date.now();
-        });
-        session.isRestored = true;
-        session.restoredAt = Date.now();
-        session.clientUpdatedAt = Date.now();
-
-        await TabVaultAPI.storage.local.set({ savedSessions: sessions });
-        loadAndRenderSessions();
-        refreshOpenTabsData();
-        TabVaultSyncEngine.onLocalDataChanged();
-      }
-    }
+    await TabVaultSessionActions.restoreSession(sessionId, inNewWindow);
+    loadAndRenderSessions();
+    refreshOpenTabsData();
   }
 
   // Re-Stash Session (Move from Restored back to Active)
   async function handleRestashSession(sessionId) {
-    const data = await TabVaultAPI.storage.local.get(['savedSessions']);
-    let sessions = data.savedSessions || [];
-    const sessionIndex = sessions.findIndex((s) => s.id === sessionId);
-    if (sessionIndex !== -1) {
-      const session = sessions[sessionIndex];
-      session.isRestored = false;
-      session.restoredAt = null;
-      (session.tabs || []).forEach((t) => {
-        t.isPopped = false;
-        t.poppedAt = null;
-      });
-      session.clientUpdatedAt = Date.now();
-
-      await TabVaultAPI.storage.local.set({ savedSessions: sessions });
-      loadAndRenderSessions();
-      TabVaultSyncEngine.onLocalDataChanged();
-    }
+    await TabVaultSessionActions.restashSession(sessionId);
+    loadAndRenderSessions();
   }
 
   // Pop single tab
   async function popTabFromSession(sessionId, tabId) {
-    const data = await TabVaultAPI.storage.local.get(['savedSessions']);
-    let sessions = data.savedSessions || [];
-    const sessionIndex = sessions.findIndex((s) => s.id === sessionId);
-    if (sessionIndex !== -1) {
-      const tab = (sessions[sessionIndex].tabs || []).find((t) => t.id === tabId);
-      if (tab) {
-        tab.isPopped = true;
-        tab.poppedAt = Date.now();
-        sessions[sessionIndex].clientUpdatedAt = Date.now();
-
-        await TabVaultAPI.storage.local.set({ savedSessions: sessions });
-        loadAndRenderSessions();
-        refreshOpenTabsData();
-        TabVaultSyncEngine.onLocalDataChanged();
-      }
-    }
+    await TabVaultSessionActions.popTab(sessionId, tabId);
+    loadAndRenderSessions();
+    refreshOpenTabsData();
   }
 
   // Delete Tab from Session
   async function handleDeleteTab(sessionId, tabId) {
-    const data = await TabVaultAPI.storage.local.get(['savedSessions']);
-    let sessions = data.savedSessions || [];
-    const sessionIndex = sessions.findIndex((s) => s.id === sessionId);
-    if (sessionIndex !== -1) {
-      sessions[sessionIndex].tabs = sessions[sessionIndex].tabs.filter(
-        (t) => t.id !== tabId
-      );
-      sessions[sessionIndex].clientUpdatedAt = Date.now();
-
-      if (sessions[sessionIndex].tabs.length === 0) {
-        sessions[sessionIndex].isArchived = true;
-        sessions[sessionIndex].archivedAt = Date.now();
-      }
-
-      TabVaultSyncEngine.onLocalDataChanged();
-      await TabVaultAPI.storage.local.set({ savedSessions: sessions });
-      loadAndRenderSessions();
-    }
+    await TabVaultSessionActions.deleteTab(sessionId, tabId);
+    loadAndRenderSessions();
   }
 });
+

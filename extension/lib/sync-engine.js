@@ -72,8 +72,12 @@
         const lastSync = data.tabvault_last_sync || 0;
         const pendingDeletions = data.tabvault_pending_deletions || [];
 
-        // Format client changes payload
-        const clientChanges = localSessions.map((session) => ({
+        // Format client changes payload (Only send modified items if lastSync > 0)
+        const sessionsToSync = lastSync > 0
+          ? localSessions.filter((s) => (s.clientUpdatedAt || s.timestamp || 0) > lastSync)
+          : localSessions;
+
+        const clientChanges = sessionsToSync.map((session) => ({
           id: session.id,
           title: session.title || 'Untitled Session',
           timestamp: session.timestamp || Date.now(),
@@ -166,7 +170,11 @@
         const lastSyncLinks = linksData.tabvault_last_sync_links || 0;
         const pendingLinkDeletions = linksData.tabvault_pending_link_deletions || [];
 
-        const clientLinkChanges = localLinks.map((l) => ({
+        const linksToSync = lastSyncLinks > 0
+          ? localLinks.filter((l) => (l.updatedAt || l.savedAt || 0) > lastSyncLinks)
+          : localLinks;
+
+        const clientLinkChanges = linksToSync.map((l) => ({
           id: l.id,
           url: l.url,
           title: l.title || 'Saved Link',

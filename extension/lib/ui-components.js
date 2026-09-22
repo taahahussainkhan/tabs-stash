@@ -13,6 +13,14 @@
       card.className = `session-card ${session.isPinned ? 'pinned' : ''} ${session.isArchived ? 'archived' : ''}`;
       card.dataset.sessionId = session.id;
 
+      if (session.customWidth) {
+        card.style.width = `${session.customWidth}px`;
+        card.style.flex = `0 0 ${session.customWidth}px`;
+      }
+      if (session.customHeight) {
+        card.style.height = `${session.customHeight}px`;
+      }
+
       const activeTabs = (session.tabs || []).filter((t) => !t.isPopped);
       const timeAgo = this.formatTimeAgo(session.timestamp);
 
@@ -232,6 +240,12 @@
             document.removeEventListener('mouseup', onMouseUp);
             document.body.style.cursor = '';
             document.body.style.userSelect = '';
+
+            const finalWidth = card.getBoundingClientRect().width;
+            const finalHeight = card.getBoundingClientRect().height;
+            if (handlers.onResize && (finalWidth !== startWidth || finalHeight !== startHeight)) {
+              handlers.onResize(session.id, finalWidth, finalHeight);
+            }
           };
 
           document.body.style.cursor = resizeWidth && resizeHeight ? 'nwse-resize' : resizeWidth ? 'ew-resize' : 'ns-resize';

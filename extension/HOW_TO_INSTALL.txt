@@ -1,5 +1,5 @@
 ================================================================================
-  TabVault Extension - Quick 10-Second Installation Guide
+  Lore Extension - Quick 10-Second Installation Guide
 ================================================================================
 
 HOW TO LOAD IN CHROME / EDGE / BRAVE / OPERA:
@@ -16,7 +16,7 @@ HOW TO LOAD IN CHROME / EDGE / BRAVE / OPERA:
 
 4. Select THIS folder (the folder containing this HOW_TO_INSTALL.txt and manifest.json).
 
-5. Done! Pin TabVault to your toolbar for quick 1-click stashing and press Alt+S anytime.
+5. Done! Pin Lore to your toolbar for quick 1-click stashing and press Alt+Shift+S anytime.
 
 
 HOW TO LOAD IN MOZILLA FIREFOX:
