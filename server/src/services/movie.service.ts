@@ -86,34 +86,27 @@ export class MovieService {
     const formattedMovies = movies.map(m => {
       const mObj = (m as any).toObject ? (m as any).toObject() : m;
       const currentSession = mObj.currentSessionId;
-      const normalizedMovie = {
-        ...mObj,
-        public_id: mObj.publicId,
-        is_favorite: mObj.isFavorite,
-        is_watchlist: mObj.isWatchlist,
-        poster_image: mObj.posterImage,
-        duration_minutes: mObj.durationMinutes,
-        created_at: mObj.createdAt,
-        updated_at: mObj.updatedAt,
-      };
-
-      const normalizedSession = currentSession ? {
-        ...(currentSession.toObject ? currentSession.toObject() : currentSession),
-        public_id: currentSession.publicId,
-        status: currentSession.status,
-        start_date: currentSession.startDate,
-        end_date: currentSession.endDate,
-        current_position: currentSession.currentPosition,
-        stop_reason: currentSession.stopReason,
-        is_rewatch: currentSession.isRewatch,
-        created_at: currentSession.createdAt,
-        updated_at: currentSession.updatedAt,
-      } : null;
 
       return {
-        ...normalizedMovie,
-        movie: normalizedMovie,
-        current_session: normalizedSession,
+        id: mObj.publicId,
+        public_id: mObj.publicId,
+        title: mObj.title,
+        director: mObj.director,
+        year: mObj.year,
+        genre: mObj.genre,
+        poster_image: mObj.posterImage,
+        platform: mObj.platform,
+        status: currentSession?.status || mObj.status || 'to_watch',
+        rating: currentSession?.rating ?? mObj.rating,
+        start_date: currentSession?.startDate || mObj.createdAt,
+        end_date: currentSession?.endDate || null,
+        current_position: currentSession?.currentPosition,
+        stop_reason: currentSession?.stopReason,
+        is_favorite: mObj.isFavorite || false,
+        is_watchlist: mObj.isWatchlist || false,
+        is_rewatch: currentSession?.isRewatch || false,
+        created_at: mObj.createdAt,
+        updated_at: mObj.updatedAt,
       };
     });
 

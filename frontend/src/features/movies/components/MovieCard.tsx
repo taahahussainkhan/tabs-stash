@@ -2,15 +2,16 @@ import { memo } from 'react'
 import type { MovieLog } from '../types/movie'
 import { useNavigate } from 'react-router-dom'
 import { 
-  MessageSquare, Star, Bookmark, Calendar, User, Tag, Edit, 
-  History, CheckCircle2, Trash2 
+  MessageSquare, Star, Bookmark, Calendar, User, Tag,
+  CheckCircle2, Trash2, Film 
 } from 'lucide-react'
 import { getStatusColorClass, getStatusDotClass } from '../../../shared/utils/styles'
 import { 
   CardContainer, 
   CardHeader, 
   CardStats, 
-  StatItem 
+  StatItem,
+  CardImage 
 } from '../../../shared/components/common/Card'
 import { CardActions } from './card/CardActions'
 
@@ -31,13 +32,13 @@ interface MovieCardProps {
 export const MovieCard = memo(function MovieCard({
   movie,
   onEdit,
-  onAddComments,
   onRewatch,
   onViewHistory,
   onMarkCompleted,
   onDelete,
   onToggleFavorite,
   onToggleWatchlist,
+  size,
   layout = 'grid'
 }: MovieCardProps) {
   const navigate = useNavigate()
@@ -122,62 +123,73 @@ export const MovieCard = memo(function MovieCard({
   return (
     <CardContainer
       layout={layout}
+      size={size}
       onClick={() => navigate(`/movies/${movie.id}`)}
       className="card-accent-cyan"
     >
-      <CardHeader
+      <CardImage
+        src={movie.poster_image}
+        alt={movie.title}
+        fallbackIcon={<Film className={isList ? "w-5 h-5 text-accent-cyan/40" : "w-10 h-10 text-accent-cyan/30"} />}
         layout={layout}
-        title={movie.title}
-        status={movie.status}
-        statusColorClass={getStatusColorClass(movie.status)}
-        statusDotClass={getStatusDotClass(movie.status)}
-        icons={quickIcons}
-        dropdownItems={dropdownItems}
-        subtitle={
-          <>
-            {movie.year && <span>{movie.year}</span>}
-            {movie.director && <span>• {movie.director}</span>}
-            {movie.genre && <span>• {movie.genre}</span>}
-          </>
-        }
       />
 
-      <CardStats layout={layout}>
-        {movie.rating != null && (
-          <StatItem
-            icon={Star}
-            label={<span className="font-mono text-accent-ochre font-bold">★ {movie.rating.toFixed(1)}/10</span>}
-          />
-        )}
-        {movie.director && !isList && (
-          <StatItem icon={User} label={movie.director} />
-        )}
-        {movie.genre && !isList && (
-          <StatItem icon={Tag} label={movie.genre} />
-        )}
-        {movie.start_date && (
-          <StatItem
-            icon={Calendar}
-            label={new Date(movie.start_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-          />
-        )}
-        {movie.comments && movie.comments.length > 0 && (
-          <StatItem
-            icon={MessageSquare}
-            label={`${movie.comments.length} log note${movie.comments.length > 1 ? 's' : ''}`}
-          />
-        )}
-      </CardStats>
-
-      {!isList && (
-        <CardActions
-          movie={movie}
-          onEdit={onEdit}
-          onMarkCompleted={onMarkCompleted}
-          onRewatch={onRewatch}
-          onViewHistory={onViewHistory}
+      <div className="flex-1 min-w-0 flex flex-col justify-between">
+        <CardHeader
+          layout={layout}
+          title={movie.title}
+          status={movie.status}
+          statusColorClass={getStatusColorClass(movie.status)}
+          statusDotClass={getStatusDotClass(movie.status)}
+          icons={quickIcons}
+          dropdownItems={dropdownItems}
+          subtitle={
+            <>
+              {movie.year && <span>{movie.year}</span>}
+              {movie.director && <span>• {movie.director}</span>}
+              {movie.genre && <span>• {movie.genre}</span>}
+            </>
+          }
         />
-      )}
+
+        <CardStats layout={layout}>
+          {movie.rating != null && (
+            <StatItem
+              icon={Star}
+              label={<span className="font-mono text-accent-ochre font-bold">★ {movie.rating.toFixed(1)}/10</span>}
+            />
+          )}
+          {movie.director && !isList && (
+            <StatItem icon={User} label={movie.director} />
+          )}
+          {movie.genre && !isList && (
+            <StatItem icon={Tag} label={movie.genre} />
+          )}
+          {movie.start_date && (
+            <StatItem
+              icon={Calendar}
+              label={new Date(movie.start_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+            />
+          )}
+          {movie.comments && movie.comments.length > 0 && (
+            <StatItem
+              icon={MessageSquare}
+              label={`${movie.comments.length} log note${movie.comments.length > 1 ? 's' : ''}`}
+            />
+          )}
+        </CardStats>
+
+        {!isList && (
+          <CardActions
+            movie={movie}
+            onEdit={onEdit}
+            onMarkCompleted={onMarkCompleted}
+            onRewatch={onRewatch}
+            onViewHistory={onViewHistory}
+          />
+        )}
+      </div>
     </CardContainer>
   )
 })
+

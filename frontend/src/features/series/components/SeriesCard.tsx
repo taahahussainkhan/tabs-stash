@@ -3,14 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import type { SeriesLog } from '../types/series'
 import { 
   Star, Bookmark, Calendar, User, Tag, 
-  CheckCircle2, Trash2, Layers
+  CheckCircle2, Trash2, Layers, Tv
 } from 'lucide-react'
 import { getStatusColorClass, getStatusDotClass } from '../../../shared/utils/styles'
 import { 
   CardContainer, 
   CardHeader, 
   CardStats, 
-  StatItem 
+  StatItem,
+  CardImage 
 } from '../../../shared/components/common/Card'
 import { CardActions } from './card/CardActions'
 
@@ -37,6 +38,7 @@ export const SeriesCard = memo(function SeriesCard({
   onDelete,
   onToggleFavorite,
   onToggleWatchlist,
+  size,
   layout = 'grid'
 }: SeriesCardProps) {
   const navigate = useNavigate()
@@ -121,62 +123,72 @@ export const SeriesCard = memo(function SeriesCard({
   return (
     <CardContainer
       layout={layout}
+      size={size}
       onClick={() => navigate(`/series/${series.id}`)}
       className="card-accent-ochre"
     >
-      <CardHeader
+      <CardImage
+        src={series.poster_image}
+        alt={series.title}
+        fallbackIcon={<Tv className={isList ? "w-5 h-5 text-accent-ochre/40" : "w-10 h-10 text-accent-ochre/30"} />}
         layout={layout}
-        title={series.title}
-        status={series.status}
-        statusColorClass={getStatusColorClass(series.status)}
-        statusDotClass={getStatusDotClass(series.status)}
-        icons={quickIcons}
-        dropdownItems={dropdownItems}
-        subtitle={
-          <>
-            {series.year && <span>{series.year}</span>}
-            {series.creator && <span>• {series.creator}</span>}
-            {series.genre && <span>• {series.genre}</span>}
-          </>
-        }
       />
 
-      <CardStats layout={layout}>
-        {series.rating != null && (
-          <StatItem
-            icon={Star}
-            label={<span className="font-mono text-accent-ochre font-bold">★ {series.rating.toFixed(1)}/10</span>}
-          />
-        )}
-        {series.total_episodes != null && series.total_episodes > 0 && (
-          <StatItem
-            icon={Layers}
-            label={<span className="font-mono text-xs">{series.episodes_watched || 0}/{series.total_episodes} eps</span>}
-          />
-        )}
-        {series.creator && !isList && (
-          <StatItem icon={User} label={series.creator} />
-        )}
-        {series.genre && !isList && (
-          <StatItem icon={Tag} label={series.genre} />
-        )}
-        {series.start_date && (
-          <StatItem
-            icon={Calendar}
-            label={new Date(series.start_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-          />
-        )}
-      </CardStats>
-
-      {!isList && (
-        <CardActions
-          series={series}
-          onEdit={onEdit}
-          onMarkCompleted={onMarkCompleted}
-          onRewatch={onRewatch}
-          onViewHistory={onViewHistory}
+      <div className="flex-1 min-w-0 flex flex-col justify-between">
+        <CardHeader
+          layout={layout}
+          title={series.title}
+          status={series.status}
+          statusColorClass={getStatusColorClass(series.status)}
+          statusDotClass={getStatusDotClass(series.status)}
+          icons={quickIcons}
+          dropdownItems={dropdownItems}
+          subtitle={
+            <>
+              {series.year && <span>{series.year}</span>}
+              {series.creator && <span>• {series.creator}</span>}
+              {series.genre && <span>• {series.genre}</span>}
+            </>
+          }
         />
-      )}
+
+        <CardStats layout={layout}>
+          {series.rating != null && (
+            <StatItem
+              icon={Star}
+              label={<span className="font-mono text-accent-ochre font-bold">★ {series.rating.toFixed(1)}/10</span>}
+            />
+          )}
+          {series.total_episodes != null && series.total_episodes > 0 && (
+            <StatItem
+              icon={Layers}
+              label={<span className="font-mono text-xs">{series.episodes_watched || 0}/{series.total_episodes} eps</span>}
+            />
+          )}
+          {series.creator && !isList && (
+            <StatItem icon={User} label={series.creator} />
+          )}
+          {series.genre && !isList && (
+            <StatItem icon={Tag} label={series.genre} />
+          )}
+          {series.start_date && (
+            <StatItem
+              icon={Calendar}
+              label={new Date(series.start_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+            />
+          )}
+        </CardStats>
+
+        {!isList && (
+          <CardActions
+            series={series}
+            onEdit={onEdit}
+            onMarkCompleted={onMarkCompleted}
+            onRewatch={onRewatch}
+            onViewHistory={onViewHistory}
+          />
+        )}
+      </div>
     </CardContainer>
   )
 })

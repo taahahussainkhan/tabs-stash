@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { cn } from '../../../../lib/utils';
 
 interface CardImageProps {
@@ -20,6 +20,7 @@ export const CardImage: React.FC<CardImageProps> = ({
   containerClass,
   layout = 'grid',
 }) => {
+  const [hasError, setHasError] = useState(false);
   const isList = layout === 'list';
 
   return (
@@ -28,14 +29,15 @@ export const CardImage: React.FC<CardImageProps> = ({
       isList ? 'w-14 h-18 rounded-[4px] shrink-0' : 'w-full aspect-[2/3] mb-3.5',
       containerClass
     )}>
-      {src ? (
+      {src && !hasError ? (
         <img 
           src={src} 
-          alt={alt} 
+          alt={alt || 'Media cover'} 
+          onError={() => setHasError(true)}
           className={cn('w-full h-full object-cover transition-transform duration-300 group-hover:scale-105', className)} 
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center text-content-muted/30">
+        <div className="w-full h-full flex items-center justify-center text-content-muted/30 bg-[#15171c]">
           {fallbackIcon}
         </div>
       )}
@@ -48,3 +50,4 @@ export const CardImage: React.FC<CardImageProps> = ({
     </div>
   );
 };
+

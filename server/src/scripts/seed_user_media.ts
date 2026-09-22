@@ -5,7 +5,7 @@ import { MovieModel, IMovie } from '../models/movie.model';
 import { SeriesModel, ISeries, ISeason, IEpisode } from '../models/series.model';
 import { MediaSessionModel } from '../models/media-session.model';
 import { mediaCatalogService } from '../services/catalog/media-catalog.service';
-import { enrichMediaFromCatalog } from '../services/helpers/catalog-enrichment';
+import { enrichMediaFromCatalog, EnrichableMedia } from '../services/helpers/catalog-enrichment';
 import { randomUUID } from 'crypto';
 
 interface SeedMovieConfig {
@@ -587,7 +587,7 @@ async function seedUserMedia() {
   console.log('\n--- Seeding Movies ---');
   for (const m of MOVIES_TO_SEED) {
     console.log(`Processing movie: "${m.title}"...`);
-    const { enrichedData, catalogDoc } = await enrichMediaFromCatalog(
+    const { enrichedData, catalogDoc } = await enrichMediaFromCatalog<EnrichableMedia>(
       {
         title: m.tmdbQuery || m.title,
         year: m.year,
@@ -662,7 +662,7 @@ async function seedUserMedia() {
   console.log('\n--- Seeding Series ---');
   for (const s of SERIES_TO_SEED) {
     console.log(`Processing series: "${s.title}"...`);
-    const { enrichedData, catalogDoc } = await enrichMediaFromCatalog(
+    const { enrichedData, catalogDoc } = await enrichMediaFromCatalog<EnrichableMedia>(
       {
         title: s.tmdbQuery || s.title,
         year: s.year,

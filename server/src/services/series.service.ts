@@ -73,35 +73,28 @@ export class SeriesService {
       const totalEpisodes = allEpisodes.length;
       const watchedEpisodes = allEpisodes.filter((e: any) => e.isWatched).length;
 
-      const normalizedSeries = {
-        ...sObj,
+      return {
+        id: sObj.publicId,
         public_id: sObj.publicId,
-        is_favorite: sObj.isFavorite,
-        is_watchlist: sObj.isWatchlist,
+        title: sObj.title,
+        creator: sObj.creator,
+        year: sObj.year,
+        genre: sObj.genre,
         poster_image: sObj.posterImage,
-        created_at: sObj.createdAt,
-        updated_at: sObj.updatedAt,
+        platform: sObj.platform,
+        status: currentSession?.status || sObj.status || 'to_watch',
+        rating: currentSession?.rating ?? sObj.rating,
+        start_date: currentSession?.startDate || sObj.createdAt,
+        end_date: currentSession?.endDate || null,
+        current_position: currentSession?.currentPosition,
+        stop_reason: currentSession?.stopReason,
+        is_favorite: sObj.isFavorite || false,
+        is_watchlist: sObj.isWatchlist || false,
+        is_rewatch: currentSession?.isRewatch || false,
         total_episodes: totalEpisodes,
         episodes_watched: watchedEpisodes,
-      };
-
-      const normalizedSession = currentSession ? {
-        ...(currentSession.toObject ? currentSession.toObject() : currentSession),
-        public_id: currentSession.publicId,
-        status: currentSession.status,
-        start_date: currentSession.startDate,
-        end_date: currentSession.endDate,
-        current_position: currentSession.currentPosition,
-        stop_reason: currentSession.stopReason,
-        is_rewatch: currentSession.isRewatch,
-        created_at: currentSession.createdAt,
-        updated_at: currentSession.updatedAt,
-      } : null;
-
-      return {
-        ...normalizedSeries,
-        series: normalizedSeries,
-        current_session: normalizedSession,
+        created_at: sObj.createdAt,
+        updated_at: sObj.updatedAt,
       };
     });
 
