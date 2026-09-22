@@ -501,8 +501,10 @@ const SERIES_TO_SEED: SeedSeriesConfig[] = [
   {
     title: 'Shehr-e-Zaat',
     tmdbQuery: 'Shehr-e-Zaat',
-    status: 'watching',
+    status: 'completed',
     startDate: new Date('2026-08-01T00:30:00.000Z'),
+    endDate: new Date('2026-08-08T12:00:00.000Z'),
+    completeAllSeasons: true,
   },
   {
     title: 'O Rangreza',

@@ -79,7 +79,7 @@
 | 57 | **The Walking Dead: Dead City — S3 Ep 1** | TV Series (Horror/Drama) | `26/07/2026, 1:39 pm`<br>*"The walking dead dead city s3 ep 1"* | `26/07/2026, 3:29 pm`<br>*"Compel"* | 1h 50m | ✅ Completed | Episode completed in 1h 50m (Reply Msg 540) |
 | 58 | **Kartavya** | TV Drama | `26/07/2026, 9:05 pm`<br>*"Kartavya reusme"* | `27/07/2026, 2:09 am`<br>*"Comple"* | 5h 04m | ✅ Completed | Resumed & finished in 5h 04m (Reply Msg 542) |
 | 59 | **I Will Find You** | Book / Literature | `31/07/2026, 1:13 pm`<br>*"I will find you"* | `—` | — | 📌 Watchlist / Planned | Harlan Coben thriller note (Msg 546) |
-| 60 | **Shehr-e-Zaat** | Pakistani Drama | `01/08/2026, 12:30 am`<br>*"Sheher e zaat start Dram"* | `—` | — | ⏳ Started | Mahira Khan / Umera Ahmed classic drama (Msg 547-548) |
+| 60 | **Shehr-e-Zaat** | Pakistani Drama (19 Episodes) | `01/08/2026, 12:30 am`<br>*"Sheher e zaat start Dram"* | `08/08/2026 (~prior to Spider-Man)` | ~7.5 days | ✅ Completed | Mahira Khan / Umera Ahmed classic drama; completed prior to Spider-Man watch on 08/08 |
 | 61 | **Spider-Man (2002)** | Movie (Superhero) | `08/08/2026, 1:18 pm`<br>*"Spiderman 2002 start"* | `09/08/2026, 4:58 pm`<br>*"Completed"* | 1d 3h 40m | ✅ Completed | Tobey Maguire classic; finished in 1d 3h 40m (Reply Msg 550) |
 | 62 | **Spider-Man 2 (2004)** | Movie (Superhero) | `09/08/2026, 8:07 pm`<br>*"Spiderman 2 start"* | `13/08/2026, 1:45 am`<br>*"Compeleted"* | 3d 5h 38m | ✅ Completed | Sam Raimi sequel; finished in 3d 5h 38m (Reply Msg 555) |
 | 63 | **O Rangreza** | Pakistani Drama | `13/08/2026, 11:01 pm`<br>*"O rangreza start"* | `—` | — | ⏳ Started | Sajal Aly / Bilal Abbas Khan drama (Msg 556) |
