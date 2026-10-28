@@ -7,6 +7,7 @@ try {
     'lib/api-client.js',
     'lib/sync-engine.js',
     'lib/links-manager.js',
+    'lib/cards-manager.js',
     'lib/session-actions.js'
   );
 } catch (e) {
@@ -55,11 +56,19 @@ chrome.runtime.onInstalled.addListener(() => {
     contexts: ["link"]
   });
 
+  // Right-Click Text Selection as Quick Card
+  chrome.contextMenus.create({
+    id: "save_text_as_card",
+    title: "Save Selection as Quick Card",
+    contexts: ["selection"]
+  });
+
   chrome.contextMenus.create({
     id: "open_dashboard",
     title: "Open Lore Dashboard",
     contexts: ["action", "page"]
   });
+
 
   // Setup periodic background sync alarm (runs every 10 minutes)
   if (chrome.alarms) {
@@ -106,22 +115,103 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       if (info.linkUrl) {
         await saveLinkFromContext(info.linkUrl, info.pageUrl, info.selectionText);
       }
+    } else if (info.menuItemId === "save_text_as_card") {
+      if (info.selectionText && typeof TabVaultCardsManager !== 'undefined') {
+        const pageTitle = tab && tab.title ? tab.title : '';
+        await TabVaultCardsManager.saveCard({
+          content: info.selectionText,
+          title: pageTitle,
+          color: 'charcoal',
+          tags: ['web-snippet'],
+          sourceUrl: tab && tab.url ? tab.url : '',
+        });
+      }
     } else if (info.menuItemId === "open_dashboard") {
       openDashboard();
     }
+
   } catch (err) {
     console.error("TabVault context menu click error:", err);
   }
 });
 
 // 4. Keyboard Commands Handler
-chrome.commands.onCommand.addListener((command) => {
+chrome.commands.onCommand.addListener(async (command) => {
   if (command === "stash_all_tabs") {
     stashCurrentWindowTabs({ exceptCurrent: false });
   } else if (command === "open_dashboard") {
     openDashboard();
+  } else if (command === "quick_card") {
+    try {
+      const [activeTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+      if (activeTab && activeTab.id) {
+        chrome.tabs.sendMessage(activeTab.id, { action: 'toggle_card_modal' }, async (response) => {
+          if (chrome.runtime.lastError || !response || !response.success) {
+            await openCenteredQuickCard();
+          }
+        });
+      } else {
+        await openCenteredQuickCard();
+      }
+    } catch (e) {
+      await openCenteredQuickCard();
+    }
   }
 });
+
+// Helper: Open Quick Flash Card popup centered on current screen
+async function openCenteredQuickCard(selectionText = '') {
+  const width = 520;
+  const height = 460;
+
+  let left = 200;
+  let top = 150;
+  let queryParams = '';
+
+  try {
+    const [activeTab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+    if (activeTab && activeTab.url && !activeTab.url.startsWith('chrome://') && !activeTab.url.startsWith('edge://')) {
+      const title = encodeURIComponent(activeTab.title || '');
+      const url = encodeURIComponent(activeTab.url || '');
+      queryParams = `?title=${title}&sourceUrl=${url}`;
+      if (selectionText) {
+        queryParams += `&selection=${encodeURIComponent(selectionText)}`;
+      }
+    }
+
+    const lastFocusedWin = await chrome.windows.getLastFocused();
+    if (lastFocusedWin && typeof lastFocusedWin.left === 'number' && typeof lastFocusedWin.width === 'number') {
+      left = Math.round(lastFocusedWin.left + (lastFocusedWin.width - width) / 2);
+      top = Math.round(lastFocusedWin.top + (lastFocusedWin.height - height) / 2);
+    }
+  } catch (e) {
+    console.warn('TabVault: Could not determine last focused window coordinates', e);
+  }
+
+  left = Math.max(20, left);
+  top = Math.max(20, top);
+
+  try {
+    await chrome.windows.create({
+      url: chrome.runtime.getURL(`quick-card.html${queryParams}`),
+      type: 'popup',
+      width: width,
+      height: height,
+      left: left,
+      top: top,
+      focused: true
+    });
+  } catch (err) {
+    console.error('TabVault: Error creating centered window:', err);
+    await chrome.windows.create({
+      url: chrome.runtime.getURL('quick-card.html'),
+      type: 'popup',
+      width: width,
+      height: height,
+      focused: true
+    });
+  }
+}
 
 // Helper: Open Dashboard in a tab
 function openDashboard() {
@@ -427,6 +517,20 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return true;
     }
     sendResponse({ success: false, reason: "sync_engine_not_found" });
+    return true;
+  } else if (request.action === "save_card" || request.action === "SAVE_CARD") {
+    if (typeof TabVaultCardsManager !== 'undefined') {
+      TabVaultCardsManager.saveCard(request.card)
+        .then((res) => sendResponse({ success: true, card: res }))
+        .catch((err) => sendResponse({ success: false, error: err.message }));
+      return true;
+    } else {
+      sendResponse({ success: false, error: 'cards_manager_not_loaded' });
+      return true;
+    }
+  } else if (request.action === "open_quick_card") {
+    openCenteredQuickCard(request.selection || '');
+    sendResponse({ success: true });
     return true;
   }
 });

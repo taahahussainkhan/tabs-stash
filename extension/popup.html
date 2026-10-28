@@ -1,18 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lore - Personal Assistant &amp; Tab Stash</title>
   <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
   <div class="app-container">
     <!-- Header -->
     <header class="app-header">
       <div class="brand">
         <div class="logo-icon">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="18" height="18" rx="4"></rect>
             <path d="M9 3v18"></path>
             <path d="M14 9l3 3-3 3"></path>
@@ -24,9 +27,21 @@
         </div>
       </div>
       <div class="header-actions">
+        <!-- Quick Card Mini-Popup Trigger Button -->
+        <button id="header-quick-card-btn" class="quick-card-header-btn"
+          title="New Quick Card (Alt+Shift+C anywhere on screen, Alt+C in popup)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+          </svg>
+          <span>+ Card</span>
+          <span class="header-card-hotkey">Alt+C</span>
+        </button>
+
         <!-- Optional Cloud Sync / Account Button -->
         <button id="cloud-sync-btn" class="cloud-btn" title="Cloud Sync & PC Manager">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
           </svg>
           <span id="sync-status-dot" class="status-dot hidden"></span>
@@ -34,7 +49,8 @@
         </button>
 
         <button id="open-dashboard-btn" class="icon-btn" title="Open Full Dashboard (Alt+Shift+D)">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <rect x="3" y="3" width="7" height="7"></rect>
             <rect x="14" y="3" width="7" height="7"></rect>
             <rect x="14" y="14" width="7" height="7"></rect>
@@ -66,7 +82,8 @@
     <div class="action-section">
       <div class="primary-action-row">
         <button id="stash-all-btn" class="primary-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
             <polyline points="17 21 17 13 7 13 7 21"></polyline>
             <polyline points="7 3 7 8 15 8"></polyline>
@@ -74,8 +91,10 @@
           <span>Stash All Window Tabs</span>
           <span class="hotkey">Alt+S</span>
         </button>
-        <button id="stash-except-btn" class="secondary-btn" title="Stash all tabs except the tab you are currently viewing">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button id="stash-except-btn" class="secondary-btn"
+          title="Stash all tabs except the tab you are currently viewing">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="8" x2="12" y2="12"></line>
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
@@ -94,7 +113,8 @@
           <span>Select Tabs...</span>
         </button>
 
-        <button id="stash-domain-btn" class="quick-action-pill domain-pill-btn hidden" title="Stash all tabs from active website">
+        <button id="stash-domain-btn" class="quick-action-pill domain-pill-btn hidden"
+          title="Stash all tabs from active website">
           <span class="pill-icon">🌐</span>
           <span id="stash-domain-btn-text">Stash Site</span>
         </button>
@@ -137,7 +157,12 @@
           <span>Links</span>
           <span id="links-count-badge" class="count-badge hidden">0</span>
         </button>
+        <button class="popup-tab-btn" data-view="cards">
+          <span>Cards</span>
+          <span id="cards-count-badge" class="count-badge hidden">0</span>
+        </button>
       </div>
+
       <div id="popup-grouping-selector" class="popup-grouping-selector hidden">
         <button class="popup-group-btn active" data-group="site" title="Group by Site">🌐</button>
         <button class="popup-group-btn" data-group="date" title="Group by Date">📅</button>
@@ -149,7 +174,8 @@
     <!-- Search & Filter Controls -->
     <div class="search-filter-row">
       <div class="search-container">
-        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="11" cy="11" r="8"></circle>
           <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
         </svg>
@@ -157,7 +183,8 @@
         <button id="clear-search-btn" class="clear-btn hidden">&times;</button>
       </div>
       <button id="open-filter-btn" class="icon-btn filter-btn" title="Filter by Site, Device / PC, Date">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
           <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
         </svg>
         <span id="filter-active-dot" class="filter-dot hidden"></span>
@@ -196,7 +223,8 @@
             <button class="link-filter-pill" data-filter="read">Read</button>
           </div>
           <div class="links-bulk-actions">
-            <button id="convert-links-to-stash-btn" class="sm-btn primary-btn" title="Convert selected (or unread) links into a Stashed Tab Session">
+            <button id="convert-links-to-stash-btn" class="sm-btn primary-btn"
+              title="Convert selected (or unread) links into a Stashed Tab Session">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
               </svg>
@@ -209,17 +237,46 @@
         </div>
       </div>
 
+      <!-- Quick Cards & Sticky Notes View Container -->
+      <div id="cards-container" class="cards-list-container hidden">
+        <!-- Cards Filter Bar & New Card Trigger -->
+        <div class="cards-filter-toolbar">
+          <div class="cards-filter-pills">
+            <button class="card-filter-pill active" data-filter="all">All Cards</button>
+            <button class="card-filter-pill" data-filter="pinned">📌 Pinned</button>
+          </div>
+          <div class="cards-toolbar-right">
+            <span id="cards-count-indicator" class="cards-count-indicator">0 cards</span>
+            <button id="open-card-modal-btn" class="sm-btn primary-btn new-card-btn" title="Create a new quick card">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              <span>New Card</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Saved Cards List -->
+        <div id="saved-cards-list" class="saved-cards-list">
+          <!-- Dynamic Quick Cards render here -->
+        </div>
+      </div>
+
+
       <!-- Empty State -->
       <div id="empty-state" class="empty-state hidden">
         <div class="empty-illustration">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+            stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
             <line x1="12" y1="11" x2="12" y2="17"></line>
             <line x1="9" y1="14" x2="15" y2="14"></line>
           </svg>
         </div>
         <h3 id="empty-heading">No Stashed Tabs Found</h3>
-        <p id="empty-subtext">Click <strong>"Stash All Window Tabs"</strong> above to store your open tabs safely here!</p>
+        <p id="empty-subtext">Click <strong>"Stash All Window Tabs"</strong> above to store your open tabs safely here!
+        </p>
       </div>
     </div>
 
@@ -258,6 +315,64 @@
             <button id="stash-selected-confirm-btn" class="primary-btn">
               <span>Stash Selected Tabs</span>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Card Composer Modal Overlay (Spacious panel-sized dialog) -->
+    <div id="card-composer-modal" class="modal-overlay hidden">
+      <div class="modal-card card-modal-card">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e5a83b" stroke-width="2.5">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+            </svg>
+            <h3>⚡ Quick Card / Note</h3>
+          </div>
+          <button id="close-card-composer-btn" class="close-modal-btn" title="Close (Esc)">&times;</button>
+        </div>
+
+        <div class="modal-body card-modal-body">
+          <div class="card-modal-textarea-wrap">
+            <textarea id="modal-card-content" class="card-modal-textarea"
+              placeholder="Paste anything here... text, notes, code snippets, ideas, reminders..." rows="7" autofocus></textarea>
+          </div>
+
+          <div class="card-modal-inputs-row">
+            <input type="text" id="modal-card-title" class="card-modal-input"
+              placeholder="Title (optional, auto-detected from 1st line)" />
+            <input type="text" id="modal-card-tags" class="card-modal-input"
+              placeholder="Tags (comma-separated, optional)" />
+          </div>
+
+          <div class="card-modal-footer">
+            <div class="card-color-picker" id="modal-card-color-picker">
+              <span class="picker-label">Color:</span>
+              <button type="button" class="color-dot active" data-color="charcoal" title="Charcoal"
+                style="background:#202228;"></button>
+              <button type="button" class="color-dot" data-color="terracotta" title="Terracotta"
+                style="background:#e05a47;"></button>
+              <button type="button" class="color-dot" data-color="ochre" title="Warm Ochre"
+                style="background:#e5a83b;"></button>
+              <button type="button" class="color-dot" data-color="sage" title="Sage Green"
+                style="background:#38a169;"></button>
+              <button type="button" class="color-dot" data-color="cyan" title="Teal Cyan"
+                style="background:#0d9488;"></button>
+              <button type="button" class="color-dot" data-color="purple" title="Royal Purple"
+                style="background:#5c67f2;"></button>
+            </div>
+
+            <div class="card-modal-actions">
+              <span class="card-modal-hotkey">Ctrl+Enter</span>
+              <button type="button" id="cancel-card-modal-btn" class="sm-btn secondary-btn">Cancel</button>
+              <button type="button" id="modal-save-card-btn" class="sm-btn primary-btn">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                </svg>
+                <span>Save Card</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -369,7 +484,8 @@
 
               <div class="form-group">
                 <label for="auth-password">Password</label>
-                <input type="password" id="auth-password" placeholder="••••••••" required autocomplete="current-password" />
+                <input type="password" id="auth-password" placeholder="••••••••" required
+                  autocomplete="current-password" />
               </div>
 
               <div id="auth-error-box" class="auth-error hidden"></div>
@@ -408,7 +524,8 @@
             <div class="profile-actions">
               <button id="manual-sync-btn" class="primary-btn w-full">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3L21.5 8M22 12.5a10 10 0 0 1-18.8 4.2L2.5 16"/>
+                  <path
+                    d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3L21.5 8M22 12.5a10 10 0 0 1-18.8 4.2L2.5 16" />
                 </svg>
                 <span>Sync Now</span>
               </button>
@@ -425,11 +542,14 @@
   <script src="lib/browser-adapter.js"></script>
   <script src="lib/device-manager.js"></script>
   <script src="lib/links-manager.js"></script>
+  <script src="lib/cards-manager.js"></script>
   <script src="lib/filter-manager.js"></script>
+
   <script src="lib/ui-components.js"></script>
   <script src="lib/api-client.js"></script>
   <script src="lib/sync-engine.js"></script>
   <script src="lib/session-actions.js"></script>
   <script src="popup.js"></script>
 </body>
+
 </html>

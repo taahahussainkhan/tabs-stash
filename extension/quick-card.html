@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lore • Quick Flash Card</title>
+  <link rel="stylesheet" href="quick-card.css">
+</head>
+<body>
+  <div class="composer-container">
+    <!-- Header -->
+    <header class="composer-header">
+      <div class="brand">
+        <div class="logo-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h2>Quick Flash Card</h2>
+          <span class="hotkey-hint">Ctrl+Enter to save • Esc to close</span>
+        </div>
+      </div>
+      <button id="close-btn" class="close-btn" title="Close (Esc)">&times;</button>
+    </header>
+
+    <!-- Main Content Input -->
+    <main class="composer-main">
+      <textarea id="card-content" class="card-textarea"
+        placeholder="Paste anything here... text, notes, code snippets, ideas, reminders, links..." autofocus></textarea>
+
+      <!-- Optional Fields -->
+      <div class="composer-meta-row">
+        <input type="text" id="card-title" class="meta-input"
+          placeholder="Title (optional, auto-detected from 1st line)" />
+        <input type="text" id="card-tags" class="meta-input"
+          placeholder="Tags (comma-separated, optional)" />
+      </div>
+
+      <div id="source-badge" class="source-badge hidden">
+        <span class="source-icon">🔗</span>
+        <span id="source-text" class="source-text">From active tab</span>
+      </div>
+    </main>
+
+    <!-- Footer Toolbar -->
+    <footer class="composer-footer">
+      <div class="color-picker-group">
+        <span class="picker-label">Color:</span>
+        <div class="color-dots" id="color-dots">
+          <button type="button" class="color-dot active" data-color="charcoal" title="Charcoal" style="background:#202228;"></button>
+          <button type="button" class="color-dot" data-color="terracotta" title="Terracotta" style="background:#e05a47;"></button>
+          <button type="button" class="color-dot" data-color="ochre" title="Warm Ochre" style="background:#e5a83b;"></button>
+          <button type="button" class="color-dot" data-color="sage" title="Sage Green" style="background:#38a169;"></button>
+          <button type="button" class="color-dot" data-color="cyan" title="Teal Cyan" style="background:#0d9488;"></button>
+          <button type="button" class="color-dot" data-color="purple" title="Royal Purple" style="background:#5c67f2;"></button>
+        </div>
+      </div>
+
+      <div class="footer-actions">
+        <button type="button" id="cancel-btn" class="secondary-btn">Cancel</button>
+        <button type="button" id="save-card-btn" class="primary-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+          </svg>
+          <span>Save Card</span>
+          <span class="key-tag">Ctrl+↵</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+  <script src="lib/browser-adapter.js"></script>
+  <script src="lib/cards-manager.js"></script>
+  <script src="lib/api-client.js"></script>
+  <script src="lib/sync-engine.js"></script>
+  <script src="quick-card.js"></script>
+</body>
+</html>

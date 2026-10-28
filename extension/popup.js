@@ -27,6 +27,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   const linksCountBadge = document.getElementById('links-count-badge');
   const convertLinksToStashBtn = document.getElementById('convert-links-to-stash-btn');
 
+  // Quick Cards & Sticky Notes Elements
+  const headerQuickCardBtn = document.getElementById('header-quick-card-btn');
+  const cardsContainer = document.getElementById('cards-container');
+  const savedCardsList = document.getElementById('saved-cards-list');
+  const cardsCountBadge = document.getElementById('cards-count-badge');
+  const cardsCountIndicator = document.getElementById('cards-count-indicator');
+  const openCardModalBtn = document.getElementById('open-card-modal-btn');
+
+  // Quick Card Composer Modal Elements
+  const cardComposerModal = document.getElementById('card-composer-modal');
+  const closeCardComposerBtn = document.getElementById('close-card-composer-btn');
+  const cancelCardModalBtn = document.getElementById('cancel-card-modal-btn');
+  const modalCardContent = document.getElementById('modal-card-content');
+  const modalCardTitle = document.getElementById('modal-card-title');
+  const modalCardTags = document.getElementById('modal-card-tags');
+  const modalSaveCardBtn = document.getElementById('modal-save-card-btn');
+  const modalCardColorPicker = document.getElementById('modal-card-color-picker');
+
   // Search Live Open Tabs Elements
   const searchOpenTabsSection = document.getElementById('search-open-tabs-section');
   const searchOpenCount = document.getElementById('search-open-count');
@@ -94,9 +112,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   // State
   let allSessions = [];
   let allSavedLinks = [];
+  let allSavedCards = [];
   let currentOpenTabs = [];
   let selectedOpenTabIds = new Set();
   let linksFilterMode = 'all'; // 'all' | 'unread' | 'read'
+  let cardsFilterMode = 'all'; // 'all' | 'pinned'
+  let selectedCardColor = 'charcoal';
   let currentActiveDomain = '';
   let authMode = 'login';
 
@@ -108,7 +129,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   await refreshOpenTabsData();
   loadAndRenderSessions();
   loadAndRenderSavedLinks();
+  loadAndRenderCards();
   updateCloudUI();
+
 
   // Global Keyboard Shortcut: Ctrl+K / / to Focus Search
   window.addEventListener('keydown', (e) => {
@@ -116,14 +139,24 @@ document.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
       searchInput.focus();
       searchInput.select();
-    } else if (e.key === '/' && document.activeElement !== searchInput && document.activeElement.tagName !== 'INPUT') {
+    } else if (e.key === '/' && document.activeElement !== searchInput && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
       e.preventDefault();
       searchInput.focus();
       searchInput.select();
+    } else if (
+      (e.altKey && (e.key.toLowerCase() === 'c' || e.code === 'KeyC')) ||
+      (e.key.toLowerCase() === 'c' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA')
+    ) {
+      e.preventDefault();
+      openCardComposerModal();
+    } else if (e.key === 'Escape') {
+      if (cardComposerModal && !cardComposerModal.classList.contains('hidden')) {
+        cardComposerModal.classList.add('hidden');
+      }
     }
   });
 
-  // Listen for sync, data, and links events
+  // Listen for sync, data, links, and cards events
   window.addEventListener('tabvault:data-updated', () => {
     loadAndRenderSessions();
     refreshOpenTabsData();
@@ -134,6 +167,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadAndRenderSavedLinks();
   });
 
+  window.addEventListener('tabvault:cards-updated', () => {
+    loadAndRenderCards();
+  });
+
   window.addEventListener('tabvault:sync-status', (e) => {
     updateSyncStatusBadge(e.detail.status, e.detail.error);
   });
@@ -142,6 +179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCloudUI();
     loadAndRenderSessions();
     loadAndRenderSavedLinks();
+    loadAndRenderCards();
   });
 
   window.addEventListener('tabvault:device-updated', (e) => {
@@ -153,7 +191,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderFilteredSessions();
   });
 
-  // 1. Popup Navigation Tabs (Active | All Tabs | Archive | Links)
+  // 1. Popup Navigation Tabs (Active | All Tabs | Archive | Links | Cards)
   document.querySelectorAll('.popup-tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.popup-tab-btn').forEach((b) => b.classList.remove('active'));
@@ -162,12 +200,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (view === 'links') {
         sessionsContainer.classList.add('hidden');
+        cardsContainer.classList.add('hidden');
         linksContainer.classList.remove('hidden');
         popupGroupingSelector.classList.add('hidden');
         searchOpenTabsSection.classList.add('hidden');
+        emptyState.classList.add('hidden');
         renderSavedLinks();
+      } else if (view === 'cards') {
+        sessionsContainer.classList.add('hidden');
+        linksContainer.classList.add('hidden');
+        cardsContainer.classList.remove('hidden');
+        popupGroupingSelector.classList.add('hidden');
+        searchOpenTabsSection.classList.add('hidden');
+        emptyState.classList.add('hidden');
+        renderCards();
       } else {
         linksContainer.classList.add('hidden');
+        cardsContainer.classList.add('hidden');
         sessionsContainer.classList.remove('hidden');
         TabVaultFilterManager.setViewMode(view);
 
@@ -179,6 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
   });
+
 
   // Grouping Buttons (in All Tabs View)
   document.querySelectorAll('.popup-group-btn').forEach((btn) => {
@@ -224,7 +274,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           try {
             const d = new URL(t.url).hostname.replace(/^www\./, '');
             domainMap[d] = (domainMap[d] || 0) + 1;
-          } catch {}
+          } catch { }
         }
       });
 
@@ -442,6 +492,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     clearSearchBtn.classList.toggle('hidden', !val);
     TabVaultFilterManager.setFilter('query', val);
 
+    // If currently viewing links or cards, re-render them with search query
+    if (document.querySelector('.popup-tab-btn[data-view="links"].active')) {
+      renderSavedLinks();
+    } else if (document.querySelector('.popup-tab-btn[data-view="cards"].active')) {
+      renderCards();
+    }
+
     if (val.trim()) {
       renderSearchOpenTabs(val.trim());
     } else {
@@ -454,8 +511,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     clearSearchBtn.classList.add('hidden');
     searchOpenTabsSection.classList.add('hidden');
     TabVaultFilterManager.setFilter('query', '');
+    if (document.querySelector('.popup-tab-btn[data-view="links"].active')) {
+      renderSavedLinks();
+    } else if (document.querySelector('.popup-tab-btn[data-view="cards"].active')) {
+      renderCards();
+    }
     searchInput.focus();
   });
+
 
   function renderSearchOpenTabs(query) {
     const q = query.toLowerCase();
@@ -592,8 +655,292 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  // 7. Filter Modal Controls
+  // 7. Quick Cards & Sticky Notes Handlers
+  async function loadAndRenderCards() {
+    allSavedCards = await TabVaultCardsManager.getCards();
+
+    // Update count badge & indicator
+    const count = allSavedCards.length;
+    if (count > 0) {
+      cardsCountBadge.textContent = count;
+      cardsCountBadge.classList.remove('hidden');
+    } else {
+      cardsCountBadge.classList.add('hidden');
+    }
+
+    if (cardsCountIndicator) {
+      const pinnedCount = allSavedCards.filter((c) => c.isPinned).length;
+      cardsCountIndicator.textContent =
+        pinnedCount > 0 ? `${count} cards (${pinnedCount} pinned)` : `${count} cards`;
+    }
+
+    renderCards();
+  }
+
+  // Card Composer Modal Logic
+  function openCardComposerModal() {
+    if (cardComposerModal) {
+      cardComposerModal.classList.remove('hidden');
+      setTimeout(() => {
+        if (modalCardContent) {
+          modalCardContent.focus();
+        }
+      }, 50);
+    }
+  }
+
+  function closeCardComposerModal() {
+    if (cardComposerModal) {
+      cardComposerModal.classList.add('hidden');
+    }
+  }
+
+  if (headerQuickCardBtn) {
+    headerQuickCardBtn.addEventListener('click', openCardComposerModal);
+  }
+
+  if (openCardModalBtn) {
+    openCardModalBtn.addEventListener('click', openCardComposerModal);
+  }
+
+  if (closeCardComposerBtn) {
+    closeCardComposerBtn.addEventListener('click', closeCardComposerModal);
+  }
+
+  if (cancelCardModalBtn) {
+    cancelCardModalBtn.addEventListener('click', closeCardComposerModal);
+  }
+
+  if (cardComposerModal) {
+    cardComposerModal.addEventListener('click', (e) => {
+      if (e.target === cardComposerModal) {
+        closeCardComposerModal();
+      }
+    });
+  }
+
+  // Color Picker for Modal Card Composer
+  if (modalCardColorPicker) {
+    modalCardColorPicker.querySelectorAll('.color-dot').forEach((dot) => {
+      dot.addEventListener('click', () => {
+        modalCardColorPicker.querySelectorAll('.color-dot').forEach((d) => d.classList.remove('active'));
+        dot.classList.add('active');
+        selectedCardColor = dot.dataset.color || 'charcoal';
+      });
+    });
+  }
+
+  // Filter Pills for Cards (All | Pinned)
+  document.querySelectorAll('.card-filter-pill').forEach((pill) => {
+    pill.addEventListener('click', () => {
+      document.querySelectorAll('.card-filter-pill').forEach((p) => p.classList.remove('active'));
+      pill.classList.add('active');
+      cardsFilterMode = pill.dataset.filter;
+      renderCards();
+    });
+  });
+
+  // Save Card Function (from Modal)
+  async function handleSaveCard() {
+    const content = modalCardContent ? modalCardContent.value.trim() : '';
+    if (!content) {
+      if (modalCardContent) {
+        modalCardContent.focus();
+        modalCardContent.style.borderColor = 'var(--danger)';
+        setTimeout(() => {
+          modalCardContent.style.borderColor = '';
+        }, 1200);
+      }
+      return;
+    }
+
+    const title = modalCardTitle ? modalCardTitle.value.trim() : '';
+    const tags = modalCardTags
+      ? modalCardTags.value
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean)
+      : [];
+
+    if (modalSaveCardBtn) {
+      modalSaveCardBtn.disabled = true;
+      const btnSpan = modalSaveCardBtn.querySelector('span');
+      if (btnSpan) btnSpan.textContent = 'Saving...';
+    }
+
+    try {
+      await TabVaultCardsManager.saveCard({
+        content,
+        title,
+        color: selectedCardColor,
+        tags,
+      });
+
+      if (modalCardContent) modalCardContent.value = '';
+      if (modalCardTitle) modalCardTitle.value = '';
+      if (modalCardTags) modalCardTags.value = '';
+
+      closeCardComposerModal();
+      await loadAndRenderCards();
+    } catch (err) {
+      alert(err.message || 'Failed to save card');
+    } finally {
+      if (modalSaveCardBtn) {
+        modalSaveCardBtn.disabled = false;
+        const btnSpan = modalSaveCardBtn.querySelector('span');
+        if (btnSpan) btnSpan.textContent = 'Save Card';
+      }
+    }
+  }
+
+  if (modalSaveCardBtn) {
+    modalSaveCardBtn.addEventListener('click', handleSaveCard);
+  }
+
+  if (modalCardContent) {
+    modalCardContent.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        handleSaveCard();
+      }
+    });
+  }
+
+  function renderCards() {
+    if (document.querySelector('.popup-tab-btn[data-view="cards"].active') === null) {
+      return;
+    }
+
+    savedCardsList.innerHTML = '';
+    const query = (searchInput.value || '').toLowerCase().trim();
+
+    let filtered = allSavedCards;
+    if (cardsFilterMode === 'pinned') {
+      filtered = filtered.filter((c) => c.isPinned);
+    }
+
+    if (query) {
+      filtered = filtered.filter(
+        (c) =>
+          (c.content || '').toLowerCase().includes(query) ||
+          (c.title || '').toLowerCase().includes(query) ||
+          (c.tags || []).some((t) => t.toLowerCase().includes(query))
+      );
+    }
+
+    if (filtered.length === 0) {
+      savedCardsList.innerHTML = `
+        <div style="padding: 36px 16px; text-align: center; color: var(--text-dim);">
+          <div style="font-size: 30px; margin-bottom: 8px;">⚡</div>
+          <h4 style="color: var(--text-main); font-size: 13px; margin-bottom: 4px;">No Quick Cards</h4>
+          <p style="font-size: 11px; max-width: 260px; margin: 0 auto;">Paste any text, code snippet, idea, or reminder above and click <strong>Save Card</strong> (or Ctrl+Enter).</p>
+        </div>
+      `;
+      return;
+    }
+
+    filtered.forEach((card) => {
+      const cardEl = document.createElement('div');
+      cardEl.className = `card-item ${card.isPinned ? 'pinned' : ''}`;
+      cardEl.dataset.color = card.color || 'charcoal';
+
+      // Safe HTML escaping
+      const safeContent = (card.content || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      const safeTitle = (card.title || 'Quick Card')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+      const dateStr = card.savedAt
+        ? new Date(card.savedAt).toLocaleDateString(undefined, {
+          month: 'short',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+        : '';
+
+      const tagsHtml = (card.tags || [])
+        .map((t) => `<span class="card-tag-pill">#${t}</span>`)
+        .join('');
+
+      cardEl.innerHTML = `
+        <div class="card-top-row">
+          <div class="card-title-wrap">
+            <span class="card-item-title" title="${safeTitle}">${safeTitle}</span>
+            ${card.isPinned ? '<span class="card-pinned-badge" title="Pinned to top">📌</span>' : ''}
+          </div>
+          <div class="card-quick-actions">
+            <button class="card-copy-btn" title="1-click Copy to clipboard">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copy</span>
+            </button>
+            <button class="action-icon-btn card-pin-btn" title="${card.isPinned ? 'Unpin card' : 'Pin to top'}">
+              ${card.isPinned ? '📌' : '📍'}
+            </button>
+            <button class="action-icon-btn card-del-btn danger-hover" title="Delete card">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="card-content-body">${safeContent}</div>
+
+        <div class="card-footer-row">
+          <div class="card-tags-list">
+            ${tagsHtml}
+          </div>
+          <div class="card-meta-right">
+            <span>${dateStr}</span>
+          </div>
+        </div>
+      `;
+
+      // Copy Action (1-Click clipboard copy with animation)
+      const copyBtn = cardEl.querySelector('.card-copy-btn');
+      copyBtn.addEventListener('click', async () => {
+        const ok = await TabVaultCardsManager.copyToClipboard(card.content);
+        if (ok) {
+          copyBtn.classList.add('copied');
+          copyBtn.querySelector('span').textContent = 'Copied! ✨';
+          setTimeout(() => {
+            copyBtn.classList.remove('copied');
+            copyBtn.querySelector('span').textContent = 'Copy';
+          }, 1800);
+        }
+      });
+
+      // Pin Action
+      const pinBtn = cardEl.querySelector('.card-pin-btn');
+      pinBtn.addEventListener('click', async () => {
+        await TabVaultCardsManager.togglePin(card.id);
+        loadAndRenderCards();
+      });
+
+      // Delete Action
+      const delBtn = cardEl.querySelector('.card-del-btn');
+      delBtn.addEventListener('click', async () => {
+        await TabVaultCardsManager.deleteCard(card.id);
+        loadAndRenderCards();
+      });
+
+      savedCardsList.appendChild(cardEl);
+    });
+  }
+
+  // 8. Filter Modal Controls
   openFilterBtn.addEventListener('click', () => {
+
     populateFilterModal();
     filterModal.classList.remove('hidden');
   });
@@ -642,8 +989,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const exportData = {
       sessions: allSessions,
       links: allSavedLinks,
+      cards: allSavedCards,
       exportedAt: new Date().toISOString(),
     };
+
     const jsonStr = JSON.stringify(exportData, null, 2);
     const blob = new Blob([jsonStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
