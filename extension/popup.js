@@ -1114,6 +1114,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateCloudUI();
   });
 
+  // --- Auto-Sync (Live Backup) toggle ---
+  const liveSyncToggle = document.getElementById('live-sync-toggle');
+  const liveSyncStatusEl = document.getElementById('live-sync-status');
+
+  async function refreshLiveSyncStatus() {
+    if (!liveSyncToggle || !liveSyncStatusEl) return;
+    try {
+      const res = await TabVaultAPI.runtime.sendMessage({ action: 'GET_LIVE_SYNC_STATUS' });
+      if (res && res.success && res.status) {
+        liveSyncToggle.checked = !!res.status.enabled;
+        const count = res.status.liveSessionCount || 0;
+        liveSyncStatusEl.textContent = res.status.enabled
+          ? `On • ${count} live window backup${count === 1 ? '' : 's'}`
+          : 'Off';
+      }
+    } catch (e) {
+      // background worker not reachable; leave UI as-is
+    }
+  }
+
+  if (liveSyncToggle) {
+    liveSyncToggle.addEventListener('change', async () => {
+      const enabled = liveSyncToggle.checked;
+      liveSyncToggle.disabled = true;
+      liveSyncStatusEl.textContent = enabled ? 'Enabling…' : 'Disabling…';
+      try {
+        await TabVaultAPI.runtime.sendMessage({ action: 'SET_LIVE_SYNC', enabled });
+      } finally {
+        liveSyncToggle.disabled = false;
+        await refreshLiveSyncStatus();
+      }
+    });
+  }
+
   function showAuthError(msg) {
     authErrorBox.textContent = msg;
     authErrorBox.classList.remove('hidden');
@@ -1140,6 +1174,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       profileLastSync.textContent = storage.tabvault_last_sync
         ? TabVaultUI.formatTimeAgo(storage.tabvault_last_sync)
         : 'Never';
+
+      await refreshLiveSyncStatus();
     } else {
       authFormsContainer.classList.remove('hidden');
       authProfileContainer.classList.add('hidden');
@@ -1228,7 +1264,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = await TabVaultAPI.storage.local.get(['savedSessions', 'totalTabsStashed']);
     allSessions = data.savedSessions || [];
 
-    const activeSessions = allSessions.filter((s) => !s.isArchived);
+    const activeSessions = allSessions.filter((s) => !s.isArchived && s.sessionType !== 'live');
     const totalActiveTabs = activeSessions.reduce((acc, s) => {
       const activeTabs = (s.tabs || []).filter((t) => !t.isPopped);
       return acc + activeTabs.length;

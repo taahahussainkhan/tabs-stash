@@ -68,6 +68,16 @@
       );
     }
 
+    // Live auto-backup snapshots are a separate concern from manual stashes and
+    // must never leak into the normal session/tab views.
+    isLive(session) {
+      return session && session.sessionType === 'live';
+    }
+
+    isStash(session) {
+      return !this.isLive(session);
+    }
+
     notify() {
       this.listeners.forEach((cb) => cb(this.filters));
       if (typeof window !== 'undefined') {
@@ -81,6 +91,7 @@
     extractUniqueDomains(sessions = []) {
       const map = {};
       sessions.forEach((s) => {
+        if (this.isLive(s)) return;
         if (!s.isArchived) {
           (s.tabs || []).forEach((t) => {
             if (!t.isPopped && t.hostname && t.hostname !== 'local') {
@@ -102,6 +113,7 @@
     extractUniqueDevices(sessions = []) {
       const map = {};
       sessions.forEach((s) => {
+        if (this.isLive(s)) return;
         if (!s.isArchived) {
           const info = s.deviceInfo || {};
           const devId = info.deviceId || 'local_pc';
@@ -141,6 +153,7 @@
 
       const tabsList = [];
       sessions.forEach((session) => {
+        if (this.isLive(session)) return; // exclude live auto-backup snapshots
         if (session.isArchived) return; // Do not include archived sessions in all-tabs
 
         // Date filter
@@ -262,7 +275,17 @@
       const q = (query || '').trim().toLowerCase();
       const now = Date.now();
 
+      // Dedicated recovery view: only live auto-backup snapshots, newest first.
+      if (viewMode === 'live') {
+        return sessions
+          .filter((s) => this.isLive(s))
+          .filter((s) => !deviceId || s.deviceInfo?.deviceId === deviceId)
+          .filter((s) => !q || (s.title || '').toLowerCase().includes(q))
+          .sort((a, b) => (b.clientUpdatedAt || b.timestamp || 0) - (a.clientUpdatedAt || a.timestamp || 0));
+      }
+
       return sessions
+        .filter((s) => this.isStash(s)) // never show live snapshots in stash views
         .map((session) => {
           const isSessionRestored = session.isRestored || (session.tabs && session.tabs.length > 0 && session.tabs.every((t) => t.isPopped));
 

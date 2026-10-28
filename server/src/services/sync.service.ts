@@ -1,10 +1,11 @@
-import { StashedSessionModel, ITabItem, IDeviceInfo } from '../models/session.model';
+import { StashedSessionModel, ITabItem, IDeviceInfo, SessionType } from '../models/session.model';
 import { Types } from 'mongoose';
 
 export interface ClientSessionChange {
   id: string;
   title: string;
   timestamp: number;
+  sessionType?: SessionType;
   isPinned?: boolean;
   isArchived?: boolean;
   archivedAt?: number | null;
@@ -31,6 +32,7 @@ export class SyncService {
     if (clientChanges && clientChanges.length > 0) {
       for (const change of clientChanges) {
         const isArchived = change.isArchived === true;
+        const sessionType: SessionType = change.sessionType === 'live' ? 'live' : 'stash';
 
         const existingSession = await StashedSessionModel.findOne({
           $or: [{ userId: userObjectId }, { userId: String(userId) }],
@@ -41,6 +43,7 @@ export class SyncService {
           await StashedSessionModel.create({
             sessionId: change.id,
             userId: userObjectId,
+            sessionType,
             title: change.title,
             timestamp: change.timestamp,
             isPinned: change.isPinned || false,
@@ -54,6 +57,7 @@ export class SyncService {
             deletedAt: change.deletedAt || null,
           });
         } else if (change.clientUpdatedAt >= existingSession.clientUpdatedAt) {
+          existingSession.sessionType = sessionType;
           existingSession.title = change.title;
           existingSession.timestamp = change.timestamp;
           existingSession.isPinned = change.isPinned || false;
@@ -81,6 +85,7 @@ export class SyncService {
     const serverChanges = modifiedSessions.map((s) => ({
       id: s.sessionId,
       sessionId: s.sessionId,
+      sessionType: s.sessionType || 'stash',
       title: s.title,
       timestamp: s.timestamp,
       isPinned: s.isPinned || false,
@@ -108,6 +113,7 @@ export class SyncService {
     const sessions = await StashedSessionModel.find({
       $and: [
         { $or: [{ userId: userObjectId }, { userId: String(userId) }] },
+        { sessionType: { $ne: 'live' } },
         { isArchived: { $ne: true } },
         {
           $or: [
@@ -123,10 +129,43 @@ export class SyncService {
     return sessions.map((s) => ({
       id: s.sessionId,
       sessionId: s.sessionId,
+      sessionType: s.sessionType || 'stash',
       title: s.title,
       timestamp: s.timestamp,
       isPinned: s.isPinned || false,
       isArchived: false,
+      tags: s.tags || [],
+      tabs: s.tabs || [],
+      deviceInfo: s.deviceInfo || {},
+      clientUpdatedAt: s.clientUpdatedAt,
+      serverUpdatedAt: s.serverUpdatedAt,
+    }));
+  }
+
+  /**
+   * Get live auto-backup snapshots for window/session recovery.
+   * Newest first, optionally scoped to a single device.
+   */
+  static async getLiveSessions(userId: string, deviceId?: string) {
+    const userObjectId = Types.ObjectId.isValid(userId) ? new Types.ObjectId(userId) : userId;
+
+    const sessions = await StashedSessionModel.find({
+      $and: [
+        { $or: [{ userId: userObjectId }, { userId: String(userId) }] },
+        { sessionType: 'live' },
+        { $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }] },
+        ...(deviceId ? [{ 'deviceInfo.deviceId': deviceId }] : []),
+      ],
+    })
+      .sort({ timestamp: -1 })
+      .lean();
+
+    return sessions.map((s) => ({
+      id: s.sessionId,
+      sessionId: s.sessionId,
+      sessionType: 'live' as const,
+      title: s.title,
+      timestamp: s.timestamp,
       tags: s.tags || [],
       tabs: s.tabs || [],
       deviceInfo: s.deviceInfo || {},

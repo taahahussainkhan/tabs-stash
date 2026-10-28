@@ -32,6 +32,19 @@ export class SyncController {
     }
   }
 
+  static async getLiveSessions(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const deviceId = req.query.deviceId as string | undefined;
+      const sessions = await SyncService.getLiveSessions(req.user!.userId, deviceId);
+      res.status(200).json({
+        success: true,
+        data: sessions,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async upsertSession(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const session = await SyncService.upsertSingleSession(req.user!.userId, req.body);

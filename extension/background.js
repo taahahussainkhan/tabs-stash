@@ -8,10 +8,19 @@ try {
     'lib/sync-engine.js',
     'lib/links-manager.js',
     'lib/cards-manager.js',
+    'lib/live-sync.js',
     'lib/session-actions.js'
   );
 } catch (e) {
   console.warn('TabVault: importScripts skipped or running in module environment', e);
+}
+
+// MV3: register event listeners synchronously at worker startup so the service
+// worker wakes on tab/window changes. Snapshot actions are gated by the enabled
+// setting inside the handlers, so registering them unconditionally is safe.
+if (typeof TabVaultLiveSync !== 'undefined') {
+  TabVaultLiveSync.registerListeners();
+  TabVaultLiveSync.ensureAlarm();
 }
 
 // 1. Setup Context Menus and Periodic Sync on Installation
@@ -76,6 +85,14 @@ chrome.runtime.onInstalled.addListener(() => {
       periodInMinutes: 10
     });
   }
+
+  // Ensure the live auto-backup flush alarm exists and prime current windows
+  if (typeof TabVaultLiveSync !== 'undefined') {
+    TabVaultLiveSync.ensureAlarm();
+    TabVaultLiveSync.isEnabled().then((enabled) => {
+      if (enabled) TabVaultLiveSync.markAllWindowsDirty();
+    }).catch(() => {});
+  }
 });
 
 // 2. Alarm Listener for Periodic Background Sync
@@ -87,6 +104,8 @@ if (chrome.alarms) {
           console.log("TabVault Background Sync Check:", err.message);
         });
       }
+    } else if (typeof TabVaultLiveSync !== 'undefined') {
+      TabVaultLiveSync.handleAlarm(alarm);
     }
   });
 }
@@ -517,6 +536,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       return true;
     }
     sendResponse({ success: false, reason: "sync_engine_not_found" });
+    return true;
+  } else if (request.action === "SET_LIVE_SYNC") {
+    if (typeof TabVaultLiveSync !== 'undefined') {
+      TabVaultLiveSync.setEnabled(!!request.enabled)
+        .then((enabled) => {
+          if (enabled) return TabVaultLiveSync.flush({ force: true });
+          return { success: true };
+        })
+        .then(() => sendResponse({ success: true, enabled: !!request.enabled }))
+        .catch((err) => sendResponse({ success: false, error: err.message }));
+      return true;
+    }
+    sendResponse({ success: false, reason: "live_sync_not_found" });
+    return true;
+  } else if (request.action === "GET_LIVE_SYNC_STATUS") {
+    if (typeof TabVaultLiveSync !== 'undefined') {
+      TabVaultLiveSync.getStatus()
+        .then((status) => sendResponse({ success: true, status }))
+        .catch((err) => sendResponse({ success: false, error: err.message }));
+      return true;
+    }
+    sendResponse({ success: false, reason: "live_sync_not_found" });
     return true;
   } else if (request.action === "save_card" || request.action === "SAVE_CARD") {
     if (typeof TabVaultCardsManager !== 'undefined') {

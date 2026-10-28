@@ -27,6 +27,11 @@ syncRouter.get(
   SyncController.getSessions
 );
 
+syncRouter.get(
+  '/sessions/live',
+  SyncController.getLiveSessions
+);
+
 syncRouter.post(
   '/sessions',
   validate(singleSessionUpsertSchema),

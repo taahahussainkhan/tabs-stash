@@ -20,9 +20,12 @@ export interface IDeviceInfo {
   windowId?: number | string;
 }
 
+export type SessionType = 'stash' | 'live';
+
 export interface IStashedSession extends Document {
-  sessionId: string; // Client generated ID (e.g. 'session_1723812345')
+  sessionId: string; // Client generated ID (e.g. 'session_1723812345' or 'live_<deviceId>_<windowId>')
   userId: Types.ObjectId;
+  sessionType: SessionType; // Discriminator: manually stashed vs silent live auto-backup
   title: string;
   timestamp: number;
   isPinned: boolean;
@@ -68,6 +71,7 @@ const StashedSessionSchema = new Schema<IStashedSession>(
   {
     sessionId: { type: String, required: true },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    sessionType: { type: String, enum: ['stash', 'live'], default: 'stash', index: true },
     title: { type: String, required: true },
     timestamp: { type: Number, required: true },
     isPinned: { type: Boolean, default: false },
@@ -89,5 +93,6 @@ const StashedSessionSchema = new Schema<IStashedSession>(
 StashedSessionSchema.index({ userId: 1, sessionId: 1 }, { unique: true });
 StashedSessionSchema.index({ userId: 1, serverUpdatedAt: 1 });
 StashedSessionSchema.index({ userId: 1, deletedAt: 1 });
+StashedSessionSchema.index({ userId: 1, sessionType: 1, serverUpdatedAt: -1 });
 
 export const StashedSessionModel = model<IStashedSession>('StashedSession', StashedSessionSchema);
