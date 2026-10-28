@@ -32,6 +32,9 @@ terraform/*.tfstate
 terraform/*.tfstate.*
 terraform/*.tfvars
 
+# Personal chat exports (PII) – never commit raw conversation data
+extracted_chat/
+
 # OS & IDE Files
 .DS_Store
 Thumbs.db
