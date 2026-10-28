@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Copy Markdown
   copyMarkdownBtn.addEventListener('click', () => {
-    const activeSessions = allSessions.filter((s) => !s.isArchived);
+    const activeSessions = allSessions.filter((s) => !s.isArchived && s.sessionType !== 'live');
     if (!activeSessions.length) return;
 
     let md = '# TabVault Stashed Sessions\n\n';
@@ -554,7 +554,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const data = await TabVaultAPI.storage.local.get(['savedSessions']);
     allSessions = data.savedSessions || [];
 
-    const activeSessions = allSessions.filter((s) => !s.isArchived);
+    const activeSessions = allSessions.filter((s) => !s.isArchived && s.sessionType !== 'live');
     const totalActiveTabs = activeSessions.reduce((acc, s) => {
       const activeTabs = (s.tabs || []).filter((t) => !t.isPopped);
       return acc + activeTabs.length;
@@ -740,6 +740,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (viewMode === 'archive') {
         emptyHeading.textContent = 'No Archived Sessions';
         emptySubtext.textContent = 'Archived sessions will appear safely stored here.';
+      } else if (viewMode === 'live') {
+        emptyHeading.textContent = 'No Live Backups Yet';
+        emptySubtext.textContent = 'Enable Auto-Sync in the extension to silently back up your open windows here for recovery.';
       } else {
         emptyHeading.textContent = 'No Stashed Sessions Found';
         emptySubtext.textContent = 'Click "Stash Window Tabs" or press Alt+S to stash your open tabs.';
