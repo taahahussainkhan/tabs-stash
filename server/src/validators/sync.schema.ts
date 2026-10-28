@@ -24,6 +24,7 @@ export const clientSessionChangeSchema = z.object({
   id: z.string().min(1, 'Session ID is required'),
   title: z.string().min(1, 'Title is required'),
   timestamp: z.number().int().positive(),
+  sessionType: z.enum(['stash', 'live']).optional().default('stash'),
   isPinned: z.boolean().default(false),
   isArchived: z.boolean().optional().default(false),
   archivedAt: z.number().int().nullable().optional().default(null),
