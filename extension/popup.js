@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadAndRenderSavedLinks();
   loadAndRenderCards();
   updateCloudUI();
+  refreshLiveSyncStatus();
 
 
   // Global Keyboard Shortcut: Ctrl+K / / to Focus Search

@@ -78,6 +78,18 @@
       </div>
     </div>
 
+    <!-- Live Auto-Sync control (always visible, works without login) -->
+    <div class="autosync-bar">
+      <div class="autosync-info">
+        <span class="autosync-title">⚡ Auto-Sync <span class="autosync-tag">Live Backup</span></span>
+        <span id="live-sync-status" class="autosync-status">Off</span>
+      </div>
+      <label class="live-switch" for="live-sync-toggle" title="Silently back up open tabs for recovery. Tabs are never closed.">
+        <input type="checkbox" id="live-sync-toggle" />
+        <span class="live-slider"></span>
+      </label>
+    </div>
+
     <!-- Primary Action Banner -->
     <div class="action-section">
       <div class="primary-action-row">
@@ -518,23 +530,6 @@
               <div class="sync-row">
                 <span>Last Synchronized:</span>
                 <span id="profile-last-sync" class="sync-time">Just now</span>
-              </div>
-            </div>
-
-            <!-- Auto-Sync (Live Backup) setting -->
-            <div class="live-sync-box">
-              <label class="live-sync-row" for="live-sync-toggle">
-                <span class="live-sync-text">
-                  <strong>Auto-Sync (Live Backup)</strong>
-                  <small>Silently back up open tabs so a closed window or lost machine can be recovered. Tabs are never closed.</small>
-                </span>
-                <span class="live-switch">
-                  <input type="checkbox" id="live-sync-toggle" />
-                  <span class="live-slider"></span>
-                </span>
-              </label>
-              <div class="live-sync-foot">
-                <span id="live-sync-status" class="live-sync-status">Off</span>
               </div>
             </div>
 
