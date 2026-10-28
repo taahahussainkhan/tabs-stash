@@ -1,11 +1,13 @@
 import { Router } from 'express';
 import { SyncController } from '../controllers/sync.controller';
 import { LinkController } from '../controllers/link.controller';
+import { CardController } from '../controllers/card.controller';
 import { authenticate } from '../middlewares/auth.middleware';
 import { syncLimiter } from '../middlewares/rate-limiter.middleware';
 import { validate } from '../middlewares/validate.middleware';
 import { deltaSyncSchema, singleSessionUpsertSchema } from '../validators/sync.schema';
 import { createLinkSchema, updateLinkReadSchema, linksDeltaSyncSchema } from '../validators/link.schema';
+import { createCardSchema, updateCardSchema, cardsDeltaSyncSchema } from '../validators/card.schema';
 
 export const syncRouter = Router();
 
@@ -70,3 +72,39 @@ syncRouter.post(
   validate(linksDeltaSyncSchema),
   LinkController.deltaSync
 );
+
+// --- Quick Cards & Notes Sync Routes ---
+syncRouter.get(
+  '/cards',
+  CardController.getCards
+);
+
+syncRouter.post(
+  '/cards',
+  validate(createCardSchema),
+  CardController.saveCard
+);
+
+syncRouter.put(
+  '/cards/:id',
+  validate(updateCardSchema),
+  CardController.updateCard
+);
+
+syncRouter.patch(
+  '/cards/:id/pin',
+  CardController.togglePin
+);
+
+syncRouter.delete(
+  '/cards/:id',
+  CardController.deleteCard
+);
+
+syncRouter.post(
+  '/cards/delta',
+  syncLimiter,
+  validate(cardsDeltaSyncSchema),
+  CardController.deltaSync
+);
+

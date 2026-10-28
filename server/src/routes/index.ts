@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { authRouter } from './auth.routes';
 import { syncRouter } from './sync.routes';
+import { cardRouter } from './card.routes';
 import { userRouter } from './user.routes';
 import { tagRouter } from './tag.routes';
 import { movieRouter } from './movie.routes';
@@ -29,6 +30,7 @@ apiRouter.use('/auth', authRouter);
 apiRouter.use('/sync', syncRouter);
 
 // 2. Personal Assistant & Logger Routes
+apiRouter.use('/cards', cardRouter);
 apiRouter.use('/users', userRouter);
 apiRouter.use('/tags', tagRouter);
 
@@ -59,3 +61,4 @@ apiRouter.use('/catalog', mediaCatalogRouter);
 
 // Dashboard & Search
 apiRouter.use('/', dashboardRouter);
+
