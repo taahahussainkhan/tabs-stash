@@ -19,6 +19,7 @@ const GenresPage = lazy(() => import('../features/genres/GenresPage').then(m => 
 const PublishersPage = lazy(() => import('../features/publishers/PublishersPage').then(m => ({ default: m.PublishersPage })))
 const MagazinesPage = lazy(() => import('../features/magazines/MagazinesPage').then(m => ({ default: m.MagazinesPage })))
 const TabsPage = lazy(() => import('../features/tabs/TabsPage').then(m => ({ default: m.TabsPage })))
+const CardsPage = lazy(() => import('../features/cards/CardsPage').then(m => ({ default: m.CardsPage })))
 
 // Route configuration type
 export interface RouteConfig {
@@ -39,10 +40,12 @@ export const routes: RouteConfig[] = [
     { path: '/settings', component: SettingsPage, protected: true, layout: true },
     { path: '/profile', component: ProfilePage, protected: true, layout: true },
 
-    // Tab Stash / Tab Vault
+    // Tab Stash & Quick Cards
     { path: '/tabs', component: TabsPage, protected: true, layout: true },
+    { path: '/cards', component: CardsPage, protected: true, layout: true },
 
     // Movies routes
+
     { path: '/movies', component: MoviesPage, protected: true, layout: true },
     { path: '/movies/:movieId', component: MovieDetailPage, protected: true, layout: true },
     { path: '/movies/recently-watched', component: MoviesPage, protected: true, layout: true },

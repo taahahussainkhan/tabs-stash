@@ -1,4 +1,4 @@
-import { Film, Tv, FileText, Book, BookOpen, Star, Clock, Bookmark, Layers } from 'lucide-react'
+import { Film, Tv, FileText, Book, BookOpen, Star, Clock, Bookmark, Layers, StickyNote } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 export interface NavLink {
@@ -24,8 +24,10 @@ export const NAV_DROPDOWNS: NavDropdown[] = [
     basePath: '/tabs',
     links: [
       { value: 'tabs', path: '/tabs', label: 'All Stashed Tabs', icon: Layers },
+      { value: 'cards', path: '/cards', label: 'Quick Cards & Notes', icon: StickyNote },
     ],
   },
+
   {
     id: 'movies',
     label: 'Movies',
@@ -80,8 +82,10 @@ export const MOBILE_NAV_LINKS: Array<{ label: string; links: NavLink[] }> = [
     label: 'Productivity',
     links: [
       { value: 'tabs', path: '/tabs', label: 'Tab Vault', icon: Layers },
+      { value: 'cards', path: '/cards', label: 'Quick Cards & Notes', icon: StickyNote },
     ],
   },
+
   {
     label: 'Entertainment',
     links: [
