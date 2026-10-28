@@ -81,6 +81,7 @@
           id: session.id,
           title: session.title || 'Untitled Session',
           timestamp: session.timestamp || Date.now(),
+          sessionType: session.sessionType || 'stash',
           isPinned: !!session.isPinned,
           isArchived: !!session.isArchived,
           archivedAt: session.archivedAt || null,
