@@ -240,6 +240,20 @@
     }
 
     /**
+     * Execute delta sync for quick cards & sticky notes against backend
+     */
+    async deltaSyncCards(lastSyncedTimestamp, clientChanges) {
+      return this.request('/sync/cards/delta', {
+        method: 'POST',
+        body: JSON.stringify({
+          lastSyncedTimestamp: lastSyncedTimestamp || 0,
+          clientChanges: clientChanges || [],
+        }),
+      });
+    }
+
+
+    /**
      * Fetch user profile & sync stats
      */
     async getMe() {

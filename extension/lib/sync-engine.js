@@ -242,6 +242,92 @@
           console.warn('TabVault Links Sync Notice:', linkSyncErr.message);
         }
 
+        // 3. Execute delta sync for Quick Cards & Sticky Notes
+        try {
+          const cardsData = await TabVaultAPI.storage.local.get([
+            'savedCards',
+            'tabvault_last_sync_cards',
+            'tabvault_pending_card_deletions',
+          ]);
+          const localCards = cardsData.savedCards || [];
+          const lastSyncCards = cardsData.tabvault_last_sync_cards || 0;
+          const pendingCardDeletions = cardsData.tabvault_pending_card_deletions || [];
+
+          const cardsToSync = lastSyncCards > 0
+            ? localCards.filter((c) => (c.updatedAt || c.savedAt || 0) > lastSyncCards)
+            : localCards;
+
+          const clientCardChanges = cardsToSync.map((c) => ({
+            id: c.id,
+            content: c.content || '',
+            title: c.title || '',
+            color: c.color || 'charcoal',
+            tags: c.tags || [],
+            isPinned: !!c.isPinned,
+            sourceUrl: c.sourceUrl || '',
+            savedAt: c.savedAt || Date.now(),
+            clientUpdatedAt: c.updatedAt || c.savedAt || Date.now(),
+            deletedAt: null,
+          }));
+
+          pendingCardDeletions.forEach((del) => {
+            clientCardChanges.push({
+              id: del.id,
+              content: '',
+              title: '',
+              savedAt: del.deletedAt,
+              clientUpdatedAt: del.deletedAt,
+              deletedAt: del.deletedAt,
+            });
+          });
+
+          const cardsRes = await TabVaultApiClient.deltaSyncCards(lastSyncCards, clientCardChanges);
+          const { serverChanges: serverCardChanges, newSyncTimestamp: newCardsTimestamp } = cardsRes.data;
+
+          let mergedCards = [...localCards];
+          if (serverCardChanges && serverCardChanges.length > 0) {
+            serverCardChanges.forEach((remoteCard) => {
+              if (remoteCard.deletedAt) {
+                mergedCards = mergedCards.filter((c) => c.id !== remoteCard.id);
+              } else {
+                const existingIdx = mergedCards.findIndex((c) => c.id === remoteCard.id);
+                if (existingIdx !== -1) {
+                  const localUpdated = mergedCards[existingIdx].updatedAt || mergedCards[existingIdx].savedAt || 0;
+                  const remoteUpdated = remoteCard.clientUpdatedAt || remoteCard.serverUpdatedAt || 0;
+                  if (localUpdated < remoteUpdated) {
+                    mergedCards[existingIdx] = {
+                      ...mergedCards[existingIdx],
+                      ...remoteCard,
+                    };
+                  }
+                } else {
+                  mergedCards.unshift(remoteCard);
+                }
+              }
+            });
+          }
+
+          // Sort merged cards: pinned first, then newest
+          mergedCards.sort((a, b) => {
+            if (a.isPinned === b.isPinned) {
+              return (b.savedAt || 0) - (a.savedAt || 0);
+            }
+            return a.isPinned ? -1 : 1;
+          });
+
+          await TabVaultAPI.storage.local.set({
+            savedCards: mergedCards,
+            tabvault_last_sync_cards: newCardsTimestamp,
+            tabvault_pending_card_deletions: [],
+          });
+
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('tabvault:cards-updated'));
+          }
+        } catch (cardSyncErr) {
+          console.warn('TabVault Cards Sync Notice:', cardSyncErr.message);
+        }
+
         this.notifyStatus('synced');
 
         if (typeof window !== 'undefined') {
@@ -249,6 +335,7 @@
         }
 
         return { success: true, count: mergedSessions.length };
+
       } catch (error) {
         console.error('TabVault Sync Error:', error);
         this.notifyStatus('error', error.message || 'Sync failed.');
