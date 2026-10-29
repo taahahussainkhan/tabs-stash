@@ -13,6 +13,7 @@ import { commentRouter, sessionCommentRouter } from './comment.routes';
 import { userSettingsRouter, loggingCategoriesRouter } from './settings.routes';
 import { dashboardRouter } from './dashboard.routes';
 import { mediaCatalogRouter } from './media-catalog.routes';
+import { quickRecordRouter } from './quick-record.routes';
 
 export const apiRouter = Router();
 
@@ -58,6 +59,9 @@ apiRouter.use('/logging', loggingCategoriesRouter);
 
 // External Media Catalog / Metadata Lookup
 apiRouter.use('/catalog', mediaCatalogRouter);
+
+// Mobile-first quick capture: raw records + timestamped logs
+apiRouter.use('/quick-records', quickRecordRouter);
 
 // Dashboard & Search
 apiRouter.use('/', dashboardRouter);
