@@ -9,6 +9,7 @@ function toItem(raw: AnyRecord): DashboardItem {
     id: String(raw.public_id ?? raw.publicId ?? raw.id ?? ''),
     title: raw.title ?? 'Untitled',
     kind,
+    posterUrl: raw.poster_url ?? raw.posterUrl ?? raw.poster_image ?? null,
     authorOrDirector: raw.author_or_director ?? raw.authorOrDirector ?? null,
     year: raw.year ?? null,
     genre: raw.genre ?? null,
@@ -31,11 +32,15 @@ function toStats(raw: AnyRecord | undefined): DashboardStats {
     total_series: raw?.total_series ?? 0,
     total_books: raw?.total_books ?? 0,
     total_stashed_tabs: raw?.total_stashed_tabs ?? 0,
+    total_links: raw?.total_links ?? 0,
+    total_cards: raw?.total_cards ?? 0,
+    total_records: raw?.total_records ?? 0,
     watching: raw?.watching ?? 0,
     reading: raw?.reading ?? 0,
     completed: raw?.completed ?? 0,
-    watchlist: raw?.watchlist ?? 0,
     completed_this_month: raw?.completed_this_month ?? 0,
+    watchlist: raw?.watchlist ?? 0,
+    reconciled_at: raw?.reconciled_at ?? 0,
   };
 }
 

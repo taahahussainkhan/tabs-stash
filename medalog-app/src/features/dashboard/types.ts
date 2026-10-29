@@ -1,8 +1,11 @@
 /** One card in the dashboard strips (continue / completed / watchlist). */
+import type { StatsSnapshot } from '../stats';
+
 export interface DashboardItem {
   id: string;
   title: string;
   kind: 'movie' | 'series' | 'book';
+  posterUrl?: string | null;
   authorOrDirector?: string | null;
   year?: number | null;
   genre?: string | null;
@@ -14,17 +17,8 @@ export interface DashboardItem {
   endDate?: string | null;
 }
 
-export interface DashboardStats {
-  total_movies: number;
-  total_series: number;
-  total_books: number;
-  total_stashed_tabs: number;
-  watching: number;
-  reading: number;
-  completed: number;
-  watchlist: number;
-  completed_this_month: number;
-}
+/** The dashboard shows the same counters as every other screen. */
+export type DashboardStats = StatsSnapshot;
 
 export interface DashboardData {
   stats: DashboardStats;
@@ -37,4 +31,11 @@ export const KIND_GLYPH: Record<DashboardItem['kind'], string> = {
   movie: '▶',
   series: '❐',
   book: '▥',
+};
+
+/** Accent per media kind, shared by dashboard tiles and empty posters. */
+export const KIND_TINT: Record<DashboardItem['kind'], string> = {
+  movie: '#7c5cff',
+  series: '#2fb8a6',
+  book: '#e0803a',
 };

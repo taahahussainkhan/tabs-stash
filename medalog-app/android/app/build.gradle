@@ -82,8 +82,8 @@ android {
         applicationId "com.medalogapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 7
-        versionName "2.0.0"
+        versionCode 8
+        versionName "2.1.0"
         // Allow plain-http sync to a LAN/dev MediaLog server in release builds too.
         manifestPlaceholders = [usesCleartextTraffic: "true"]
     }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, View } from 'react-native';
 import { Poster, Text, color, radius, space } from '../../../design';
-import { KIND_GLYPH, type DashboardItem } from '../types';
+import { KIND_GLYPH, KIND_TINT, type DashboardItem } from '../types';
 
 const TILE_WIDTH = 118;
 
@@ -26,7 +26,9 @@ export function HomeTile({
       style={({ pressed }) => ({ width: TILE_WIDTH, opacity: pressed ? 0.85 : 1 })}
     >
       <Poster
-        uri={undefined}
+        uri={item.posterUrl ?? undefined}
+        title={item.title}
+        tint={KIND_TINT[item.kind]}
         width={TILE_WIDTH}
         height={Math.round(TILE_WIDTH * 1.45)}
         glyph={KIND_GLYPH[item.kind]}

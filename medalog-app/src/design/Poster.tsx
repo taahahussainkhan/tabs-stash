@@ -16,6 +16,7 @@ export function Poster({
   height,
   tint = color.accent,
   glyph = '▤',
+  title,
   radiusSize = 'md',
 }: {
   uri?: string;
@@ -23,10 +24,19 @@ export function Poster({
   height: number;
   tint?: string;
   glyph?: string;
+  /** When there is no artwork, the title's initials read better than a symbol. */
+  title?: string;
   radiusSize?: keyof typeof radius;
 }) {
   const [failed, setFailed] = useState(false);
   const show = !!uri && !failed;
+
+  const initials = (title ?? '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(word => word.charAt(0).toUpperCase())
+    .join('');
 
   return (
     <View
@@ -49,6 +59,10 @@ export function Poster({
           resizeMode="cover"
           onError={() => setFailed(true)}
         />
+      ) : initials ? (
+        <Text style={{ fontSize: width * 0.34, color: tint, fontWeight: '900', opacity: 0.85 }}>
+          {initials}
+        </Text>
       ) : (
         <Text style={{ fontSize: width * 0.38, color: tint, fontWeight: '800' }}>{glyph}</Text>
       )}
