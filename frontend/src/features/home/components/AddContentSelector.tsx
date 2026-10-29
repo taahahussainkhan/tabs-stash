@@ -57,9 +57,9 @@ export function AddContentSelector({
               type.onClick()
               onClose()
             }}
-            className={`p-4 bg-[#1e2026] hover:bg-[#262830] border border-[#2e323c] border-l-[3px] ${type.borderLeft} rounded-[6px] text-left transition-all duration-150 group cursor-pointer`}
+            className={`p-4 bg-[var(--surface)] hover:bg-[var(--surface-light)] border border-[var(--border-color)] border-l-[3px] ${type.borderLeft} rounded-[var(--radius-md)] text-left transition-all duration-150 group cursor-pointer`}
           >
-            <div className="w-8 h-8 rounded-[4px] bg-[#121316] border border-[#2e323c] flex items-center justify-center mb-3">
+            <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-[var(--background)] border border-[var(--border-color)] flex items-center justify-center mb-3">
               {type.icon}
             </div>
             <div className="text-xs font-bold text-content-primary mb-1 group-hover:text-white">

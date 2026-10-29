@@ -41,16 +41,16 @@ export function ItemSummaryCard({ item }: ItemSummaryCardProps) {
   return (
     <div 
       onClick={() => navigate(config.path)}
-      className={`group bg-[#1e2026] hover:bg-[#262830] rounded-[6px] p-4 transition-all duration-150 cursor-pointer border border-[#2e323c] border-l-[3px] ${config.borderLeft} flex flex-col justify-between`}
+      className={`group bg-[var(--surface)] hover:bg-[var(--surface-light)] rounded-[var(--radius-lg)] p-4 transition-all duration-150 cursor-pointer border border-[var(--border-color)] border-l-[3px] ${config.borderLeft} flex flex-col`}
     >
       <div>
-        <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center justify-between gap-2 mb-2.5">
           <span className={`mono-badge ${config.badge}`}>
             <Icon className="w-3 h-3" />
             <span>{item.type}</span>
           </span>
 
-          <div className="w-6 h-6 rounded-[3px] bg-[#121316] border border-[#2e323c] flex items-center justify-center text-content-muted group-hover:text-white group-hover:border-[#3d4350] transition-colors">
+          <div className="w-6 h-6 rounded-[var(--radius-xs)] bg-[var(--background)] border border-[var(--border-color)] flex items-center justify-center text-content-muted group-hover:text-white group-hover:border-[#3d4350] transition-colors">
             <ArrowUpRight className="w-3.5 h-3.5" />
           </div>
         </div>
@@ -59,12 +59,12 @@ export function ItemSummaryCard({ item }: ItemSummaryCardProps) {
           {item.title}
         </h3>
         
-        <p className="text-content-muted text-xs font-mono mb-4 line-clamp-1">
+        <p className="text-content-muted text-xs mb-3 line-clamp-1">
           {item.author_or_director || 'Creator unlisted'} {item.year ? `• ${item.year}` : ''}
         </p>
       </div>
 
-      <div className="flex items-center justify-between pt-3 border-t border-[#242730] text-xs font-mono">
+      <div className="flex items-center justify-between pt-3 border-t border-[var(--border-subtle)] text-xs font-mono">
         <div className="flex items-center gap-1 text-accent-ochre font-bold">
           <Star className="w-3.5 h-3.5 fill-accent-ochre" />
           <span>{item.rating != null ? item.rating.toFixed(1) : '—'}</span>

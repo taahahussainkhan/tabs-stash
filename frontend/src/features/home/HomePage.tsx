@@ -1,53 +1,62 @@
 import { useNavigate } from 'react-router-dom'
+import {
+  Bookmark,
+  BookOpen,
+  Clock,
+  Film,
+  Layers,
+  Plus,
+  Play,
+  Star,
+  StickyNote,
+  Tv,
+} from 'lucide-react'
 import { useDashboardQuery } from '../../services/dashboardService'
 import { ItemSummaryCard } from './components/ItemSummaryCard'
 import { useAddContentModal } from './hooks/useAddContentModal'
 import { useCreateMovieMutation, useCreateWatchlistMovieMutation } from '../movies/hooks/useMoviesQuery'
 import { useCreateSeriesMutation, useCreateWatchlistSeriesMutation } from '../series/hooks/useSeriesQuery'
-import { Play, Star, Bookmark, Plus, BookOpen, Film, Tv, ArrowRight, Layers } from 'lucide-react'
 import type { MovieSchemaData } from '../movies/schemas/movieSchema'
-import { AddContentModal } from './components/AddContentModal'
 import type { WatchlistMovieData } from '../../shared/components/modals/AddToWatchlistModalContent'
 import { mediaCatalogService } from '../../services/mediaCatalogService'
 import { EmptyState } from '../../shared/components/common/EmptyState'
+import { useAuth } from '../../app/auth'
+import { Fab, PageHeader, SectionHeader, Skeleton, StatTile, type FabAction } from '../../design'
+
+const STAT_ACCENT = {
+  movie: 'var(--primary)',
+  series: 'var(--accent-sage)',
+  book: 'var(--accent-ochre)',
+  vault: 'var(--accent-cyan)',
+  progress: 'var(--accent-indigo)',
+  done: 'var(--accent-sage)',
+} as const
 
 function DashboardSkeleton() {
   return (
-    <div className="w-full space-y-8 page-fade-in animate-pulse">
-      {/* Top Banner Skeleton */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#2e323c]">
-        <div className="space-y-2">
-          <div className="h-3.5 w-36 bg-[#1e2026] rounded" />
-          <div className="h-8 w-72 bg-[#1e2026] rounded" />
-          <div className="h-3 w-56 bg-[#1e2026] rounded" />
+    <div className="w-full space-y-8 page-fade-in">
+      <div className="flex flex-col gap-4 pb-6 section-rule md:flex-row md:items-end md:justify-between">
+        <div className="space-y-2.5">
+          <Skeleton className="h-3 w-36" />
+          <Skeleton className="h-9 w-72" />
+          <Skeleton className="h-3 w-56" />
         </div>
         <div className="flex gap-2.5">
-          <div className="h-8 w-28 bg-[#1e2026] rounded" />
-          <div className="h-8 w-28 bg-[#1e2026] rounded" />
+          <Skeleton className="h-9 w-28" />
+          <Skeleton className="h-9 w-28" />
         </div>
       </div>
 
-      {/* Stats Grid Skeleton */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="bg-[#1e2026] border border-[#2e323c] rounded-[6px] p-4 flex items-center justify-between h-20">
-            <div className="space-y-2">
-              <div className="h-2.5 w-24 bg-[#262830] rounded" />
-              <div className="h-6 w-12 bg-[#262830] rounded" />
-            </div>
-            <div className="w-9 h-9 rounded-[4px] bg-[#121316] border border-[#2e323c]" />
-          </div>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-6">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <Skeleton key={index} className="h-[74px]" />
         ))}
       </div>
 
-      {/* Media Cards Skeleton */}
-      <div className="space-y-4 pt-4">
-        <div className="h-5 w-48 bg-[#1e2026] rounded" />
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[0, 1, 2].map((i) => (
-            <div key={i} className="h-28 bg-[#1e2026] border border-[#2e323c] rounded-[6px]" />
-          ))}
-        </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <Skeleton key={index} className="h-28" />
+        ))}
       </div>
     </div>
   )
@@ -55,9 +64,10 @@ function DashboardSkeleton() {
 
 export function HomePage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const { data: dashboardData, isLoading: loading, error, refetch } = useDashboardQuery()
-  const { 
-    openContentSelector, 
+  const {
+    openContentSelector,
     handleSelectMovie,
     handleSelectMovieWatchlist,
     handleSelectSeries,
@@ -86,7 +96,7 @@ export function HomePage() {
       is_rewatch: false,
       seasons: data.seasons,
     } as any)
-    refetch() 
+    refetch()
   }
 
   const handleAddMovieToWatchlist = async (data: WatchlistMovieData) => {
@@ -98,7 +108,7 @@ export function HomePage() {
       posterImage: data.posterImage,
       externalId: data.externalId,
     })
-    refetch() 
+    refetch()
   }
 
   const handleAddSeriesToWatchlist = async (data: WatchlistMovieData) => {
@@ -149,7 +159,7 @@ export function HomePage() {
       externalId,
       seasons: seasons && seasons.length > 0 ? seasons : undefined,
     })
-    refetch() 
+    refetch()
   }
 
   const openAddSelector = (mode: 'add' | 'watchlist' = 'add') => {
@@ -170,16 +180,23 @@ export function HomePage() {
     }
   }
 
+  const fabActions: FabAction[] = [
+    { key: 'card', label: 'Quick card', icon: StickyNote, accent: 'var(--accent-indigo)', onSelect: () => navigate('/cards') },
+    { key: 'vault', label: 'Tab vault', icon: Layers, accent: 'var(--accent-cyan)', onSelect: () => navigate('/tabs') },
+    { key: 'queue', label: 'Add to queue', icon: Bookmark, accent: 'var(--accent-ochre)', onSelect: () => openAddSelector('watchlist') },
+    { key: 'log', label: 'Log content', icon: Plus, accent: 'var(--primary)', onSelect: () => openAddSelector('add') },
+  ]
+
   if (loading) {
     return <DashboardSkeleton />
   }
 
   if (error || !dashboardData) {
     return (
-      <div className="w-full py-20 flex items-center justify-center">
-        <div className="text-center bg-[#1e2026] border border-[#2e323c] p-8 rounded-[6px] max-w-md w-full">
-          <h2 className="text-lg font-bold text-danger mb-2">Connection Lost</h2>
-          <p className="text-xs text-content-secondary mb-6">Unable to retrieve logs from local archive.</p>
+      <div className="flex w-full items-center justify-center py-20">
+        <div className="w-full max-w-md rounded-[var(--radius-lg)] border border-border-main bg-surface p-8 text-center">
+          <h2 className="mb-2 text-lg font-bold text-danger">Connection lost</h2>
+          <p className="mb-6 text-xs text-content-secondary">Unable to reach the archive. Check the server and try again.</p>
           <button className="btn-primary w-full py-2 text-xs" onClick={() => refetch()}>
             Reconnect
           </button>
@@ -188,94 +205,103 @@ export function HomePage() {
     )
   }
 
+  const { stats } = dashboardData
+  const greetingName = user?.first_name || user?.username || user?.email?.split('@')[0] || 'there'
+  const isEmpty =
+    dashboardData.continue_watching.length === 0 &&
+    dashboardData.recently_completed.length === 0 &&
+    dashboardData.watchlist_preview.length === 0
+
   return (
     <div className="w-full space-y-8 page-fade-in">
-      {/* Top Banner / Hero Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-[#2e323c]">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <span className="w-2 h-2 rounded-full bg-accent-vermillion"></span>
-            <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-accent-ochre">
-              Lore Archive &bull; Dashboard
-            </span>
+      <PageHeader
+        eyebrow="Lore archive / dashboard"
+        tone="ochre"
+        title={`Hi, ${greetingName}`}
+        description="Everything you have watched, read and saved — across cinema, series, books and the tab vault."
+        actions={
+          <>
+            <button onClick={() => openAddSelector('add')} className="btn-primary flex items-center gap-2 px-4 py-2 text-xs">
+              <Plus className="h-4 w-4" />
+              <span>Log content</span>
+            </button>
+            <button onClick={() => openAddSelector('watchlist')} className="btn-secondary flex items-center gap-2 px-4 py-2 text-xs">
+              <Bookmark className="h-4 w-4" style={{ color: 'var(--accent-ochre)' }} />
+              <span>Add to queue</span>
+            </button>
+          </>
+        }
+      />
+
+      {/* Counters — one indexed stats document, never a full collection scan */}
+      <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+        <StatTile label="Movies" value={stats.total_movies} icon={Film} accent={STAT_ACCENT.movie} to="/movies" />
+        <StatTile label="Series" value={stats.total_series} icon={Tv} accent={STAT_ACCENT.series} to="/series" />
+        <StatTile label="Books" value={stats.total_books} icon={BookOpen} accent={STAT_ACCENT.book} to="/books" />
+        <StatTile label="Stashed tabs" value={stats.total_stashed_tabs} icon={Layers} accent={STAT_ACCENT.vault} to="/tabs" />
+        <StatTile label="In progress" value={stats.watching + stats.reading} icon={Play} accent={STAT_ACCENT.progress} hint={`${stats.watching} watching · ${stats.reading} reading`} />
+        <StatTile label="Completed" value={stats.completed} icon={Star} accent={STAT_ACCENT.done} hint={`${stats.completed_this_month} this month`} />
+      </section>
+
+      {/* Highlight: this month's wins plus the queue in one glance */}
+      <section className="grid grid-cols-1 gap-3 md:grid-cols-3">
+        <div
+          className="rounded-[var(--radius-lg)] border border-[var(--border-color)] p-5"
+          style={{ background: 'linear-gradient(135deg, var(--primary-soft), transparent 70%)' }}
+        >
+          <div className="eyebrow" style={{ color: 'var(--primary)' }}>Finished this month</div>
+          <div className="mt-2 text-3xl font-extrabold tracking-tight text-content-primary">
+            {stats.completed_this_month}
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-content-primary">
-            Media & Reading Collection
-          </h1>
-          <p className="text-xs text-content-secondary mt-1 font-sans">
-            Personal records of cinema, episodic television, and literature.
+          <p className="mt-1 text-[11px] text-content-secondary">
+            {stats.completed_this_month === 0
+              ? 'Nothing closed out yet — the month is young.'
+              : 'Titles marked complete since the 1st.'}
           </p>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="tile p-5">
+          <div className="flex items-center justify-between">
+            <div className="eyebrow">Queue</div>
+            <Bookmark className="h-4 w-4" style={{ color: 'var(--accent-ochre)' }} />
+          </div>
+          <div className="mt-2 text-3xl font-extrabold tracking-tight text-content-primary">{stats.watchlist}</div>
           <button
-            onClick={() => openAddSelector('add')}
-            className="btn-primary px-4 py-2 text-xs flex items-center gap-2"
+            onClick={() => navigate('/movies/watchlist')}
+            className="mt-1 text-[11px] font-semibold text-content-secondary transition-colors hover:text-content-primary"
           >
-            <Plus className="w-4 h-4" />
-            <span>Log Content</span>
-          </button>
-
-          <button
-            onClick={() => openAddSelector('watchlist')}
-            className="btn-secondary px-4 py-2 text-xs flex items-center gap-2"
-          >
-            <Bookmark className="w-4 h-4 text-accent-ochre" />
-            <span>Add to Queue</span>
+            Open watchlist →
           </button>
         </div>
-      </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: 'Books Logged', value: dashboardData.stats.total_books, icon: BookOpen, accent: 'card-accent-indigo', badge: 'mono-badge-indigo', path: '/books' },
-          { label: 'Cinema Watched', value: dashboardData.stats.total_movies, icon: Film, accent: 'card-accent-cyan', badge: 'mono-badge-cyan', path: '/movies' },
-          { label: 'Series Tracked', value: dashboardData.stats.total_series, icon: Tv, accent: 'card-accent-ochre', badge: 'mono-badge-ochre', path: '/series' },
-          { label: 'Queue / Watchlist', value: dashboardData.stats.watchlist, icon: Layers, accent: 'card-accent-vermillion', badge: 'mono-badge-vermillion', path: '/movies/watchlist' },
-        ].map((stat, i) => (
-          <div 
-            key={i} 
-            className={`bg-[#1e2026] border border-[#2e323c] rounded-[6px] p-4 cursor-pointer hover:bg-[#262830] transition-all duration-150 flex items-center justify-between ${stat.accent}`}
-            onClick={() => navigate(stat.path)}
-          >
-            <div>
-              <div className="text-[10px] font-mono uppercase tracking-wider text-content-muted font-bold mb-1">{stat.label}</div>
-              <div className="text-2xl font-mono font-bold text-content-primary">{stat.value}</div>
-            </div>
-            <div className="w-9 h-9 rounded-[4px] bg-[#121316] border border-[#2e323c] flex items-center justify-center">
-              <stat.icon className="w-4 h-4 text-content-secondary" />
-            </div>
+        <div className="tile p-5">
+          <div className="flex items-center justify-between">
+            <div className="eyebrow">Captured</div>
+            <Clock className="h-4 w-4" style={{ color: 'var(--accent-cyan)' }} />
           </div>
-        ))}
-      </div>
+          <div className="mt-2 text-3xl font-extrabold tracking-tight text-content-primary">
+            {(stats.total_cards ?? 0) + (stats.total_links ?? 0)}
+          </div>
+          <p className="mt-1 text-[11px] text-content-secondary">
+            {stats.total_cards ?? 0} cards · {stats.total_links ?? 0} links
+          </p>
+        </div>
+      </section>
 
-      {/* Content Sections */}
       {[
-        { title: 'In Progress', items: dashboardData.continue_watching, icon: Play, navigateTo: '/books', subtitle: 'Currently active logs' },
-        { title: 'Recent Completions', items: dashboardData.recently_completed, icon: Star, navigateTo: '/movies/recently-watched', subtitle: 'Recently finished' },
-        { title: 'Queue & Watchlist', items: dashboardData.watchlist_preview, icon: Bookmark, navigateTo: '/movies/watchlist', subtitle: 'Queued next' }
-      ].map((section, idx) => section.items.length > 0 && (
-        <section key={idx} className="space-y-4">
-          <div className="flex items-center justify-between border-b border-[#2e323c] pb-2.5">
-            <div className="flex items-center gap-2.5">
-              <section.icon className="w-4 h-4 text-accent-vermillion" />
-              <div>
-                <h2 className="text-base font-bold text-content-primary tracking-tight">{section.title}</h2>
-              </div>
-              <span className="text-[10px] font-mono text-content-muted">/ {section.subtitle}</span>
-            </div>
-            <button
-              onClick={() => navigate(section.navigateTo)}
-              className="flex items-center gap-1.5 text-xs font-mono font-bold text-content-secondary hover:text-white transition-colors"
-            >
-              <span>View All</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        { title: 'In progress', items: dashboardData.continue_watching, icon: Play, navigateTo: '/books', subtitle: 'Active logs' },
+        { title: 'Recently finished', items: dashboardData.recently_completed, icon: Star, navigateTo: '/movies/recently-watched', subtitle: 'Closed out' },
+        { title: 'Queue & watchlist', items: dashboardData.watchlist_preview, icon: Bookmark, navigateTo: '/movies/watchlist', subtitle: 'Up next' },
+      ].map((section) => section.items.length > 0 && (
+        <section key={section.title} className="space-y-4">
+          <SectionHeader
+            title={section.title}
+            subtitle={section.subtitle}
+            icon={section.icon}
+            count={section.items.length}
+            viewAllTo={section.navigateTo}
+          />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {section.items.map((item) => (
               <ItemSummaryCard key={`${item.type}-${item.id}`} item={item} />
             ))}
@@ -283,22 +309,21 @@ export function HomePage() {
         </section>
       ))}
 
-      {/* Empty State */}
-      {dashboardData.continue_watching.length === 0 &&
-        dashboardData.recently_completed.length === 0 &&
-        dashboardData.watchlist_preview.length === 0 && (
-          <EmptyState
-            icon={Layers}
-            badge="DASHBOARD ARCHIVE"
-            title="Your Lore is Waiting"
-            description="Your media vault currently has no active in-progress sessions, completions, or queued items. Begin building your collection across tabs, books, films, and series."
-            accent="vermillion"
-            actionText="Log Content"
-            onAction={() => openAddSelector('add')}
-            secondaryActionText="Add to Queue"
-            onSecondaryAction={() => openAddSelector('watchlist')}
-          />
+      {isEmpty && (
+        <EmptyState
+          icon={Layers}
+          badge="DASHBOARD ARCHIVE"
+          title="Your archive is waiting"
+          description="Nothing is in progress, completed or queued yet. Start from the button in the corner, or log something directly."
+          accent="vermillion"
+          actionText="Log content"
+          onAction={() => openAddSelector('add')}
+          secondaryActionText="Add to queue"
+          onSecondaryAction={() => openAddSelector('watchlist')}
+        />
       )}
+
+      <Fab actions={fabActions} label="New entry" />
     </div>
   )
 }

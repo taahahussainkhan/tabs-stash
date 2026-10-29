@@ -1,5 +1,5 @@
-import { useLocation } from 'react-router-dom'
-import { WifiOff } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
+import { Home, WifiOff } from 'lucide-react'
 import { ProfileMenu } from '../common/ProfileMenu'
 import { Dropdown } from '../common/form/Dropdown'
 import { Logo } from './Logo'
@@ -11,29 +11,42 @@ import { NAV_DROPDOWNS } from '../../constants/navigation'
 export function Navbar() {
   const location = useLocation()
   const isOnline = useOnlineStatus()
+  const isHome = location.pathname === '/'
 
   return (
-    <header className="sticky top-0 z-50 bg-[#17181d]/95 backdrop-blur-md border-b border-[#2e323c] px-4 sm:px-8 py-3 transition-all duration-200">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 border-b border-border-main bg-[var(--surface-sidebar)]/95 px-4 py-3 backdrop-blur-md transition-all duration-200 sm:px-8">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
         {/* Left: Brand Logo */}
-        <div className="flex items-center gap-4 shrink-0">
+        <div className="flex shrink-0 items-center gap-3">
           <Logo />
 
           {!isOnline && (
-            <div className="flex items-center gap-1.5 px-2 py-0.5 bg-danger/10 border border-danger/30 rounded-[3px] text-danger animate-pulse">
-              <WifiOff className="w-3 h-3" />
-              <span className="text-[10px] font-mono font-bold uppercase tracking-wider">Offline</span>
+            <div className="flex animate-pulse items-center gap-1.5 rounded-[var(--radius-pill)] border border-danger/30 bg-danger/10 px-2.5 py-1 text-danger">
+              <WifiOff className="h-3 w-3" />
+              <span className="text-[10px] font-bold uppercase tracking-wider">Offline</span>
             </div>
           )}
         </div>
 
         {/* Center: Search & Navigation */}
-        <div className="flex items-center gap-3 flex-1 max-w-2xl justify-center">
+        <div className="flex max-w-2xl flex-1 items-center justify-center gap-3">
           <div className="w-full max-w-xs">
             <GlobalSearch />
           </div>
 
-          <div className="hidden lg:flex items-center gap-1">
+          <nav className="hidden items-center gap-1 lg:flex">
+            <Link
+              to="/"
+              className={
+                isHome
+                  ? 'flex items-center gap-2 rounded-[var(--radius-pill)] border border-transparent bg-primary-soft px-3 py-1.5 text-xs font-semibold text-content-primary'
+                  : 'flex items-center gap-2 rounded-[var(--radius-pill)] border border-transparent px-3 py-1.5 text-xs font-semibold text-content-secondary transition-all duration-150 hover:bg-surface hover:text-content-primary'
+              }
+            >
+              <Home className={`h-3.5 w-3.5 ${isHome ? 'text-primary' : 'text-content-muted'}`} />
+              <span>Home</span>
+            </Link>
+
             {NAV_DROPDOWNS.map((dropdown) => {
               const Icon = dropdown.icon
               const isActive = location.pathname.startsWith(dropdown.basePath)
@@ -45,24 +58,24 @@ export function Navbar() {
                   items={dropdown.links}
                   placeholder={dropdown.label}
                   basePath={dropdown.basePath}
-                  buttonClassName={`flex items-center gap-2 px-3 py-1.5 rounded-[4px] text-xs font-semibold tracking-tight transition-all duration-150 border ${
+                  buttonClassName={`flex items-center gap-2 px-3 py-1.5 rounded-[var(--radius-pill)] text-xs font-semibold tracking-tight transition-all duration-150 border ${
                     isActive
-                      ? 'bg-[#1e2026] text-white border-[#2e323c] border-b-2 border-b-[#e05a47]'
-                      : 'text-content-secondary hover:text-content-primary hover:bg-[#1e2026] border-transparent hover:border-[#2e323c]'
+                      ? 'bg-primary-soft text-content-primary border-transparent'
+                      : 'text-content-secondary hover:text-content-primary hover:bg-surface border-transparent'
                   }`}
                   triggerIcon={
-                    <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#e05a47]' : 'text-content-muted'}`} />
+                    <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-primary' : 'text-content-muted'}`} />
                   }
                   hover
                   className="m-0"
                 />
               )
             })}
-          </div>
+          </nav>
         </div>
 
         {/* Right: Actions & User Menu */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex shrink-0 items-center gap-2">
           <ProfileMenu />
           <div className="lg:hidden">
             <MobileMenu />

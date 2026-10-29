@@ -11,27 +11,26 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background text-content-primary flex flex-col antialiased">
+    <div className="flex min-h-screen flex-col bg-background text-content-primary antialiased">
       <Navbar />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 page-fade-in">
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 page-fade-in sm:px-6 lg:px-8">
         {children}
       </main>
 
-      {/* Minimalist Editorial Footer */}
-      <footer className="mt-auto border-t border-[#2e323c] bg-[#17181d] py-6 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-mono text-content-muted">
+      <footer className="mt-auto border-t border-border-main bg-[var(--surface-sidebar)] px-4 py-6">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-[11px] text-content-muted sm:flex-row">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#38a169]"></span>
-            <span>LORE PERSONAL ASSISTANT &amp; ARCHIVE</span>
-            <span className="text-[#2e323c]">/</span>
+            <span className="h-2 w-2 rounded-full bg-success" />
+            <span className="font-semibold tracking-wide">LORE PERSONAL ASSISTANT &amp; ARCHIVE</span>
+            <span className="text-border-main">/</span>
             <span>LOCAL ARCHIVE ACTIVE</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-accent-ochre font-semibold">EDITION v3.0</span>
-            <span className="text-[#2e323c]">/</span>
-            <span>NO GRADIENTS &bull; EDITORIAL MINIMAL</span>
+            <span className="font-semibold text-primary">EDITION v3.1</span>
+            <span className="text-border-main">/</span>
+            <span>MEDIALOG DESIGN LANGUAGE</span>
           </div>
         </div>
       </footer>

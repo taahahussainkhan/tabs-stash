@@ -27,8 +27,8 @@ export function AddContentModalContent({
       icon: <Film className="w-5 h-5" />,
       onClick: onSelectMovie,
       badge: 'CINEMA',
-      accentColor: 'text-[#2dd4bf] border-[#134e4a] bg-[#0f2e2b]',
-      hoverBorder: 'hover:border-[#2dd4bf]/40',
+      accentColor: 'text-[var(--accent-sage)] border-[var(--success)] bg-[var(--success-soft)]',
+      hoverBorder: 'hover:border-[var(--accent-sage)]/40',
       available: true
     },
     {
@@ -38,8 +38,8 @@ export function AddContentModalContent({
       icon: <Tv className="w-5 h-5" />,
       onClick: onSelectSeries,
       badge: 'TELEVISION',
-      accentColor: 'text-[#fbbf24] border-[#78350f] bg-[#3b2c12]',
-      hoverBorder: 'hover:border-[#fbbf24]/40',
+      accentColor: 'text-[var(--warning)] border-[var(--warning)] bg-[var(--warning-soft)]',
+      hoverBorder: 'hover:border-[var(--warning)]/40',
       available: true
     },
     {
@@ -49,7 +49,7 @@ export function AddContentModalContent({
       icon: <BookOpen className="w-5 h-5" />,
       onClick: onSelectBook,
       badge: 'LIBRARY',
-      accentColor: 'text-[#818cf8] border-[#3730a3] bg-[#1e1b4b]',
+      accentColor: 'text-[#818cf8] border-[var(--accent-indigo)] bg-[var(--primary-soft)]',
       hoverBorder: 'hover:border-[#818cf8]/40',
       available: true
     },
@@ -60,14 +60,14 @@ export function AddContentModalContent({
       icon: <FileText className="w-5 h-5" />,
       onClick: onSelectDocumentary || onSelectMovie,
       badge: 'DOCS',
-      accentColor: 'text-[#4ade80] border-[#1e593a] bg-[#143324]',
-      hoverBorder: 'hover:border-[#4ade80]/40',
+      accentColor: 'text-[var(--success)] border-[var(--success)] bg-[var(--success-soft)]',
+      hoverBorder: 'hover:border-[var(--success)]/40',
       available: false
     }
   ]
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <div className="p-6 sm:p-10 flex-1 overflow-y-auto custom-scrollbar space-y-6">
         {/* Title */}
         <div className="space-y-1">
@@ -97,12 +97,12 @@ export function AddContentModalContent({
               }}
               disabled={!type.available}
               className={`
-                p-4 rounded-[6px] border border-[#2e323c] bg-[#15161a] text-left transition-all relative group cursor-pointer
+                p-4 rounded-[var(--radius-md)] border border-[var(--border-color)] bg-[var(--surface-input)] text-left transition-all relative group cursor-pointer
                 ${type.available ? `${type.hoverBorder} hover:bg-[#1c1e24]` : 'opacity-40 cursor-not-allowed'}
               `}
             >
               <div className="flex items-center justify-between mb-3">
-                <div className={`w-9 h-9 rounded-[4px] border flex items-center justify-center ${type.accentColor}`}>
+                <div className={`w-9 h-9 rounded-[var(--radius-sm)] border flex items-center justify-center ${type.accentColor}`}>
                   {type.icon}
                 </div>
                 <span className="mono-badge mono-badge-neutral text-[9px]">
@@ -129,7 +129,7 @@ export function AddContentModalContent({
       </div>
 
       {/* Footer */}
-      <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-end bg-[#17181d] shrink-0">
+      <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-end bg-[var(--surface-sidebar)] shrink-0">
         <button 
           type="button" 
           className="text-xs font-medium text-content-muted hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer"

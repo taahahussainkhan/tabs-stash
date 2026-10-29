@@ -12,8 +12,23 @@ export const dashboardService = {
       id: s.public_id || s.id || s._id,
     })
 
+    const stats = rawData.stats || {}
+
     return {
-      stats: rawData.stats || { total_movies: 0, total_series: 0, total_books: 0, watchlist: 0 },
+      stats: {
+        total_movies: stats.total_movies ?? 0,
+        total_series: stats.total_series ?? 0,
+        total_books: stats.total_books ?? 0,
+        total_stashed_tabs: stats.total_stashed_tabs ?? 0,
+        total_links: stats.total_links ?? 0,
+        total_cards: stats.total_cards ?? 0,
+        total_records: stats.total_records ?? 0,
+        watching: stats.watching ?? 0,
+        reading: stats.reading ?? 0,
+        completed: stats.completed ?? 0,
+        completed_this_month: stats.completed_this_month ?? 0,
+        watchlist: stats.watchlist ?? 0,
+      },
       continue_watching: Array.isArray(rawData.continue_watching) ? rawData.continue_watching.map(mapSummary) : [],
       recently_completed: Array.isArray(rawData.recently_completed) ? rawData.recently_completed.map(mapSummary) : [],
       watchlist_preview: Array.isArray(rawData.watchlist_preview) ? rawData.watchlist_preview.map(mapSummary) : [],

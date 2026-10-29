@@ -23,6 +23,10 @@ export interface DashboardData {
     total_movies: number
     total_series: number
     total_books: number
+    total_stashed_tabs: number
+    total_links: number
+    total_cards: number
+    total_records: number
     watching: number
     reading: number
     completed: number
