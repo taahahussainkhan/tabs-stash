@@ -22,12 +22,12 @@ export function Button({
   ...props
 }: Props) {
   const variantClasses = {
-    primary: 'bg-[#e05a47] hover:bg-[#cc4a38] text-white border-[#ff7b68]',
-    secondary: 'bg-[#1e2026] hover:bg-[#262830] text-content-secondary hover:text-white border-[#2e323c] hover:border-content-muted',
-    accent: 'bg-[#1e2026] hover:bg-[#262830] text-accent-ochre border-accent-ochre/30 hover:border-accent-ochre',
-    ghost: 'bg-transparent hover:bg-[#1e2026] text-content-secondary hover:text-white border-transparent',
-    outline: 'bg-transparent hover:bg-[#1e2026] text-content-secondary hover:text-white border-[#2e323c] hover:border-content-muted',
-    danger: 'bg-[#271414] hover:bg-[#3b1818] text-danger border-danger/40 hover:border-danger'
+    primary: 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white border-[var(--primary)]',
+    secondary: 'bg-[var(--surface)] hover:bg-[var(--surface-light)] text-content-secondary hover:text-white border-[var(--border-color)] hover:border-content-muted',
+    accent: 'bg-[var(--surface)] hover:bg-[var(--surface-light)] text-accent-ochre border-accent-ochre/30 hover:border-accent-ochre',
+    ghost: 'bg-transparent hover:bg-[var(--surface)] text-content-secondary hover:text-white border-transparent',
+    outline: 'bg-transparent hover:bg-[var(--surface)] text-content-secondary hover:text-white border-[var(--border-color)] hover:border-content-muted',
+    danger: 'bg-[var(--danger-soft)] hover:bg-[var(--danger-soft)] text-danger border-danger/40 hover:border-danger'
   }
 
   const sizeClasses = {
@@ -40,7 +40,7 @@ export function Button({
   return (
     <button
       className={cn(
-        'inline-flex items-center justify-center font-bold tracking-tight rounded-[4px] border transition-all duration-150 cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none active:scale-[0.98]',
+        'inline-flex items-center justify-center font-bold tracking-tight rounded-[var(--radius-sm)] border transition-all duration-150 cursor-pointer select-none disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none active:scale-[0.98]',
         variantClasses[variant],
         sizeClasses[size],
         loading && 'opacity-80 pointer-events-none',

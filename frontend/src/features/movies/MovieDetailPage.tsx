@@ -36,7 +36,7 @@ export function MovieDetailPage() {
   if (error || !data) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-12 h-12 bg-danger/10 rounded-[4px] border border-danger/20 flex items-center justify-center mb-4">
+        <div className="w-12 h-12 bg-danger/10 rounded-[var(--radius-sm)] border border-danger/20 flex items-center justify-center mb-4">
           <Film className="w-6 h-6 text-danger" />
         </div>
         <h2 className="text-lg font-bold text-content-primary mb-1">Movie Not Found</h2>
@@ -65,8 +65,8 @@ export function MovieDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left Column: Poster & Tracking Stats */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="bg-[#1e2026] rounded-[6px] p-2 border border-[#2e323c] shadow-lg relative">
-            <div className="aspect-[2/3] rounded-[4px] overflow-hidden bg-[#121316] relative border border-[#2e323c]">
+          <div className="bg-[var(--surface)] rounded-[var(--radius-md)] p-2 border border-[var(--border-color)] shadow-lg relative">
+            <div className="aspect-[2/3] rounded-[var(--radius-sm)] overflow-hidden bg-[var(--background)] relative border border-[var(--border-color)]">
               {movie.poster_image ? (
                 <img src={movie.poster_image} alt={movie.title} className="w-full h-full object-cover" />
               ) : (
@@ -78,15 +78,15 @@ export function MovieDetailPage() {
             
             {/* Status Badge */}
             <div className="absolute top-4 right-4">
-              <span className={`px-2 py-0.5 rounded-[3px] text-[10px] font-mono font-bold uppercase tracking-wider border ${getStatusColorClass(movie.status)}`}>
+              <span className={`px-2 py-0.5 rounded-[var(--radius-xs)] text-[10px] font-mono font-bold uppercase tracking-wider border ${getStatusColorClass(movie.status)}`}>
                 {movie.status}
               </span>
             </div>
           </div>
 
           {/* Quick Tracking Stats */}
-          <div className="bg-[#1e2026] rounded-[6px] p-4 border border-[#2e323c] space-y-4 font-mono">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-accent-cyan pb-2 border-b border-[#242730]">
+          <div className="bg-[var(--surface)] rounded-[var(--radius-md)] p-4 border border-[var(--border-color)] space-y-4 font-mono">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-accent-cyan pb-2 border-b border-[var(--border-subtle)]">
               <Clock size={14} /> Tracking Metrics
             </div>
             
@@ -100,7 +100,7 @@ export function MovieDetailPage() {
                 <span className="text-content-primary">{formatDate(movie.created_at)}</span>
               </div>
               {movie.is_favorite && (
-                <div className="flex justify-between items-center pt-2 border-t border-[#242730] text-accent-ochre font-bold">
+                <div className="flex justify-between items-center pt-2 border-t border-[var(--border-subtle)] text-accent-ochre font-bold">
                   <span>Favorite Status</span>
                   <div className="flex items-center gap-1">
                     <Star size={13} className="fill-current" />
@@ -115,7 +115,7 @@ export function MovieDetailPage() {
         {/* Right Column: Details & History */}
         <div className="lg:col-span-8 space-y-6">
           {/* Header Details */}
-          <div className="bg-[#1e2026] border border-[#2e323c] rounded-[6px] p-5 space-y-3">
+          <div className="bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] p-5 space-y-3">
             <div className="flex flex-wrap items-center gap-1.5 font-mono">
               {movie.genre?.split(',').map(g => (
                 <span key={g} className="mono-badge mono-badge-cyan text-[10px]">
@@ -144,7 +144,7 @@ export function MovieDetailPage() {
 
           {/* Viewing History Timeline */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between border-b border-[#2e323c] pb-2">
+            <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
               <h2 className="text-sm font-bold text-content-primary flex items-center gap-2 tracking-tight">
                 <History className="w-4 h-4 text-accent-vermillion" /> Viewing Sessions
               </h2>
@@ -156,10 +156,10 @@ export function MovieDetailPage() {
             <div className="space-y-3">
               {sessions.length > 0 ? (
                 sessions.map((session) => (
-                  <div key={session.sessionId} className="bg-[#1e2026] border border-[#2e323c] border-l-[3px] border-l-accent-cyan rounded-[6px] p-4 space-y-3">
+                  <div key={session.sessionId} className="bg-[var(--surface)] border border-[var(--border-color)] border-l-[3px] border-l-accent-cyan rounded-[var(--radius-md)] p-4 space-y-3">
                     <div className="flex items-center justify-between gap-4 font-mono text-xs">
                       <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded-[3px] text-[10px] font-bold uppercase tracking-wider border ${getStatusColorClass(session.status)}`}>
+                        <span className={`px-2 py-0.5 rounded-[var(--radius-xs)] text-[10px] font-bold uppercase tracking-wider border ${getStatusColorClass(session.status)}`}>
                           {session.status}
                         </span>
                         <span className="text-content-muted">
@@ -177,16 +177,16 @@ export function MovieDetailPage() {
                     </div>
 
                     {session.notes && (
-                      <p className="text-xs text-content-secondary leading-relaxed bg-[#15161a] p-2.5 rounded-[4px] border border-[#2e323c] font-sans">
+                      <p className="text-xs text-content-secondary leading-relaxed bg-[var(--surface-input)] p-2.5 rounded-[var(--radius-sm)] border border-[var(--border-color)] font-sans">
                         "{session.notes}"
                       </p>
                     )}
 
                     {/* Session Comments */}
                     {session.comments.length > 0 && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2 border-t border-[#242730]">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pt-2 border-t border-[var(--border-subtle)]">
                         {session.comments.map(comment => (
-                          <div key={comment.public_id} className="bg-[#15161a] rounded-[4px] p-2.5 border border-[#2e323c]">
+                          <div key={comment.public_id} className="bg-[var(--surface-input)] rounded-[var(--radius-sm)] p-2.5 border border-[var(--border-color)]">
                             <div className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-accent-cyan mb-1">
                               <MessageSquare size={11} />
                               <span>{comment.timestamp ? formatSecondsAsHoursMinutes(comment.timestamp) : 'General Note'}</span>

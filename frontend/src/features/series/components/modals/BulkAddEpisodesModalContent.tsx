@@ -30,7 +30,7 @@ export function BulkAddEpisodesModalContent({ seasonPublicId, seriesPublicId, on
   const episodeCount = form.state.values.end_episode - form.state.values.start_episode + 1
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -51,7 +51,7 @@ export function BulkAddEpisodesModalContent({ seasonPublicId, seriesPublicId, on
             </h2>
           </div>
 
-          <div className="p-3 rounded-[4px] bg-[#15161a] border border-[#2e323c] text-xs font-mono text-content-secondary flex items-center gap-2">
+          <div className="p-3 rounded-[var(--radius-sm)] bg-[var(--surface-input)] border border-[var(--border-color)] text-xs font-mono text-content-secondary flex items-center gap-2">
             <Layers className="w-4 h-4 text-accent-ochre shrink-0" />
             <span>
               Batch creating <span className="text-accent-ochre font-bold">{episodeCount > 0 ? episodeCount : 0} episode{episodeCount !== 1 ? 's' : ''}</span> (from episode {form.state.values.start_episode} to {form.state.values.end_episode}).
@@ -95,7 +95,7 @@ export function BulkAddEpisodesModalContent({ seasonPublicId, seriesPublicId, on
         </div>
 
         {/* Footer */}
-        <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-between gap-4 bg-[#17181d] shrink-0">
+        <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-between gap-4 bg-[var(--surface-sidebar)] shrink-0">
           <button
             type="button"
             onClick={onClose}

@@ -31,7 +31,7 @@ export const TabItemRow: React.FC<TabItemRowProps> = ({ tab, sessionId, index })
           href={tab.url}
           target="_blank"
           rel="noreferrer"
-          className="text-xs text-content-secondary hover:text-[#e05a47] truncate transition-colors"
+          className="text-xs text-content-secondary hover:text-[var(--primary)] truncate transition-colors"
           title={tab.title}
         >
           {tab.title || tab.url}

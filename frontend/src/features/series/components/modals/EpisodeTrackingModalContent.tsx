@@ -143,7 +143,7 @@ export function EpisodeTrackingModalContent({
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <form
         id="episode-tracking-form"
         onSubmit={(e) => {
@@ -167,12 +167,12 @@ export function EpisodeTrackingModalContent({
               </div>
 
               {/* Tabs */}
-              <div className="flex p-0.5 bg-[#15161a] border border-[#2e323c] rounded-[4px] font-mono text-xs">
+              <div className="flex p-0.5 bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] font-mono text-xs">
                 <button
                   type="button"
-                  className={`px-2.5 py-0.5 font-semibold rounded-[3px] transition-colors cursor-pointer ${
+                  className={`px-2.5 py-0.5 font-semibold rounded-[var(--radius-xs)] transition-colors cursor-pointer ${
                     activeTab === 'details' 
-                      ? 'bg-[#0f2e2b] text-[#2dd4bf] border border-[#134e4a]' 
+                      ? 'bg-[var(--success-soft)] text-[var(--accent-sage)] border border-[var(--success)]' 
                       : 'text-content-muted hover:text-white'
                   }`}
                   onClick={() => setActiveTab('details')}
@@ -181,9 +181,9 @@ export function EpisodeTrackingModalContent({
                 </button>
                 <button
                   type="button"
-                  className={`px-2.5 py-0.5 font-semibold rounded-[3px] transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  className={`px-2.5 py-0.5 font-semibold rounded-[var(--radius-xs)] transition-colors flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'comments' 
-                      ? 'bg-[#0f2e2b] text-[#2dd4bf] border border-[#134e4a]' 
+                      ? 'bg-[var(--success-soft)] text-[var(--accent-sage)] border border-[var(--success)]' 
                       : 'text-content-muted hover:text-white'
                   }`}
                   onClick={() => setActiveTab('comments')}
@@ -220,10 +220,10 @@ export function EpisodeTrackingModalContent({
                   <div className="flex flex-wrap items-center gap-2 py-1">
                     <button
                       type="button"
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] border font-mono text-xs font-semibold transition-colors cursor-pointer ${
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-[var(--radius-sm)] border font-mono text-xs font-semibold transition-colors cursor-pointer ${
                         status === 'to_watch'
-                          ? 'bg-[#1e1b4b] border-[#3730a3] text-[#a5b4fc]'
-                          : 'bg-[#15161a] border-[#2e323c] text-content-muted hover:text-white'
+                          ? 'bg-[var(--primary-soft)] border-[var(--accent-indigo)] text-[var(--accent-indigo)]'
+                          : 'bg-[var(--surface-input)] border-[var(--border-color)] text-content-muted hover:text-white'
                       }`}
                       onClick={handleMarkToWatch}
                     >
@@ -232,10 +232,10 @@ export function EpisodeTrackingModalContent({
                     </button>
                     <button
                       type="button"
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] border font-mono text-xs font-semibold transition-colors cursor-pointer ${
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-[var(--radius-sm)] border font-mono text-xs font-semibold transition-colors cursor-pointer ${
                         status === 'watching'
-                          ? 'bg-[#0f2e2b] border-[#134e4a] text-[#2dd4bf]'
-                          : 'bg-[#15161a] border-[#2e323c] text-content-muted hover:text-white'
+                          ? 'bg-[var(--success-soft)] border-[var(--success)] text-[var(--accent-sage)]'
+                          : 'bg-[var(--surface-input)] border-[var(--border-color)] text-content-muted hover:text-white'
                       }`}
                       onClick={handleMarkInProgress}
                     >
@@ -244,10 +244,10 @@ export function EpisodeTrackingModalContent({
                     </button>
                     <button
                       type="button"
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded-[4px] border font-mono text-xs font-semibold transition-colors cursor-pointer ${
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-[var(--radius-sm)] border font-mono text-xs font-semibold transition-colors cursor-pointer ${
                         status === 'completed'
-                          ? 'bg-[#143324] border-[#1e593a] text-[#4ade80]'
-                          : 'bg-[#15161a] border-[#2e323c] text-content-muted hover:text-white'
+                          ? 'bg-[var(--success-soft)] border-[var(--success)] text-[var(--success)]'
+                          : 'bg-[var(--surface-input)] border-[var(--border-color)] text-content-muted hover:text-white'
                       }`}
                       onClick={handleMarkWatched}
                     >
@@ -332,7 +332,7 @@ export function EpisodeTrackingModalContent({
               </div>
 
               {/* Notes */}
-              <div className="space-y-2 pt-4 border-t border-[#242730]">
+              <div className="space-y-2 pt-4 border-t border-[var(--border-subtle)]">
                 <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-[#6b7280] px-1">
                   <AlignLeft className="w-3.5 h-3.5" />
                   <span>Episode Thoughts</span>
@@ -374,13 +374,13 @@ export function EpisodeTrackingModalContent({
                     ))}
                   </div>
                 ) : (
-                  <div className="py-6 bg-[#15161a] border border-[#2e323c] rounded-[4px] text-center font-mono text-xs text-content-muted">
+                  <div className="py-6 bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] text-center font-mono text-xs text-content-muted">
                     No timestamped notes recorded yet.
                   </div>
                 )}
               </div>
 
-              <div className="pt-3 border-t border-[#242730]">
+              <div className="pt-3 border-t border-[var(--border-subtle)]">
                 <CommentForm onAdd={addComment} />
               </div>
             </div>
@@ -388,7 +388,7 @@ export function EpisodeTrackingModalContent({
         </div>
 
         {/* Footer */}
-        <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-between gap-4 bg-[#17181d] shrink-0">
+        <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-between gap-4 bg-[var(--surface-sidebar)] shrink-0">
           <button 
             type="button" 
             className="text-xs font-medium text-content-muted hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer"

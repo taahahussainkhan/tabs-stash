@@ -20,13 +20,13 @@ export function SeasonCard({ seasonWithProgress, seriesPublicId, onDelete }: Sea
   const isCompleted = total_episodes > 0 && watched_episodes === total_episodes
 
   return (
-    <div className={`bg-[#1e2026] rounded-[6px] border border-[#2e323c] transition-colors ${isExpanded ? 'border-l-[3px] border-l-accent-ochre' : ''}`}>
+    <div className={`bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border-color)] transition-colors ${isExpanded ? 'border-l-[3px] border-l-accent-ochre' : ''}`}>
       <div className="p-4">
         {/* Season Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3 flex-1">
             <button
-              className="mt-0.5 p-1.5 rounded-[4px] bg-[#121316] hover:bg-[#262830] border border-[#2e323c] text-content-muted hover:text-white transition-colors"
+              className="mt-0.5 p-1.5 rounded-[var(--radius-sm)] bg-[var(--background)] hover:bg-[var(--surface-light)] border border-[var(--border-color)] text-content-muted hover:text-white transition-colors"
               onClick={() => setIsExpanded(!isExpanded)}
             >
               {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -67,7 +67,7 @@ export function SeasonCard({ seasonWithProgress, seriesPublicId, onDelete }: Sea
               {/* Progress Bar */}
               {total_episodes > 0 && (
                 <div className="mt-3 flex items-center gap-3">
-                  <div className="flex-1 h-1.5 bg-[#121316] border border-[#2e323c] rounded-full overflow-hidden">
+                  <div className="flex-1 h-1.5 bg-[var(--background)] border border-[var(--border-color)] rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-accent-ochre transition-all duration-300"
                       style={{ width: `${progress_percentage}%` }}
@@ -80,7 +80,7 @@ export function SeasonCard({ seasonWithProgress, seriesPublicId, onDelete }: Sea
               )}
 
               {season.notes && (
-                <p className="text-xs text-content-secondary italic mt-2.5 pl-2.5 border-l-2 border-[#2e323c]">{season.notes}</p>
+                <p className="text-xs text-content-secondary italic mt-2.5 pl-2.5 border-l-2 border-[var(--border-color)]">{season.notes}</p>
               )}
             </div>
           </div>
@@ -88,10 +88,10 @@ export function SeasonCard({ seasonWithProgress, seriesPublicId, onDelete }: Sea
           {/* Actions */}
           <div className="flex items-center gap-1.5 self-end sm:self-center">
             <div className="dropdown dropdown-end">
-              <label tabIndex={0} className="w-7 h-7 rounded-[4px] bg-[#121316] hover:bg-[#262830] border border-[#2e323c] text-content-primary transition-colors flex items-center justify-center cursor-pointer">
+              <label tabIndex={0} className="w-7 h-7 rounded-[var(--radius-sm)] bg-[var(--background)] hover:bg-[var(--surface-light)] border border-[var(--border-color)] text-content-primary transition-colors flex items-center justify-center cursor-pointer">
                 <Plus className="w-3.5 h-3.5" />
               </label>
-              <ul tabIndex={0} className="dropdown-content z-20 menu p-1 bg-[#1e2026] border border-[#2e323c] rounded-[6px] shadow-2xl w-44 mt-1">
+              <ul tabIndex={0} className="dropdown-content z-20 menu p-1 bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] shadow-2xl w-44 mt-1">
                 <li>
                   <button onClick={() => openAddEpisodeModal(season.public_id, seriesPublicId)} className="text-xs py-1.5">
                     Add Single Episode
@@ -106,7 +106,7 @@ export function SeasonCard({ seasonWithProgress, seriesPublicId, onDelete }: Sea
             </div>
             
             <button
-              className="w-7 h-7 rounded-[4px] bg-[#271414] hover:bg-[#3b1818] border border-danger/30 text-danger transition-colors flex items-center justify-center"
+              className="w-7 h-7 rounded-[var(--radius-sm)] bg-[var(--danger-soft)] hover:bg-[var(--danger-soft)] border border-danger/30 text-danger transition-colors flex items-center justify-center"
               onClick={() => onDelete(season.public_id)}
               title="Delete Season"
             >
@@ -117,7 +117,7 @@ export function SeasonCard({ seasonWithProgress, seriesPublicId, onDelete }: Sea
 
         {/* Episodes List (Expanded) */}
         {isExpanded && (
-          <div className="mt-4 pt-4 border-t border-[#242730] animate-in fade-in duration-200">
+          <div className="mt-4 pt-4 border-t border-[var(--border-subtle)] animate-in fade-in duration-200">
             <EpisodeList
               seasonPublicId={season.public_id}
               seriesPublicId={seriesPublicId}

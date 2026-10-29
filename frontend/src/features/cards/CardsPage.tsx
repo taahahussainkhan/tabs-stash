@@ -18,7 +18,7 @@ import {
 import { toast } from 'sonner';
 
 const COLOR_CONFIG: Record<CardColor, { label: string; bg: string; border: string; accent: string }> = {
-  charcoal: { label: 'Charcoal', bg: 'bg-[#1e2026]', border: 'border-[#31343e]', accent: '#4a5061' },
+  charcoal: { label: 'Charcoal', bg: 'bg-[var(--surface)]', border: 'border-[var(--surface-high)]', accent: '#4a5061' },
   terracotta: { label: 'Terracotta', bg: 'bg-[#221716]', border: 'border-[#5c241c]', accent: '#e05a47' },
   ochre: { label: 'Warm Ochre', bg: 'bg-[#251f15]', border: 'border-[#5e4418]', accent: '#e5a83b' },
   sage: { label: 'Sage Green', bg: 'bg-[#15221b]', border: 'border-[#1f5436]', accent: '#38a169' },
@@ -159,20 +159,20 @@ export const CardsPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Top Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-[#272a32] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-[var(--surface-high)] pb-6">
         <div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#202228] border border-[#31343e] flex items-center justify-center text-[#e5a83b]">
+            <div className="w-10 h-10 rounded-lg bg-[var(--surface-light)] border border-[var(--surface-high)] flex items-center justify-center text-[var(--warning)]">
               <StickyNote className="w-5 h-5" />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
                 Quick Cards & Sticky Notes
-                <span className="text-xs font-mono font-medium px-2 py-0.5 rounded bg-[#202228] border border-[#31343e] text-[#e5a83b]">
+                <span className="text-xs font-mono font-medium px-2 py-0.5 rounded bg-[var(--surface-light)] border border-[var(--surface-high)] text-[var(--warning)]">
                   {cards.length}
                 </span>
               </h1>
-              <p className="text-sm text-[#a1a6b4] mt-0.5">
+              <p className="text-sm text-[var(--content-secondary)] mt-0.5">
                 Instant scratchpad for thoughts, code snippets, memos, and reminders. Synced from your extension.
               </p>
             </div>
@@ -181,25 +181,25 @@ export const CardsPage: React.FC = () => {
 
         {/* Global Stats / Quick Counter */}
         <div className="flex items-center gap-3">
-          <div className="px-3 py-1.5 rounded-md bg-[#191b20] border border-[#31343e] text-xs font-mono text-[#a1a6b4]">
-            Pinned: <span className="text-[#e5a83b] font-bold">{pinnedCount}</span>
+          <div className="px-3 py-1.5 rounded-md bg-[var(--surface-secondary)] border border-[var(--surface-high)] text-xs font-mono text-[var(--content-secondary)]">
+            Pinned: <span className="text-[var(--warning)] font-bold">{pinnedCount}</span>
           </div>
-          <div className="px-3 py-1.5 rounded-md bg-[#191b20] border border-[#31343e] text-xs font-mono text-[#a1a6b4]">
+          <div className="px-3 py-1.5 rounded-md bg-[var(--surface-secondary)] border border-[var(--surface-high)] text-xs font-mono text-[var(--content-secondary)]">
             Total: <span className="text-white font-bold">{cards.length}</span>
           </div>
         </div>
       </div>
 
       {/* Card Composer Box */}
-      <div className="bg-[#191b20] border border-[#31343e] rounded-xl p-5 shadow-xl transition-all duration-200 focus-within:border-[#e05a47]">
+      <div className="bg-[var(--surface-secondary)] border border-[var(--surface-high)] rounded-xl p-5 shadow-xl transition-all duration-200 focus-within:border-[var(--primary)]">
         <form onSubmit={handleSave} className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-[#e5a83b] flex items-center gap-1.5">
+            <span className="text-xs font-bold uppercase tracking-wider text-[var(--warning)] flex items-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5" />
               Quick Capture Card
             </span>
-            <span className="text-xs font-mono text-[#6d7280]">
-              Press <kbd className="px-1.5 py-0.5 rounded bg-[#202228] border border-[#31343e] text-white">Ctrl+Enter</kbd> to save
+            <span className="text-xs font-mono text-[var(--content-muted)]">
+              Press <kbd className="px-1.5 py-0.5 rounded bg-[var(--surface-light)] border border-[var(--surface-high)] text-white">Ctrl+Enter</kbd> to save
             </span>
           </div>
 
@@ -210,7 +210,7 @@ export const CardsPage: React.FC = () => {
             onFocus={() => setIsComposerExpanded(true)}
             placeholder="Paste or write anything here... text, code, ideas, quotes, reminders..."
             rows={isComposerExpanded ? 4 : 2}
-            className="w-full bg-[#121316] border border-[#272a32] rounded-lg p-3 text-sm text-white placeholder-[#6d7280] focus:outline-none focus:border-[#e05a47] transition-all duration-150 resize-y"
+            className="w-full bg-[var(--background)] border border-[var(--surface-high)] rounded-lg p-3 text-sm text-white placeholder-[var(--content-muted)] focus:outline-none focus:border-[var(--primary)] transition-all duration-150 resize-y"
           />
 
           {isComposerExpanded && (
@@ -220,22 +220,22 @@ export const CardsPage: React.FC = () => {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Title (optional, auto-detected from 1st line)"
-                className="bg-[#121316] border border-[#272a32] rounded-md px-3 py-2 text-xs text-white placeholder-[#6d7280] focus:outline-none focus:border-[#31343e]"
+                className="bg-[var(--background)] border border-[var(--surface-high)] rounded-md px-3 py-2 text-xs text-white placeholder-[var(--content-muted)] focus:outline-none focus:border-[var(--surface-high)]"
               />
               <input
                 type="text"
                 value={tagsInput}
                 onChange={(e) => setTagsInput(e.target.value)}
                 placeholder="Tags (comma-separated, e.g. dev, ideas, read)"
-                className="bg-[#121316] border border-[#272a32] rounded-md px-3 py-2 text-xs text-white placeholder-[#6d7280] focus:outline-none focus:border-[#31343e]"
+                className="bg-[var(--background)] border border-[var(--surface-high)] rounded-md px-3 py-2 text-xs text-white placeholder-[var(--content-muted)] focus:outline-none focus:border-[var(--surface-high)]"
               />
             </div>
           )}
 
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#272a32]">
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[var(--surface-high)]">
             {/* Color Palette Selector */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-[#a1a6b4] mr-1">Color:</span>
+              <span className="text-xs text-[var(--content-secondary)] mr-1">Color:</span>
               {(Object.keys(COLOR_CONFIG) as CardColor[]).map((c) => (
                 <button
                   key={c}
@@ -259,8 +259,8 @@ export const CardsPage: React.FC = () => {
                 onClick={() => setIsPinned(!isPinned)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors ${
                   isPinned
-                    ? 'bg-[#251f15] border-[#5e4418] text-[#e5a83b]'
-                    : 'bg-[#202228] border-[#31343e] text-[#a1a6b4] hover:text-white'
+                    ? 'bg-[#251f15] border-[#5e4418] text-[var(--warning)]'
+                    : 'bg-[var(--surface-light)] border-[var(--surface-high)] text-[var(--content-secondary)] hover:text-white'
                 }`}
               >
                 <Pin className="w-3.5 h-3.5" />
@@ -270,7 +270,7 @@ export const CardsPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={!content.trim() || createCardMutation.isPending}
-                className="flex items-center gap-2 px-4 py-1.5 rounded-md bg-[#e05a47] hover:bg-[#cc4a38] text-white text-xs font-semibold shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-1.5 rounded-md bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-xs font-semibold shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Plus className="w-4 h-4" />
                 <span>{createCardMutation.isPending ? 'Saving...' : 'Save Card'}</span>
@@ -288,8 +288,8 @@ export const CardsPage: React.FC = () => {
             onClick={() => setActiveFilter('all')}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors border ${
               activeFilter === 'all'
-                ? 'bg-[#e05a47] border-[#e05a47] text-white'
-                : 'bg-[#191b20] border-[#31343e] text-[#a1a6b4] hover:text-white'
+                ? 'bg-[var(--primary)] border-[var(--primary)] text-white'
+                : 'bg-[var(--surface-secondary)] border-[var(--surface-high)] text-[var(--content-secondary)] hover:text-white'
             }`}
           >
             All Cards ({cards.length})
@@ -298,15 +298,15 @@ export const CardsPage: React.FC = () => {
             onClick={() => setActiveFilter('pinned')}
             className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors border flex items-center gap-1 ${
               activeFilter === 'pinned'
-                ? 'bg-[#e5a83b] border-[#e5a83b] text-black font-semibold'
-                : 'bg-[#191b20] border-[#31343e] text-[#a1a6b4] hover:text-white'
+                ? 'bg-[var(--warning)] border-[var(--warning)] text-black font-semibold'
+                : 'bg-[var(--surface-secondary)] border-[var(--surface-high)] text-[var(--content-secondary)] hover:text-white'
             }`}
           >
             <Pin className="w-3 h-3" />
             Pinned ({pinnedCount})
           </button>
 
-          <div className="h-4 w-[1px] bg-[#31343e] mx-1 hidden sm:block" />
+          <div className="h-4 w-[1px] bg-[var(--surface-high)] mx-1 hidden sm:block" />
 
           {/* Color filter dots */}
           {(Object.keys(COLOR_CONFIG) as CardColor[]).map((c) => {
@@ -318,8 +318,8 @@ export const CardsPage: React.FC = () => {
                 onClick={() => setActiveFilter(activeFilter === c ? 'all' : c)}
                 className={`px-2.5 py-1 rounded-md text-xs font-mono border flex items-center gap-1.5 transition-colors ${
                   activeFilter === c
-                    ? 'border-white text-white bg-[#202228]'
-                    : 'bg-[#191b20] border-[#31343e] text-[#a1a6b4] hover:text-white'
+                    ? 'border-white text-white bg-[var(--surface-light)]'
+                    : 'bg-[var(--surface-secondary)] border-[var(--surface-high)] text-[var(--content-secondary)] hover:text-white'
                 }`}
               >
                 <span
@@ -334,18 +334,18 @@ export const CardsPage: React.FC = () => {
 
         {/* Search input */}
         <div className="relative min-w-[240px]">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#6d7280]" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--content-muted)]" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search cards or #tags..."
-            className="w-full bg-[#191b20] border border-[#31343e] rounded-md pl-9 pr-8 py-1.5 text-xs text-white placeholder-[#6d7280] focus:outline-none focus:border-[#e05a47]"
+            className="w-full bg-[var(--surface-secondary)] border border-[var(--surface-high)] rounded-md pl-9 pr-8 py-1.5 text-xs text-white placeholder-[var(--content-muted)] focus:outline-none focus:border-[var(--primary)]"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#6d7280] hover:text-white"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--content-muted)] hover:text-white"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -357,16 +357,16 @@ export const CardsPage: React.FC = () => {
       {isLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {[1, 2, 3, 4, 5, 6].map((n) => (
-            <div key={n} className="h-44 rounded-xl bg-[#191b20] border border-[#31343e] animate-pulse" />
+            <div key={n} className="h-44 rounded-xl bg-[var(--surface-secondary)] border border-[var(--surface-high)] animate-pulse" />
           ))}
         </div>
       ) : filteredCards.length === 0 ? (
-        <div className="text-center py-20 bg-[#191b20]/40 border border-dashed border-[#31343e] rounded-xl p-8">
-          <div className="w-12 h-12 rounded-full bg-[#202228] border border-[#31343e] flex items-center justify-center mx-auto mb-3 text-[#e5a83b]">
+        <div className="text-center py-20 bg-[var(--surface-secondary)]/40 border border-dashed border-[var(--surface-high)] rounded-xl p-8">
+          <div className="w-12 h-12 rounded-full bg-[var(--surface-light)] border border-[var(--surface-high)] flex items-center justify-center mx-auto mb-3 text-[var(--warning)]">
             <StickyNote className="w-6 h-6" />
           </div>
           <h3 className="text-base font-semibold text-white">No quick cards found</h3>
-          <p className="text-xs text-[#a1a6b4] mt-1 max-w-sm mx-auto">
+          <p className="text-xs text-[var(--content-secondary)] mt-1 max-w-sm mx-auto">
             {searchQuery
               ? 'No cards match your search query. Try clearing filters.'
               : 'Paste any text in the box above or right-click any selected text on the web in your extension!'}
@@ -392,8 +392,8 @@ export const CardsPage: React.FC = () => {
                         {card.title || 'Quick Note'}
                       </h4>
                       {card.isPinned && (
-                        <span className="text-[#e5a83b] text-xs" title="Pinned to top">
-                          <Pin className="w-3.5 h-3.5 fill-[#e5a83b]" />
+                        <span className="text-[var(--warning)] text-xs" title="Pinned to top">
+                          <Pin className="w-3.5 h-3.5 fill-[var(--warning)]" />
                         </span>
                       )}
                     </div>
@@ -406,8 +406,8 @@ export const CardsPage: React.FC = () => {
                         title="Copy to clipboard"
                         className={`flex items-center gap-1 px-2 py-1 rounded text-[11px] font-semibold border transition-all ${
                           copiedId === card.id
-                            ? 'bg-[#38a169] border-[#38a169] text-white'
-                            : 'bg-[#121316]/70 border-[#31343e] text-[#a1a6b4] hover:text-white hover:border-[#a1a6b4]'
+                            ? 'bg-[var(--success)] border-[var(--success)] text-white'
+                            : 'bg-[var(--background)]/70 border-[var(--surface-high)] text-[var(--content-secondary)] hover:text-white hover:border-[var(--content-secondary)]'
                         }`}
                       >
                         {copiedId === card.id ? (
@@ -427,16 +427,16 @@ export const CardsPage: React.FC = () => {
                       <button
                         onClick={() => togglePinMutation.mutate({ id: card.id, isPinned: card.isPinned })}
                         title={card.isPinned ? 'Unpin card' : 'Pin card to top'}
-                        className="p-1 rounded text-[#a1a6b4] hover:text-white hover:bg-[#202228] transition-colors"
+                        className="p-1 rounded text-[var(--content-secondary)] hover:text-white hover:bg-[var(--surface-light)] transition-colors"
                       >
-                        <Pin className={`w-3.5 h-3.5 ${card.isPinned ? 'text-[#e5a83b] fill-[#e5a83b]' : ''}`} />
+                        <Pin className={`w-3.5 h-3.5 ${card.isPinned ? 'text-[var(--warning)] fill-[var(--warning)]' : ''}`} />
                       </button>
 
                       {/* Delete button */}
                       <button
                         onClick={() => deleteCardMutation.mutate(card.id)}
                         title="Delete card"
-                        className="p-1 rounded text-[#a1a6b4] hover:text-[#e05a47] hover:bg-[#202228] transition-colors"
+                        className="p-1 rounded text-[var(--content-secondary)] hover:text-[var(--primary)] hover:bg-[var(--surface-light)] transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -444,19 +444,19 @@ export const CardsPage: React.FC = () => {
                   </div>
 
                   {/* Body Content */}
-                  <div className="text-xs leading-relaxed text-[#d1d5db] font-sans whitespace-pre-wrap break-words max-h-56 overflow-y-auto bg-[#121316]/40 p-3 rounded-lg border border-[#272a32]/60">
+                  <div className="text-xs leading-relaxed text-[#d1d5db] font-sans whitespace-pre-wrap break-words max-h-56 overflow-y-auto bg-[var(--background)]/40 p-3 rounded-lg border border-[var(--surface-high)]/60">
                     {card.content}
                   </div>
                 </div>
 
                 {/* Footer Bar: Tags & Date */}
-                <div className="mt-4 pt-3 border-t border-[#272a32]/60 flex items-center justify-between text-[11px] text-[#6d7280]">
+                <div className="mt-4 pt-3 border-t border-[var(--surface-high)]/60 flex items-center justify-between text-[11px] text-[var(--content-muted)]">
                   <div className="flex flex-wrap items-center gap-1.5">
                     {card.tags && card.tags.length > 0 ? (
                       card.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="px-1.5 py-0.5 rounded bg-[#121316] border border-[#272a32] text-[#a1a6b4] font-mono text-[10px]"
+                          className="px-1.5 py-0.5 rounded bg-[var(--background)] border border-[var(--surface-high)] text-[var(--content-secondary)] font-mono text-[10px]"
                         >
                           #{tag}
                         </span>
@@ -475,7 +475,7 @@ export const CardsPage: React.FC = () => {
                         target="_blank"
                         rel="noreferrer"
                         title={card.sourceUrl}
-                        className="text-[#a1a6b4] hover:text-white"
+                        className="text-[var(--content-secondary)] hover:text-white"
                       >
                         <ExternalLink className="w-3 h-3" />
                       </a>

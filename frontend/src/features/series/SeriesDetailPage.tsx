@@ -43,7 +43,7 @@ export function SeriesDetailPage() {
   if (error || !seriesData) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="bg-[#1e2026] border border-[#2e323c] p-6 rounded-[6px] max-w-md w-full">
+        <div className="bg-[var(--surface)] border border-[var(--border-color)] p-6 rounded-[var(--radius-md)] max-w-md w-full">
           <p className="text-danger font-bold text-sm mb-4">Failed to load series details</p>
           <button 
             className="btn-secondary text-xs px-4 py-2 w-full" 
@@ -101,7 +101,7 @@ export function SeriesDetailPage() {
           <button
             onClick={() => syncCatalogMutation.mutate()}
             disabled={syncCatalogMutation.isPending}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-[#1e2026] hover:bg-[#262830] border border-[#2e323c] text-xs font-semibold text-accent-ochre hover:text-white transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] bg-[var(--surface)] hover:bg-[var(--surface-light)] border border-[var(--border-color)] text-xs font-semibold text-accent-ochre hover:text-white transition-colors disabled:opacity-50"
             title="Fetch latest seasons & episodes from media catalog"
           >
             <Sparkles className={`w-3.5 h-3.5 ${syncCatalogMutation.isPending ? 'animate-spin' : ''}`} />
@@ -110,7 +110,7 @@ export function SeriesDetailPage() {
 
           <button
             onClick={handleShowComments}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[4px] bg-[#1e2026] hover:bg-[#262830] border border-[#2e323c] text-xs font-semibold text-content-secondary hover:text-white transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--radius-sm)] bg-[var(--surface)] hover:bg-[var(--surface-light)] border border-[var(--border-color)] text-xs font-semibold text-content-secondary hover:text-white transition-colors"
           >
             <MessageSquare className="w-3.5 h-3.5" />
             <span>Series Notes</span>
@@ -127,13 +127,13 @@ export function SeriesDetailPage() {
       </div>
 
       {/* Series Hero Card */}
-      <div className="bg-[#1e2026] border border-[#2e323c] rounded-[6px] p-5 space-y-4">
+      <div className="bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] p-5 space-y-4">
         <div className="flex flex-col sm:flex-row gap-5 items-start">
           {(seriesData.poster_image || seriesData.posterImage) && (
             <img
               src={seriesData.poster_image || seriesData.posterImage}
               alt={seriesData.title}
-              className="w-24 h-36 object-cover rounded-[4px] border border-[#2e323c] shadow-md flex-shrink-0"
+              className="w-24 h-36 object-cover rounded-[var(--radius-sm)] border border-[var(--border-color)] shadow-md flex-shrink-0"
             />
           )}
           <div className="flex-1 min-w-0">
@@ -154,20 +154,20 @@ export function SeriesDetailPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[#242730] font-mono">
-          <div className="bg-[#15161a] p-3 rounded-[4px] border border-[#2e323c]">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-3 border-t border-[var(--border-subtle)] font-mono">
+          <div className="bg-[var(--surface-input)] p-3 rounded-[var(--radius-sm)] border border-[var(--border-color)]">
             <span className="text-[10px] uppercase text-content-muted font-bold">Total Episodes</span>
             <p className="text-lg font-bold text-content-primary mt-0.5">{totalEpisodes} <span className="text-[10px] text-content-muted font-normal">eps</span></p>
           </div>
-          <div className="bg-[#15161a] p-3 rounded-[4px] border border-[#2e323c] border-l-[3px] border-l-accent-cyan">
+          <div className="bg-[var(--surface-input)] p-3 rounded-[var(--radius-sm)] border border-[var(--border-color)] border-l-[3px] border-l-accent-cyan">
             <span className="text-[10px] uppercase text-accent-cyan font-bold">Watched</span>
             <p className="text-lg font-bold text-content-primary mt-0.5">{watchedEpisodes} <span className="text-[10px] text-content-muted font-normal">eps</span></p>
           </div>
-          <div className="bg-[#15161a] p-3 rounded-[4px] border border-[#2e323c] border-l-[3px] border-l-accent-sage">
+          <div className="bg-[var(--surface-input)] p-3 rounded-[var(--radius-sm)] border border-[var(--border-color)] border-l-[3px] border-l-accent-sage">
             <span className="text-[10px] uppercase text-accent-sage font-bold">Completion</span>
             <p className="text-lg font-bold text-content-primary mt-0.5">{overallProgress.toFixed(0)}%</p>
           </div>
-          <div className="bg-[#15161a] p-3 rounded-[4px] border border-[#2e323c] border-l-[3px] border-l-accent-ochre">
+          <div className="bg-[var(--surface-input)] p-3 rounded-[var(--radius-sm)] border border-[var(--border-color)] border-l-[3px] border-l-accent-ochre">
             <span className="text-[10px] uppercase text-accent-ochre font-bold">Score</span>
             <div className="flex items-center gap-1 mt-0.5">
               <p className="text-lg font-bold text-accent-ochre">{seriesAverageRating ? `★ ${seriesAverageRating.toFixed(1)}` : '—'}</p>
@@ -176,7 +176,7 @@ export function SeriesDetailPage() {
         </div>
 
         {totalEpisodes > 0 && (
-          <div className="w-full h-1.5 bg-[#121316] border border-[#2e323c] rounded-full overflow-hidden">
+          <div className="w-full h-1.5 bg-[var(--background)] border border-[var(--border-color)] rounded-full overflow-hidden">
             <div 
               className="h-full bg-accent-ochre"
               style={{ width: `${overallProgress}%` }}
@@ -186,7 +186,7 @@ export function SeriesDetailPage() {
       </div>
 
       {/* Seasons Header */}
-      <div className="flex items-center justify-between border-b border-[#2e323c] pb-2">
+      <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
         <h2 className="text-sm font-bold text-content-primary tracking-tight">Cataloged Seasons</h2>
         {seasons && seasons.length > 0 && (
           <span className="text-[10px] font-mono text-content-muted uppercase">

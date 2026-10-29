@@ -23,7 +23,7 @@ export const SavedLinksToolbar: React.FC<SavedLinksToolbarProps> = ({
         className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
           linksFilter === 'all'
             ? 'bg-indigo-600 text-white'
-            : 'bg-[#17181d] border border-[#2e323c] text-content-secondary hover:text-content-primary'
+            : 'bg-[var(--surface-sidebar)] border border-[var(--border-color)] text-content-secondary hover:text-content-primary'
         }`}
       >
         All
@@ -33,7 +33,7 @@ export const SavedLinksToolbar: React.FC<SavedLinksToolbarProps> = ({
         className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
           linksFilter === 'unread'
             ? 'bg-indigo-600 text-white'
-            : 'bg-[#17181d] border border-[#2e323c] text-content-secondary hover:text-content-primary'
+            : 'bg-[var(--surface-sidebar)] border border-[var(--border-color)] text-content-secondary hover:text-content-primary'
         }`}
       >
         Unread
@@ -43,7 +43,7 @@ export const SavedLinksToolbar: React.FC<SavedLinksToolbarProps> = ({
         className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
           linksFilter === 'read'
             ? 'bg-indigo-600 text-white'
-            : 'bg-[#17181d] border border-[#2e323c] text-content-secondary hover:text-content-primary'
+            : 'bg-[var(--surface-sidebar)] border border-[var(--border-color)] text-content-secondary hover:text-content-primary'
         }`}
       >
         Read

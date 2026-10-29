@@ -28,7 +28,7 @@ function EpisodeCommentsSection({ episode }: { episode: EpisodeWithComments }) {
           {episode.episodeTitle || `Episode ${episode.episodeNumber}`}
         </h4>
       </div>
-      <div className="space-y-2 pl-3 border-l-2 border-[#2e323c]">
+      <div className="space-y-2 pl-3 border-l-2 border-[var(--border-color)]">
         {episode.comments.map((comment, idx) => (
           <CommentItem
             key={comment.public_id || idx}
@@ -79,14 +79,14 @@ function SeasonCommentsSection({
   }
 
   return (
-    <div className="bg-[#15161a] border border-[#2e323c] rounded-[6px] overflow-hidden mb-3">
+    <div className="bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-md)] overflow-hidden mb-3">
       <button
         type="button"
-        className="w-full flex items-center justify-between p-3.5 hover:bg-[#1e2026] transition-colors text-left cursor-pointer"
+        className="w-full flex items-center justify-between p-3.5 hover:bg-[var(--surface)] transition-colors text-left cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-2.5">
-          <div className="w-5 h-5 rounded-[3px] bg-[#121316] border border-[#2e323c] flex items-center justify-center text-content-muted">
+          <div className="w-5 h-5 rounded-[var(--radius-xs)] bg-[var(--background)] border border-[var(--border-color)] flex items-center justify-center text-content-muted">
             {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-accent-ochre" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </div>
           <div>
@@ -102,7 +102,7 @@ function SeasonCommentsSection({
       </button>
 
       {isExpanded && (
-        <div className="px-4 pb-4 pt-2 border-t border-[#242730]">
+        <div className="px-4 pb-4 pt-2 border-t border-[var(--border-subtle)]">
           {isLoading ? (
             <div className="flex justify-center py-4">
               <LoadingSpinner />
@@ -133,7 +133,7 @@ export function ViewSeriesCommentsModalContent({
   const { data: seasons, isLoading } = useSeasonsQuery(seriesPublicId)
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <div className="p-6 sm:p-10 flex-1 overflow-y-auto custom-scrollbar space-y-6">
         {/* Title */}
         <div className="space-y-1">
@@ -157,7 +157,7 @@ export function ViewSeriesCommentsModalContent({
               <p className="text-xs font-mono text-content-muted">Retrieving notes...</p>
             </div>
           ) : !seasons || seasons.length === 0 ? (
-            <div className="text-center py-12 bg-[#15161a] border border-[#2e323c] rounded-[6px]">
+            <div className="text-center py-12 bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-md)]">
               <p className="text-xs font-mono text-content-muted">No cataloged notes for this series.</p>
             </div>
           ) : (
@@ -176,7 +176,7 @@ export function ViewSeriesCommentsModalContent({
       </div>
 
       {/* Footer */}
-      <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-end bg-[#17181d] shrink-0">
+      <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-end bg-[var(--surface-sidebar)] shrink-0">
         <button 
           type="button" 
           className="btn-secondary text-xs px-5 py-2 font-semibold" 

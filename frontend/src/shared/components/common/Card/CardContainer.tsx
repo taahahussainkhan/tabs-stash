@@ -23,7 +23,7 @@ export const CardContainer: React.FC<CardContainerProps> = ({
     <div
       onClick={onClick}
       className={cn(
-        'bg-[#1e2026] border border-[#2e323c] rounded-[6px] overflow-hidden flex transition-all duration-150',
+        'bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] overflow-hidden flex transition-all duration-150',
         isList ? 'p-3.5 sm:items-center gap-4' : 'flex-col h-full relative p-4',
         hoverEffect && 'group hover:border-[#424856] hover:bg-[#23262e] cursor-pointer',
         className

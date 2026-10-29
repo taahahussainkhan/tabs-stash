@@ -76,7 +76,7 @@ export function AddMovieModalContent({ onClose, onSubmit, onDelete, editingMovie
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -133,7 +133,7 @@ export function AddMovieModalContent({ onClose, onSubmit, onDelete, editingMovie
                         toast.info('Type at least 2 characters to search catalog')
                       }
                     }}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] bg-[#14232a] hover:bg-[#1a2f38] border border-accent-cyan/30 text-accent-cyan text-[11px] font-mono transition-colors shrink-0 cursor-pointer shadow-sm"
+                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] bg-[#14232a] hover:bg-[#1a2f38] border border-accent-cyan/30 text-accent-cyan text-[11px] font-mono transition-colors shrink-0 cursor-pointer shadow-sm"
                     title="Search catalog to auto-fill details"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
@@ -166,10 +166,10 @@ export function AddMovieModalContent({ onClose, onSubmit, onDelete, editingMovie
                 children={(field) => {
                   const status = field.state.value
                   const options = [
-                    { value: 'watching', label: 'Watching', icon: Play, active: 'bg-[#0f2e2b] text-[#2dd4bf] border-[#134e4a]' },
-                    { value: 'completed', label: 'Completed', icon: CheckCircle, active: 'bg-[#143324] text-[#4ade80] border-[#1e593a]' },
-                    { value: 'paused', label: 'Paused', icon: Pause, active: 'bg-[#3b2c12] text-[#fbbf24] border-[#78350f]' },
-                    { value: 'rewatching', label: 'Rewatch', icon: RotateCcw, active: 'bg-[#3b1c18] text-[#ff7b68] border-[#991b1b]' },
+                    { value: 'watching', label: 'Watching', icon: Play, active: 'bg-[var(--success-soft)] text-[var(--accent-sage)] border-[var(--success)]' },
+                    { value: 'completed', label: 'Completed', icon: CheckCircle, active: 'bg-[var(--success-soft)] text-[var(--success)] border-[var(--success)]' },
+                    { value: 'paused', label: 'Paused', icon: Pause, active: 'bg-[var(--warning-soft)] text-[var(--warning)] border-[var(--warning)]' },
+                    { value: 'rewatching', label: 'Rewatch', icon: RotateCcw, active: 'bg-[var(--primary-soft)] text-[var(--primary)] border-[var(--danger)]' },
                   ]
 
                   return (
@@ -182,10 +182,10 @@ export function AddMovieModalContent({ onClose, onSubmit, onDelete, editingMovie
                             key={opt.value}
                             type="button"
                             onClick={() => field.handleChange(opt.value as any)}
-                            className={`flex items-center gap-1.5 px-2 py-0.5 rounded-[3px] border font-mono text-xs transition-colors cursor-pointer ${
+                            className={`flex items-center gap-1.5 px-2 py-0.5 rounded-[var(--radius-xs)] border font-mono text-xs transition-colors cursor-pointer ${
                               isActive
                                 ? opt.active
-                                : 'bg-[#15161a] border-[#2e323c] text-content-muted hover:text-white'
+                                : 'bg-[var(--surface-input)] border-[var(--border-color)] text-content-muted hover:text-white'
                             }`}
                           >
                             <Icon className="w-3 h-3" />
@@ -323,7 +323,7 @@ export function AddMovieModalContent({ onClose, onSubmit, onDelete, editingMovie
           </div>
 
           {/* Notes / Marginalia Section */}
-          <div className="space-y-2 pt-4 border-t border-[#242730]">
+          <div className="space-y-2 pt-4 border-t border-[var(--border-subtle)]">
             <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-content-muted/40 px-1">
               <AlignLeft className="w-3.5 h-3.5" />
               <span>Notes &amp; Marginalia</span>
@@ -344,7 +344,7 @@ export function AddMovieModalContent({ onClose, onSubmit, onDelete, editingMovie
         </div>
 
         {/* Action Footer */}
-        <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-between gap-4 bg-[#17181d] shrink-0">
+        <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-between gap-4 bg-[var(--surface-sidebar)] shrink-0">
           {editingMovie && onDelete ? (
             <button
               type="button"

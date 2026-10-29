@@ -48,7 +48,7 @@ export const BookCard: React.FC<BookCardProps> = memo(({
             e.stopPropagation()
             onEdit?.(item)
           }}
-          className="flex items-center gap-2 text-xs font-semibold py-1.5 rounded-[3px]"
+          className="flex items-center gap-2 text-xs font-semibold py-1.5 rounded-[var(--radius-xs)]"
         >
           <Edit size={13} /> Edit Volume
         </button>
@@ -59,7 +59,7 @@ export const BookCard: React.FC<BookCardProps> = memo(({
             e.stopPropagation()
             onDelete?.(item)
           }}
-          className="flex items-center gap-2 text-xs font-semibold py-1.5 rounded-[3px] text-danger"
+          className="flex items-center gap-2 text-xs font-semibold py-1.5 rounded-[var(--radius-xs)] text-danger"
         >
           <Trash2 size={13} /> Delete Entry
         </button>
@@ -107,7 +107,7 @@ export const BookCard: React.FC<BookCardProps> = memo(({
           subtitle={authorNames ? <span>By {authorNames}</span> : undefined}
         />
 
-        <div className="flex items-center justify-between pt-2 border-t border-[#242730] text-xs font-mono text-content-muted">
+        <div className="flex items-center justify-between pt-2 border-t border-[var(--border-subtle)] text-xs font-mono text-content-muted">
           <span>{edition?.publisher?.name || 'Publisher unlisted'}</span>
           {(edition?.page_count || (edition as any)?.pages_count) && (
             <span>{edition?.page_count || (edition as any)?.pages_count}p</span>

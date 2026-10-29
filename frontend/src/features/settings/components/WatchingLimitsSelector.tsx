@@ -73,7 +73,7 @@ export function WatchingLimitsSelector() {
         </div>
       </div>
 
-      <div className="pt-4 border-t border-[#242730] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="pt-4 border-t border-[var(--border-subtle)] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-accent-sage font-mono text-xs">
           <ShieldCheck className="w-4 h-4 shrink-0" />
           <span>Active Ceilings Monitored</span>
@@ -91,7 +91,7 @@ export function WatchingLimitsSelector() {
         )}
       </div>
 
-      <div className="p-3.5 bg-[#15161a] border border-[#2e323c] rounded-[4px] flex gap-3 items-start">
+      <div className="p-3.5 bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] flex gap-3 items-start">
         <Info className="w-4 h-4 text-accent-cyan shrink-0 mt-0.5" />
         <p className="text-xs text-content-secondary leading-relaxed font-sans">
           When the limit is reached, adding another active entry will prompt you to conclude or mark an existing item on pause first.

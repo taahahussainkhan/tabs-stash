@@ -25,7 +25,7 @@ export function ProfileView(props: ProfilePageController) {
   if (loading) {
     return (
       <div className="w-full py-32 flex flex-col items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#2e323c] border-t-accent-vermillion rounded-full animate-spin mb-3"></div>
+        <div className="w-8 h-8 border-2 border-[var(--border-color)] border-t-accent-vermillion rounded-full animate-spin mb-3"></div>
         <p className="text-xs font-mono text-content-muted uppercase tracking-wider">Loading Profile Identity...</p>
       </div>
     )
@@ -33,7 +33,7 @@ export function ProfileView(props: ProfilePageController) {
 
   if (!profile) {
     return (
-      <div className="text-center py-20 bg-[#1e2026] border border-[#2e323c] rounded-[6px] max-w-md mx-auto p-6">
+      <div className="text-center py-20 bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] max-w-md mx-auto p-6">
         <h2 className="text-base font-bold text-danger mb-2">Profile Unavailable</h2>
         <p className="text-xs text-content-secondary">Unable to retrieve account details.</p>
       </div>
@@ -45,7 +45,7 @@ export function ProfileView(props: ProfilePageController) {
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 page-fade-in">
       {/* Header */}
-      <div className="pb-4 border-b border-[#2e323c]">
+      <div className="pb-4 border-b border-[var(--border-color)]">
         <div className="flex items-center gap-2 mb-1.5 font-mono">
           <span className="mono-badge mono-badge-cyan">ACCOUNT</span>
           <span className="text-[11px] text-content-muted uppercase tracking-wider">Personal Settings</span>
@@ -56,14 +56,14 @@ export function ProfileView(props: ProfilePageController) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Profile Card */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="bg-[#1e2026] p-5 rounded-[6px] border border-[#2e323c] flex flex-col items-center text-center">
-            <div className="w-20 h-20 rounded-[6px] bg-[#121316] border-2 border-accent-vermillion flex items-center justify-center mb-3">
+          <div className="bg-[var(--surface)] p-5 rounded-[var(--radius-md)] border border-[var(--border-color)] flex flex-col items-center text-center">
+            <div className="w-20 h-20 rounded-[var(--radius-md)] bg-[var(--background)] border-2 border-accent-vermillion flex items-center justify-center mb-3">
               <span className="text-2xl font-mono font-bold text-accent-vermillion">{initials}</span>
             </div>
             <h2 className="text-base font-bold text-content-primary mb-0.5">{firstName} {lastName}</h2>
             <p className="text-xs font-mono text-accent-ochre font-bold mb-4">@{profile.username}</p>
             
-            <div className="w-full space-y-2.5 pt-4 border-t border-[#242730] text-xs font-mono text-content-secondary">
+            <div className="w-full space-y-2.5 pt-4 border-t border-[var(--border-subtle)] text-xs font-mono text-content-secondary">
               <div className="flex items-center gap-2">
                 <Mail className="w-3.5 h-3.5 opacity-60 shrink-0" />
                 <span className="truncate">{profile.email}</span>
@@ -75,13 +75,13 @@ export function ProfileView(props: ProfilePageController) {
             </div>
           </div>
 
-          <div className="bg-[#1e2026] p-4 rounded-[6px] border border-[#2e323c] space-y-3">
-            <div className="flex items-center gap-2 font-mono text-xs font-bold text-content-primary pb-2 border-b border-[#242730]">
+          <div className="bg-[var(--surface)] p-4 rounded-[var(--radius-md)] border border-[var(--border-color)] space-y-3">
+            <div className="flex items-center gap-2 font-mono text-xs font-bold text-content-primary pb-2 border-b border-[var(--border-subtle)]">
               <Shield className="w-3.5 h-3.5 text-accent-cyan" />
               <span>SECURITY & ACCESS</span>
             </div>
             
-            <div className="p-3 bg-[#15161a] border border-[#2e323c] rounded-[4px] space-y-2">
+            <div className="p-3 bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] space-y-2">
               <p className="text-[10px] font-mono text-content-muted uppercase">Password Status</p>
               <p className="text-xs font-mono text-content-secondary">
                 {profile.last_password_update
@@ -101,8 +101,8 @@ export function ProfileView(props: ProfilePageController) {
 
         {/* Right Column: Personal Information Form */}
         <div className="lg:col-span-8">
-          <div className="bg-[#1e2026] p-6 rounded-[6px] border border-[#2e323c] space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-[#242730]">
+          <div className="bg-[var(--surface)] p-6 rounded-[var(--radius-md)] border border-[var(--border-color)] space-y-6">
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4 text-accent-vermillion" />
                 <h3 className="text-sm font-bold text-content-primary">Personal Archive Information</h3>
@@ -157,7 +157,7 @@ export function ProfileView(props: ProfilePageController) {
                 />
               </div>
 
-              <div className="pt-4 border-t border-[#242730] flex justify-end">
+              <div className="pt-4 border-t border-[var(--border-subtle)] flex justify-end">
                 <button
                   type="submit"
                   disabled={!hasPersonalChanges || saving}

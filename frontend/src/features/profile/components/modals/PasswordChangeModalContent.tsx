@@ -37,7 +37,7 @@ export function PasswordChangeModalContent({ onClose }: PasswordChangeModalConte
   })
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -113,7 +113,7 @@ export function PasswordChangeModalContent({ onClose }: PasswordChangeModalConte
         </div>
 
         {/* Footer */}
-        <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-between gap-4 bg-[#17181d] shrink-0">
+        <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-between gap-4 bg-[var(--surface-sidebar)] shrink-0">
           <button 
             type="button" 
             className="text-xs font-medium text-content-muted hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer"

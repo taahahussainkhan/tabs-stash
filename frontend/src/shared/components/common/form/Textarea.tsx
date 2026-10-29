@@ -31,7 +31,7 @@ export function Textarea({
     size === 'xl' ? 'p-5 text-base' : 
     'p-3 text-xs'
   
-  const textareaBaseClass = `textarea-modern w-full min-h-[100px] bg-[#15161a] border border-[#2e323c] rounded-[4px] focus:border-accent-vermillion text-content-primary transition-colors ${sizeClass} ${error ? 'border-danger/60 focus:border-danger' : ''} ${className}`
+  const textareaBaseClass = `textarea-modern w-full min-h-[100px] bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] focus:border-accent-vermillion text-content-primary transition-colors ${sizeClass} ${error ? 'border-danger/60 focus:border-danger' : ''} ${className}`
 
   const Label = () => label ? (
     <label className={`label ${labelSize === 'sm' ? 'py-1' : 'pb-1.5'} px-0.5`} htmlFor={textareaId}>

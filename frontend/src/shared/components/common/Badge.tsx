@@ -41,7 +41,7 @@ export function Badge({
     warning: 'mono-badge-ochre',
     error: 'mono-badge-danger',
     ghost: 'bg-transparent text-content-muted border border-transparent',
-    outline: 'bg-transparent text-content-secondary border border-[#2e323c]'
+    outline: 'bg-transparent text-content-secondary border border-[var(--border-color)]'
   }
 
   const sizeClasses: Record<BadgeSize, string> = {

@@ -121,10 +121,10 @@ export function MediaCatalogAutocomplete({
   return (
     <div
       ref={containerRef}
-      className="absolute top-full left-0 right-0 mt-2 z-[9999] bg-[#161820] border border-[#2e323c] rounded-[8px] shadow-2xl overflow-hidden flex flex-col max-h-[380px] animate-in fade-in slide-in-from-top-2 duration-150"
+      className="absolute top-full left-0 right-0 mt-2 z-[9999] bg-[#161820] border border-[var(--border-color)] rounded-[var(--radius-lg)] shadow-2xl overflow-hidden flex flex-col max-h-[380px] animate-in fade-in slide-in-from-top-2 duration-150"
     >
       {/* Header bar */}
-      <div className="flex items-center justify-between px-3 py-2 bg-[#101115] border-b border-[#242730] text-[11px] font-mono uppercase tracking-wider">
+      <div className="flex items-center justify-between px-3 py-2 bg-[#101115] border-b border-[var(--border-subtle)] text-[11px] font-mono uppercase tracking-wider">
         <div className="flex items-center gap-1.5 text-accent-cyan font-bold">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Catalog Suggestions for "{trimmedQuery}"</span>
@@ -142,12 +142,12 @@ export function MediaCatalogAutocomplete({
       </div>
 
       {/* Body: Loading skeletons vs Results list vs Empty message */}
-      <div className="overflow-y-auto custom-scrollbar divide-y divide-[#242730]/60 flex-1">
+      <div className="overflow-y-auto custom-scrollbar divide-y divide-[var(--border-subtle)]/60 flex-1">
         {loading && results.length === 0 ? (
           <div className="p-3 space-y-2.5">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-center gap-3 animate-pulse p-1">
-                <div className="w-10 h-14 bg-[#232630] rounded-[4px] shrink-0" />
+                <div className="w-10 h-14 bg-[#232630] rounded-[var(--radius-sm)] shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-3.5 bg-[#232630] rounded w-2/3" />
                   <div className="h-2.5 bg-[#232630]/60 rounded w-1/3" />
@@ -182,7 +182,7 @@ export function MediaCatalogAutocomplete({
                 } ${isFetching ? 'opacity-50 pointer-events-none' : ''}`}
               >
                 {/* Poster Thumbnail */}
-                <div className="w-10 h-14 rounded-[4px] bg-[#0c0d10] border border-[#2e323c] overflow-hidden shrink-0 flex items-center justify-center">
+                <div className="w-10 h-14 rounded-[var(--radius-sm)] bg-[#0c0d10] border border-[var(--border-color)] overflow-hidden shrink-0 flex items-center justify-center">
                   {item.posterUrl ? (
                     <img
                       src={item.posterUrl}
@@ -211,8 +211,8 @@ export function MediaCatalogAutocomplete({
                     <span
                       className={`text-[9px] font-mono uppercase px-1 py-0.2 rounded shrink-0 ${
                         isSeries
-                          ? 'bg-[#3b2c12] text-[#fbbf24]'
-                          : 'bg-[#0f2e2b] text-[#2dd4bf]'
+                          ? 'bg-[var(--warning-soft)] text-[var(--warning)]'
+                          : 'bg-[var(--success-soft)] text-[var(--accent-sage)]'
                       }`}
                     >
                       {isSeries ? 'Series' : 'Cinema'}
@@ -266,7 +266,7 @@ export function MediaCatalogAutocomplete({
       </div>
 
       {/* Footer helper */}
-      <div className="px-3 py-1.5 bg-[#101115] border-t border-[#242730] flex items-center justify-between text-[10px] font-mono text-content-muted">
+      <div className="px-3 py-1.5 bg-[#101115] border-t border-[var(--border-subtle)] flex items-center justify-between text-[10px] font-mono text-content-muted">
         <span>Click item or press Enter to auto-populate</span>
         <span>Esc to close</span>
       </div>

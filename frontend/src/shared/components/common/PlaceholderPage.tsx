@@ -9,7 +9,7 @@ interface PlaceholderPageProps {
 export function PlaceholderPage({ title, description, icon }: PlaceholderPageProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] p-8 page-fade-in">
-      <div className="text-center max-w-md bg-[#1e2026] border border-[#2e323c] p-8 rounded-[6px]">
+      <div className="text-center max-w-md bg-[var(--surface)] border border-[var(--border-color)] p-8 rounded-[var(--radius-md)]">
         <div className="mb-4 flex justify-center text-accent-vermillion">
           {icon || <Construction className="w-10 h-10" />}
         </div>

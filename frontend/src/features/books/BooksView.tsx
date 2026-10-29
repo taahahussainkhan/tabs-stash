@@ -38,7 +38,7 @@ export function BooksView(props: BooksPageController) {
     if (loading) {
       return (
         <div className="flex flex-col items-center justify-center py-20">
-          <div className="w-8 h-8 rounded-full border-2 border-[#2e323c] border-t-accent-indigo animate-spin mb-3" />
+          <div className="w-8 h-8 rounded-full border-2 border-[var(--border-color)] border-t-accent-indigo animate-spin mb-3" />
           <p className="text-xs font-mono text-content-muted">Loading literature collection...</p>
         </div>
       )
@@ -46,7 +46,7 @@ export function BooksView(props: BooksPageController) {
 
     if (error) {
       return (
-        <div className="text-center py-12 bg-[#271414] border border-danger/30 rounded-[6px] p-6 max-w-md mx-auto">
+        <div className="text-center py-12 bg-[var(--danger-soft)] border border-danger/30 rounded-[var(--radius-md)] p-6 max-w-md mx-auto">
           <p className="text-danger font-bold text-sm mb-3">{error}</p>
           <button
             className="btn-danger text-xs px-4 py-1.5"
@@ -115,7 +115,7 @@ export function BooksView(props: BooksPageController) {
   return (
     <div className="space-y-6 page-fade-in">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[#2e323c]">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[var(--border-color)]">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="mono-badge mono-badge-indigo">LIBRARY</span>
@@ -125,16 +125,16 @@ export function BooksView(props: BooksPageController) {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex bg-[#1e2026] p-0.5 rounded-[4px] border border-[#2e323c]">
+          <div className="flex bg-[var(--surface)] p-0.5 rounded-[var(--radius-sm)] border border-[var(--border-color)]">
             <button
-              className={`p-1.5 rounded-[3px] transition-colors ${viewMode === 'tiles' ? 'bg-[#121316] text-accent-indigo border border-[#2e323c]' : 'text-content-muted hover:text-white'}`}
+              className={`p-1.5 rounded-[var(--radius-xs)] transition-colors ${viewMode === 'tiles' ? 'bg-[var(--background)] text-accent-indigo border border-[var(--border-color)]' : 'text-content-muted hover:text-white'}`}
               onClick={() => setViewMode('tiles')}
               title="Grid View"
             >
               <LayoutGrid className="w-4 h-4" />
             </button>
             <button
-              className={`p-1.5 rounded-[3px] transition-colors ${viewMode === 'table' ? 'bg-[#121316] text-accent-indigo border border-[#2e323c]' : 'text-content-muted hover:text-white'}`}
+              className={`p-1.5 rounded-[var(--radius-xs)] transition-colors ${viewMode === 'table' ? 'bg-[var(--background)] text-accent-indigo border border-[var(--border-color)]' : 'text-content-muted hover:text-white'}`}
               onClick={() => setViewMode('table')}
               title="Table View"
             >
@@ -155,19 +155,19 @@ export function BooksView(props: BooksPageController) {
       {/* Stats Summary */}
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 font-mono">
-          <div className="bg-[#1e2026] border border-[#2e323c] rounded-[6px] p-3">
+          <div className="bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] p-3">
             <div className="text-[10px] uppercase text-content-muted mb-0.5">Total Volumes</div>
             <div className="text-xl font-bold text-content-primary">{stats.total}</div>
           </div>
-          <div className="bg-[#1e2026] border border-[#2e323c] border-l-[3px] border-l-accent-indigo rounded-[6px] p-3">
+          <div className="bg-[var(--surface)] border border-[var(--border-color)] border-l-[3px] border-l-accent-indigo rounded-[var(--radius-md)] p-3">
             <div className="text-[10px] uppercase text-accent-indigo mb-0.5">Owned</div>
             <div className="text-xl font-bold text-content-primary">{stats.owned}</div>
           </div>
-          <div className="bg-[#1e2026] border border-[#2e323c] border-l-[3px] border-l-accent-cyan rounded-[6px] p-3">
+          <div className="bg-[var(--surface)] border border-[var(--border-color)] border-l-[3px] border-l-accent-cyan rounded-[var(--radius-md)] p-3">
             <div className="text-[10px] uppercase text-accent-cyan mb-0.5">Reading</div>
             <div className="text-xl font-bold text-content-primary">{stats.reading}</div>
           </div>
-          <div className="bg-[#1e2026] border border-[#2e323c] border-l-[3px] border-l-accent-ochre rounded-[6px] p-3">
+          <div className="bg-[var(--surface)] border border-[var(--border-color)] border-l-[3px] border-l-accent-ochre rounded-[var(--radius-md)] p-3">
             <div className="text-[10px] uppercase text-accent-ochre mb-0.5">Wishlist</div>
             <div className="text-xl font-bold text-content-primary">{stats.wishlist}</div>
           </div>
@@ -181,7 +181,7 @@ export function BooksView(props: BooksPageController) {
           <input
             type="text"
             placeholder="Search books by title, author, publisher..."
-            className="w-full bg-[#15161a] border border-[#2e323c] rounded-[4px] py-1.5 pl-8 pr-4 text-xs text-content-primary placeholder:text-content-muted focus:border-accent-vermillion outline-none transition-colors"
+            className="w-full bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] py-1.5 pl-8 pr-4 text-xs text-content-primary placeholder:text-content-muted focus:border-accent-vermillion outline-none transition-colors"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -189,7 +189,7 @@ export function BooksView(props: BooksPageController) {
         
         <div className="flex items-center gap-1.5 w-full sm:w-auto shrink-0">
           <select
-            className="bg-[#15161a] border border-[#2e323c] rounded-[4px] py-1.5 px-2 text-xs font-mono text-content-secondary focus:border-accent-vermillion outline-none cursor-pointer"
+            className="bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] py-1.5 px-2 text-xs font-mono text-content-secondary focus:border-accent-vermillion outline-none cursor-pointer"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
           >
@@ -197,7 +197,7 @@ export function BooksView(props: BooksPageController) {
             <option value="title">Sort: Title</option>
           </select>
           <button
-            className="p-1.5 rounded-[4px] bg-[#15161a] border border-[#2e323c] text-content-muted hover:text-white transition-colors"
+            className="p-1.5 rounded-[var(--radius-sm)] bg-[var(--surface-input)] border border-[var(--border-color)] text-content-muted hover:text-white transition-colors"
             onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
             title="Toggle sort order"
           >
@@ -211,7 +211,7 @@ export function BooksView(props: BooksPageController) {
         {renderContent()}
 
         {!loading && !error && books.length > 0 && (
-          <div className="pt-6 border-t border-[#2e323c]">
+          <div className="pt-6 border-t border-[var(--border-color)]">
             <Pagination
               currentPage={page}
               totalPages={totalPages}

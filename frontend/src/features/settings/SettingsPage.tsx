@@ -10,9 +10,9 @@ export function SettingsPage() {
   return (
     <div className="w-full max-w-5xl mx-auto space-y-6 page-fade-in">
       {/* Header */}
-      <div className="flex items-center gap-4 pb-4 border-b border-[#2e323c]">
+      <div className="flex items-center gap-4 pb-4 border-b border-[var(--border-color)]">
         <button
-          className="w-8 h-8 rounded-[4px] flex items-center justify-center bg-[#1e2026] border border-[#2e323c] hover:bg-[#262830] text-content-secondary hover:text-white transition-colors"
+          className="w-8 h-8 rounded-[var(--radius-sm)] flex items-center justify-center bg-[var(--surface)] border border-[var(--border-color)] hover:bg-[var(--surface-light)] text-content-secondary hover:text-white transition-colors"
           onClick={() => navigate(-1)}
           title="Go Back"
         >
@@ -31,18 +31,18 @@ export function SettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Status Overview */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="bg-[#1e2026] p-4 rounded-[6px] border border-[#2e323c] space-y-3 font-mono">
-            <div className="flex items-center gap-2 text-xs font-bold text-content-primary pb-2 border-b border-[#242730]">
+          <div className="bg-[var(--surface)] p-4 rounded-[var(--radius-md)] border border-[var(--border-color)] space-y-3 font-mono">
+            <div className="flex items-center gap-2 text-xs font-bold text-content-primary pb-2 border-b border-[var(--border-subtle)]">
               <Settings className="w-3.5 h-3.5 text-accent-vermillion" />
               <span>SYSTEM STATUS</span>
             </div>
             
             <div className="space-y-2">
-              <div className="p-2.5 bg-[#15161a] border border-[#2e323c] rounded-[4px] flex items-center justify-between">
+              <div className="p-2.5 bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] flex items-center justify-between">
                 <span className="text-xs text-content-muted">Theme Mode</span>
                 <span className="mono-badge mono-badge-ochre text-[9px]">ACTIVE</span>
               </div>
-              <div className="p-2.5 bg-[#15161a] border border-[#2e323c] rounded-[4px] flex items-center justify-between">
+              <div className="p-2.5 bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] flex items-center justify-between">
                 <span className="text-xs text-content-muted">Storage Engine</span>
                 <span className="mono-badge mono-badge-sage text-[9px]">ONLINE</span>
               </div>
@@ -53,8 +53,8 @@ export function SettingsPage() {
         {/* Right Column: Setting Panels */}
         <div className="lg:col-span-8 space-y-6">
           {/* Theme Section */}
-          <section className="bg-[#1e2026] p-5 rounded-[6px] border border-[#2e323c] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-[#242730]">
+          <section className="bg-[var(--surface)] p-5 rounded-[var(--radius-md)] border border-[var(--border-color)] space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-[var(--border-subtle)]">
               <Palette className="w-4 h-4 text-accent-vermillion" />
               <div>
                 <h3 className="text-sm font-bold text-content-primary">Theme & Appearance</h3>
@@ -65,8 +65,8 @@ export function SettingsPage() {
           </section>
 
           {/* Layout Section */}
-          <section className="bg-[#1e2026] p-5 rounded-[6px] border border-[#2e323c] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-[#242730]">
+          <section className="bg-[var(--surface)] p-5 rounded-[var(--radius-md)] border border-[var(--border-color)] space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-[var(--border-subtle)]">
               <Layout className="w-4 h-4 text-accent-cyan" />
               <div>
                 <h3 className="text-sm font-bold text-content-primary">Layout & Display</h3>
@@ -77,8 +77,8 @@ export function SettingsPage() {
           </section>
 
           {/* Limits Section */}
-          <section className="bg-[#1e2026] p-5 rounded-[6px] border border-[#2e323c] space-y-4">
-            <div className="flex items-center gap-2 pb-3 border-b border-[#242730]">
+          <section className="bg-[var(--surface)] p-5 rounded-[var(--radius-md)] border border-[var(--border-color)] space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-[var(--border-subtle)]">
               <Eye className="w-4 h-4 text-accent-ochre" />
               <div>
                 <h3 className="text-sm font-bold text-content-primary">Activity & Limits</h3>

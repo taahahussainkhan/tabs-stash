@@ -47,17 +47,17 @@ export function LayoutSelector() {
                 key={layout.value}
                 onClick={() => handleLayoutChange(layout.value)}
                 className={`
-                  relative group flex flex-col items-start gap-2.5 p-3.5 rounded-[6px] transition-colors text-left cursor-pointer
+                  relative group flex flex-col items-start gap-2.5 p-3.5 rounded-[var(--radius-md)] transition-colors text-left cursor-pointer
                   ${isActive 
-                    ? 'bg-[#15161a] border-2 border-accent-cyan' 
-                    : 'bg-[#15161a] border border-[#2e323c] hover:border-[#424856]'
+                    ? 'bg-[var(--surface-input)] border-2 border-accent-cyan' 
+                    : 'bg-[var(--surface-input)] border border-[var(--border-color)] hover:border-[#424856]'
                   }
                 `}
                 disabled={updateLayoutMutation.isPending}
               >
                 <div className={`
-                  w-6 h-6 rounded-[3px] flex items-center justify-center
-                  ${isActive ? 'bg-[#0f2e2b] text-accent-cyan border border-accent-cyan/40' : 'bg-[#121316] text-content-muted border border-[#2e323c]'}
+                  w-6 h-6 rounded-[var(--radius-xs)] flex items-center justify-center
+                  ${isActive ? 'bg-[var(--success-soft)] text-accent-cyan border border-accent-cyan/40' : 'bg-[var(--background)] text-content-muted border border-[var(--border-color)]'}
                 `}>
                   <Icon className="w-3.5 h-3.5" />
                 </div>
@@ -92,10 +92,10 @@ export function LayoutSelector() {
                 key={size.value}
                 onClick={() => handleSizeChange(size.value)}
                 className={`
-                  p-3 rounded-[4px] border transition-colors text-left cursor-pointer
+                  p-3 rounded-[var(--radius-sm)] border transition-colors text-left cursor-pointer
                   ${isActive 
-                    ? 'bg-[#1e2026] text-white border-accent-cyan font-bold' 
-                    : 'bg-[#15161a] border-[#2e323c] text-content-secondary hover:border-[#424856]'
+                    ? 'bg-[var(--surface)] text-white border-accent-cyan font-bold' 
+                    : 'bg-[var(--surface-input)] border-[var(--border-color)] text-content-secondary hover:border-[#424856]'
                   }
                 `}
                 disabled={updateLayoutMutation.isPending}

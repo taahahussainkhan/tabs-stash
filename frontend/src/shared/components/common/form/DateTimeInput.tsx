@@ -23,7 +23,7 @@ export const DateTimeInput = forwardRef<HTMLInputElement, DateTimeInputProps>(
       size === 'lg' ? 'h-11 px-4 text-sm' : 
       'h-9 px-3 text-xs'
 
-    const inputBaseClass = `input-modern w-full font-mono bg-[#15161a] border border-[#2e323c] rounded-[4px] focus:border-accent-vermillion text-content-primary transition-colors ${sizeClass} ${error ? 'border-danger/60 focus:border-danger' : ''} ${className}`
+    const inputBaseClass = `input-modern w-full font-mono bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] focus:border-accent-vermillion text-content-primary transition-colors ${sizeClass} ${error ? 'border-danger/60 focus:border-danger' : ''} ${className}`
 
     return (
       <div className="form-control w-full group">

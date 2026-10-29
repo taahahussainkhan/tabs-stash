@@ -28,7 +28,7 @@ export function MovieHistoryModalContent({ movieId, onClose }: MovieHistoryModal
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20 space-y-3">
-        <div className="w-8 h-8 rounded-full border-2 border-[#2e323c] border-t-accent-cyan animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--border-color)] border-t-accent-cyan animate-spin" />
         <p className="text-xs font-mono text-content-muted">Retrieving cinematic timeline...</p>
       </div>
     )
@@ -36,7 +36,7 @@ export function MovieHistoryModalContent({ movieId, onClose }: MovieHistoryModal
 
   if (error) {
     return (
-      <div className="p-8 text-center bg-[#271414] border border-danger/30 rounded-[4px] m-6">
+      <div className="p-8 text-center bg-[var(--danger-soft)] border border-danger/30 rounded-[var(--radius-sm)] m-6">
         <p className="text-xs font-bold text-danger">Failed to load session timeline.</p>
         <button className="btn-danger text-xs px-3 py-1 mt-2" onClick={() => window.location.reload()}>Retry</button>
       </div>
@@ -49,7 +49,7 @@ export function MovieHistoryModalContent({ movieId, onClose }: MovieHistoryModal
   )
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <div className="p-6 sm:p-10 flex-1 overflow-y-auto custom-scrollbar space-y-6">
         {/* Title */}
         <div className="space-y-1">
@@ -67,7 +67,7 @@ export function MovieHistoryModalContent({ movieId, onClose }: MovieHistoryModal
 
         {/* Sessions list */}
         {sessions.length === 0 ? (
-          <div className="py-12 bg-[#15161a] border border-[#2e323c] rounded-[6px] text-center">
+          <div className="py-12 bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-md)] text-center">
             <p className="text-xs font-mono text-content-muted">No viewing sessions recorded in the archive yet.</p>
           </div>
         ) : (
@@ -79,7 +79,7 @@ export function MovieHistoryModalContent({ movieId, onClose }: MovieHistoryModal
               return (
                 <div 
                   key={session.public_id} 
-                  className="bg-[#15161a] border border-[#2e323c] rounded-[4px] overflow-hidden"
+                  className="bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] overflow-hidden"
                 >
                   <div 
                     className="p-3.5 flex items-center justify-between cursor-pointer hover:bg-[#1a1c22] transition-colors"
@@ -120,9 +120,9 @@ export function MovieHistoryModalContent({ movieId, onClose }: MovieHistoryModal
                   </div>
 
                   {isExpanded && (
-                    <div className="p-4 pt-0 border-t border-[#242730] space-y-3 bg-[#121316]">
+                    <div className="p-4 pt-0 border-t border-[var(--border-subtle)] space-y-3 bg-[var(--background)]">
                       {session.notes && (
-                        <div className="mt-3 bg-[#17181d] border border-[#2e323c] rounded-[4px] p-2.5">
+                        <div className="mt-3 bg-[var(--surface-sidebar)] border border-[var(--border-color)] rounded-[var(--radius-sm)] p-2.5">
                           <div className="text-[10px] font-mono uppercase text-content-muted mb-1">Session Reflections</div>
                           <p className="text-xs text-content-secondary leading-relaxed font-sans">{session.notes}</p>
                         </div>
@@ -139,7 +139,7 @@ export function MovieHistoryModalContent({ movieId, onClose }: MovieHistoryModal
       </div>
 
       {/* Footer */}
-      <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-end bg-[#17181d] shrink-0">
+      <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-end bg-[var(--surface-sidebar)] shrink-0">
         <button type="button" className="btn-secondary px-5 py-2 text-xs font-semibold" onClick={onClose}>
           Close
         </button>

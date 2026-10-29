@@ -1,38 +1,46 @@
+/**
+ * Legacy Tailwind (v3-style) mirror of the design tokens.
+ *
+ * The live palette lives in `src/index.css` under `@theme` — Tailwind v4 reads
+ * CSS first. This file is kept in sync only for the few places that import it
+ * directly and for tooling that expects a JS object.
+ */
 export const themeConfig = {
   colors: {
-    primary: "#e05a47",
-    secondary: "#1e2026",
-    accent: "#e05a47",
-    background: "#121316",
-    surface: "#1e2026",
-    "surface-light": "#262830",
-    "surface-secondary": "#191b20",
-    "surface-input": "#15161a",
-    "border-main": "#2e323c",
-    "border-subtle": "#242730",
-    error: "#e53e3e",
-    success: "#38a169",
-    warning: "#e5a83b",
-    info: "#0d9488",
+    primary: "#7c5cff",
+    secondary: "#1a1d27",
+    accent: "#7c5cff",
+    background: "#0f1117",
+    surface: "#1a1d27",
+    "surface-light": "#232735",
+    "surface-secondary": "#151821",
+    "surface-input": "#12141c",
+    "surface-high": "#2b3143",
+    "border-main": "#2a2e3c",
+    "border-subtle": "#21242f",
+    error: "#f0808a",
+    success: "#2fb8a6",
+    warning: "#e0a33a",
+    info: "#2fb8a6",
     editorial: {
-      vermillion: "#e05a47",
-      ochre: "#e5a83b",
-      sage: "#38a169",
-      cyan: "#0d9488",
-      indigo: "#5c67f2",
-      crimson: "#e53e3e",
+      violet: "#7c5cff",
+      ochre: "#e0a33a",
+      sage: "#2fb8a6",
+      cyan: "#4ea8ff",
+      indigo: "#9a86ff",
+      crimson: "#f0808a",
     },
     content: {
-      primary: "#f4f4f6",
-      secondary: "#a1a6b4",
-      muted: "#6d7280",
+      primary: "#e7e9ef",
+      secondary: "#8b90a0",
+      muted: "#5f6474",
     }
   },
   borderRadius: {
-    xs: "3px",
-    sm: "4px",
-    md: "6px",
-    lg: "8px",
-    xl: "12px",
+    xs: "6px",
+    sm: "9px",
+    md: "14px",
+    lg: "18px",
+    xl: "24px",
   }
 } as const;

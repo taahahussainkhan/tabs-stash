@@ -73,7 +73,7 @@ export function Dropdown(props: DropdownProps) {
       <div
         tabIndex={0}
         role="button"
-        className={`${buttonClassName} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${isNavActive ? 'nav-item-active' : ''} ${mode === 'form' ? 'bg-[#15161a] border border-[#2e323c] rounded-[4px] px-3 py-2 min-h-9 flex justify-between items-center w-full text-content-primary hover:border-[#3f4553] transition-colors cursor-pointer text-xs' : ''}`}
+        className={`${buttonClassName} ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${isNavActive ? 'nav-item-active' : ''} ${mode === 'form' ? 'bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] px-3 py-2 min-h-9 flex justify-between items-center w-full text-content-primary hover:border-[#3f4553] transition-colors cursor-pointer text-xs' : ''}`}
       >
         <div className="flex items-center gap-2">
           {triggerIcon && <span className="w-3.5 h-3.5 shrink-0">{triggerIcon}</span>}
@@ -83,17 +83,17 @@ export function Dropdown(props: DropdownProps) {
       </div>
       <ul
         tabIndex={0}
-        className="dropdown-content menu z-50 w-full min-w-[180px] p-1 mt-1 bg-[#1e2026] border border-[#2e323c] rounded-[6px] shadow-2xl animate-in fade-in duration-100"
+        className="dropdown-content menu z-50 w-full min-w-[180px] p-1 mt-1 bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] shadow-2xl animate-in fade-in duration-100"
       >
         {items.map((item) => (
           <li key={item.value} className="mb-0.5 last:mb-0">
             {mode === 'navigation' && item.path ? (
               <Link
                 to={item.path}
-                className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-[4px] text-xs font-medium transition-colors ${
+                className={`flex items-center gap-2.5 px-2.5 py-1.5 rounded-[var(--radius-sm)] text-xs font-medium transition-colors ${
                   isActive(item.path) 
-                    ? 'bg-[#262830] text-accent-vermillion font-bold' 
-                    : 'text-content-secondary hover:text-white hover:bg-[#262830]'
+                    ? 'bg-[var(--surface-light)] text-accent-vermillion font-bold' 
+                    : 'text-content-secondary hover:text-white hover:bg-[var(--surface-light)]'
                 }`}
               >
                 {item.icon && (() => {
@@ -106,10 +106,10 @@ export function Dropdown(props: DropdownProps) {
               <button
                 type="button"
                 onClick={() => !disabled && onChange?.(item.value)}
-                className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-[4px] text-xs font-medium transition-colors text-left ${
+                className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-[var(--radius-sm)] text-xs font-medium transition-colors text-left ${
                   value === item.value 
-                    ? 'bg-[#262830] text-accent-vermillion font-bold' 
-                    : 'text-content-secondary hover:text-white hover:bg-[#262830]'
+                    ? 'bg-[var(--surface-light)] text-accent-vermillion font-bold' 
+                    : 'text-content-secondary hover:text-white hover:bg-[var(--surface-light)]'
                 }`}
               >
                 {item.icon && (() => {

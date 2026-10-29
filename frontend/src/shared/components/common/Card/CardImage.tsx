@@ -25,8 +25,8 @@ export const CardImage: React.FC<CardImageProps> = ({
 
   return (
     <div className={cn(
-      'relative overflow-hidden bg-[#121316] border border-[#2e323c] rounded-[4px]',
-      isList ? 'w-14 h-18 rounded-[4px] shrink-0' : 'w-full aspect-[2/3] mb-3.5',
+      'relative overflow-hidden bg-[var(--background)] border border-[var(--border-color)] rounded-[var(--radius-sm)]',
+      isList ? 'w-14 h-18 rounded-[var(--radius-sm)] shrink-0' : 'w-full aspect-[2/3] mb-3.5',
       containerClass
     )}>
       {src && !hasError ? (

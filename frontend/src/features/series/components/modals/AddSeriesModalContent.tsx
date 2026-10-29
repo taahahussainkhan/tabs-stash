@@ -96,7 +96,7 @@ export function AddSeriesModalContent({ onClose, onSubmit }: AddSeriesModalConte
   const totalEpisodes = form.state.values.seasons.reduce((sum, s) => sum + s.episode_count, 0)
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -113,13 +113,13 @@ export function AddSeriesModalContent({ onClose, onSubmit }: AddSeriesModalConte
                 <span className="mono-badge mono-badge-ochre text-[9px]">TELEVISION</span>
                 <span className="text-[10px] text-content-muted uppercase tracking-wider">Series Registration</span>
               </div>
-              <div className="flex items-center gap-1.5 p-0.5 bg-[#15161a] rounded-[4px] border border-[#2e323c] font-mono text-xs">
+              <div className="flex items-center gap-1.5 p-0.5 bg-[var(--surface-input)] rounded-[var(--radius-sm)] border border-[var(--border-color)] font-mono text-xs">
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className={`px-2.5 py-0.5 rounded-[3px] font-semibold transition-colors cursor-pointer ${
+                  className={`px-2.5 py-0.5 rounded-[var(--radius-xs)] font-semibold transition-colors cursor-pointer ${
                     step === 1
-                      ? 'bg-[#1e2026] text-accent-ochre border border-accent-ochre/30'
+                      ? 'bg-[var(--surface)] text-accent-ochre border border-accent-ochre/30'
                       : 'text-content-muted hover:text-white'
                   }`}
                 >
@@ -129,9 +129,9 @@ export function AddSeriesModalContent({ onClose, onSubmit }: AddSeriesModalConte
                   type="button"
                   disabled={!form.state.canSubmit}
                   onClick={() => setStep(2)}
-                  className={`px-2.5 py-0.5 rounded-[3px] font-semibold transition-colors cursor-pointer ${
+                  className={`px-2.5 py-0.5 rounded-[var(--radius-xs)] font-semibold transition-colors cursor-pointer ${
                     step === 2
-                      ? 'bg-[#1e2026] text-accent-ochre border border-accent-ochre/30'
+                      ? 'bg-[var(--surface)] text-accent-ochre border border-accent-ochre/30'
                       : 'text-content-muted hover:text-white disabled:opacity-40'
                   }`}
                 >
@@ -175,7 +175,7 @@ export function AddSeriesModalContent({ onClose, onSubmit }: AddSeriesModalConte
                       toast.info('Type at least 2 characters to search catalog')
                     }
                   }}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] bg-[#14232a] hover:bg-[#1a2f38] border border-accent-cyan/30 text-accent-cyan text-[11px] font-mono transition-colors shrink-0 cursor-pointer shadow-sm"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] bg-[#14232a] hover:bg-[#1a2f38] border border-accent-cyan/30 text-accent-cyan text-[11px] font-mono transition-colors shrink-0 cursor-pointer shadow-sm"
                   title="Search catalog to auto-fill details and seasons"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
@@ -245,7 +245,7 @@ export function AddSeriesModalContent({ onClose, onSubmit }: AddSeriesModalConte
             </div>
           ) : (
             <div className="space-y-4">
-              <div className="p-3 rounded-[4px] bg-[#15161a] border border-[#2e323c] font-mono text-xs">
+              <div className="p-3 rounded-[var(--radius-sm)] bg-[var(--surface-input)] border border-[var(--border-color)] font-mono text-xs">
                 <div className="flex items-center gap-2 text-accent-ochre font-bold mb-0.5">
                   <Layers className="w-3.5 h-3.5" />
                   <span>Season Architecture</span>
@@ -261,7 +261,7 @@ export function AddSeriesModalContent({ onClose, onSubmit }: AddSeriesModalConte
                   children={(field) => (
                     <div className="space-y-2">
                       {field.state.value.map((season, index) => (
-                        <div key={index} className="p-3 rounded-[4px] bg-[#15161a] border border-[#2e323c] space-y-2 relative group">
+                        <div key={index} className="p-3 rounded-[var(--radius-sm)] bg-[var(--surface-input)] border border-[var(--border-color)] space-y-2 relative group">
                           <div className="grid grid-cols-2 gap-3">
                             <PropertyRow label="Season #">
                               <GhostInput
@@ -319,7 +319,7 @@ export function AddSeriesModalContent({ onClose, onSubmit }: AddSeriesModalConte
 
                       <button
                         type="button"
-                        className="w-full py-2.5 rounded-[4px] border border-dashed border-[#2e323c] text-content-secondary hover:text-white hover:border-[#424856] bg-[#15161a] transition-colors flex items-center justify-center gap-1.5 text-xs font-mono"
+                        className="w-full py-2.5 rounded-[var(--radius-sm)] border border-dashed border-[var(--border-color)] text-content-secondary hover:text-white hover:border-[#424856] bg-[var(--surface-input)] transition-colors flex items-center justify-center gap-1.5 text-xs font-mono"
                         onClick={() => {
                           const maxSeason = Math.max(...field.state.value.map((s) => s.season_number), 0)
                           field.handleChange([
@@ -340,7 +340,7 @@ export function AddSeriesModalContent({ onClose, onSubmit }: AddSeriesModalConte
         </div>
 
         {/* Action Footer */}
-        <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-between gap-4 bg-[#17181d] shrink-0">
+        <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-between gap-4 bg-[var(--surface-sidebar)] shrink-0">
           <button
             type="button"
             onClick={onClose}

@@ -38,7 +38,7 @@ export const MediaLogPage: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[#2e323c] pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-[var(--border-color)] pb-5">
         <div>
           <div className="flex items-center gap-2 text-accent-terracotta">
             <Smartphone className="w-4 h-4" />
@@ -51,7 +51,7 @@ export const MediaLogPage: React.FC = () => {
         </div>
         <button
           onClick={() => refetch()}
-          className="self-start sm:self-auto flex items-center gap-2 px-3 py-2 rounded-[4px] border border-[#2e323c] text-xs font-semibold text-content-secondary hover:text-content-primary hover:bg-[#1e2026] transition"
+          className="self-start sm:self-auto flex items-center gap-2 px-3 py-2 rounded-[var(--radius-sm)] border border-[var(--border-color)] text-xs font-semibold text-content-secondary hover:text-content-primary hover:bg-[var(--surface)] transition"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isFetching ? 'animate-spin' : ''}`} />
           Refresh
@@ -66,13 +66,13 @@ export const MediaLogPage: React.FC = () => {
       </div>
 
       {/* Filter */}
-      <div className="flex gap-1 p-1 rounded-[6px] bg-[#1a1c22] border border-[#2e323c] w-fit">
+      <div className="flex gap-1 p-1 rounded-[var(--radius-md)] bg-[#1a1c22] border border-[var(--border-color)] w-fit">
         {(['active', 'dissolved', 'all'] as Filter[]).map(f => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 rounded-[4px] text-xs font-semibold capitalize transition ${
-              filter === f ? 'bg-[#2e323c] text-white' : 'text-content-muted hover:text-content-secondary'
+            className={`px-3 py-1.5 rounded-[var(--radius-sm)] text-xs font-semibold capitalize transition ${
+              filter === f ? 'bg-[var(--border-color)] text-white' : 'text-content-muted hover:text-content-secondary'
             }`}
           >
             {f}
@@ -102,7 +102,7 @@ export const MediaLogPage: React.FC = () => {
 
 function Stat({ label, value, accent }: { label: string; value: number; accent?: boolean }) {
   return (
-    <div className="rounded-[6px] bg-[#1e2026] border border-[#31343e] p-4">
+    <div className="rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--surface-high)] p-4">
       <div className={`text-2xl font-bold ${accent ? 'text-accent-ochre' : 'text-content-primary'}`}>{value}</div>
       <div className="text-[11px] font-mono uppercase tracking-wider text-content-muted mt-1">{label}</div>
     </div>
@@ -111,7 +111,7 @@ function Stat({ label, value, accent }: { label: string; value: number; accent?:
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="rounded-[6px] border border-dashed border-[#2e323c] p-12 text-center text-content-muted text-sm">
+    <div className="rounded-[var(--radius-md)] border border-dashed border-[var(--border-color)] p-12 text-center text-content-muted text-sm">
       {text}
     </div>
   )
@@ -124,9 +124,9 @@ function RecordCard({ record }: { record: MediaLogRecord }) {
   const dissolved = record.status === 'dissolved'
 
   return (
-    <div className={`rounded-[6px] border p-5 ${dissolved ? 'bg-[#1a1c22] border-[#3a2a2a]' : 'bg-[#1e2026] border-[#31343e]'}`}>
+    <div className={`rounded-[var(--radius-md)] border p-5 ${dissolved ? 'bg-[#1a1c22] border-[#3a2a2a]' : 'bg-[var(--surface)] border-[var(--surface-high)]'}`}>
       <div className="flex items-start gap-3">
-        <div className="p-2 rounded-[6px] shrink-0" style={{ backgroundColor: meta.bg, border: `1px solid ${meta.border}` }}>
+        <div className="p-2 rounded-[var(--radius-md)] shrink-0" style={{ backgroundColor: meta.bg, border: `1px solid ${meta.border}` }}>
           <Icon className="w-4 h-4" style={{ color: meta.color }} />
         </div>
         <div className="min-w-0 flex-1">
@@ -156,7 +156,7 @@ function RecordCard({ record }: { record: MediaLogRecord }) {
 
       {/* Logs timeline */}
       {logs.length > 0 && (
-        <ol className="mt-4 space-y-3 border-t border-[#2e323c] pt-4">
+        <ol className="mt-4 space-y-3 border-t border-[var(--border-color)] pt-4">
           {logs.map(log => (
             <li key={log.id} className="flex gap-3">
               <div className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: meta.color }} />

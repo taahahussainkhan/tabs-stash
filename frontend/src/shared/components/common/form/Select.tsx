@@ -35,7 +35,7 @@ export function Select({
     size === 'xl' ? 'h-13 px-5 text-base' : 
     'h-9 px-3 text-xs'
   
-  const selectBaseClass = `select-modern w-full bg-[#15161a] border border-[#2e323c] rounded-[4px] focus:border-accent-vermillion text-content-primary transition-colors ${sizeClass} ${error ? 'border-danger/60 focus:border-danger' : ''} ${className}`
+  const selectBaseClass = `select-modern w-full bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] focus:border-accent-vermillion text-content-primary transition-colors ${sizeClass} ${error ? 'border-danger/60 focus:border-danger' : ''} ${className}`
 
   const Label = () => label ? (
     <label className={`label ${labelSize === 'sm' ? 'py-1' : 'pb-1.5'} px-0.5`} htmlFor={selectId}>
@@ -64,12 +64,12 @@ export function Select({
         {...props}
       >
         {placeholder && (
-          <option value="" disabled className="bg-[#1e2026] text-content-muted">
+          <option value="" disabled className="bg-[var(--surface)] text-content-muted">
             {placeholder}
           </option>
         )}
         {options.map((option) => (
-          <option key={option.value} value={option.value} className="bg-[#1e2026] text-content-primary">
+          <option key={option.value} value={option.value} className="bg-[var(--surface)] text-content-primary">
             {option.label}
           </option>
         ))}

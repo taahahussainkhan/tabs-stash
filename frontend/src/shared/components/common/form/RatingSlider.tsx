@@ -39,7 +39,7 @@ export function RatingSlider({
         <input
           id={sliderId}
           type="range"
-          className="range range-xs flex-1 accent-[#e05a47] cursor-pointer"
+          className="range range-xs flex-1 accent-[var(--primary)] cursor-pointer"
           min={min}
           max={max}
           step={step}
@@ -49,7 +49,7 @@ export function RatingSlider({
         />
         
         {showValue && (
-          <div className="flex items-center justify-center px-2 py-0.5 rounded-[4px] bg-[#15161a] border border-[#2e323c] min-w-[3rem]">
+          <div className="flex items-center justify-center px-2 py-0.5 rounded-[var(--radius-sm)] bg-[var(--surface-input)] border border-[var(--border-color)] min-w-[3rem]">
             <span className="font-mono font-bold text-xs text-accent-ochre">{value.toFixed(1)}</span>
             <span className="font-mono text-[10px] text-content-muted ml-0.5">/10</span>
           </div>

@@ -29,7 +29,7 @@ export function AddEpisodeModalContent({ seasonPublicId, seriesPublicId, onClose
   })
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -98,7 +98,7 @@ export function AddEpisodeModalContent({ seasonPublicId, seriesPublicId, onClose
         </div>
 
         {/* Footer */}
-        <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-between gap-4 bg-[#17181d] shrink-0">
+        <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-between gap-4 bg-[var(--surface-sidebar)] shrink-0">
           <button
             type="button"
             onClick={onClose}

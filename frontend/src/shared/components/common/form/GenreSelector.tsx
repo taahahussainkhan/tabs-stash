@@ -90,7 +90,7 @@ export function GenreSelector({
           <input
             id={inputId}
             type="text"
-            className={`input-modern w-full bg-[#15161a] border border-[#2e323c] rounded-[4px] focus:border-accent-vermillion text-content-primary pl-8 text-xs ${sizeClass} ${error ? 'border-danger/60 focus:border-danger' : ''}`}
+            className={`input-modern w-full bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] focus:border-accent-vermillion text-content-primary pl-8 text-xs ${sizeClass} ${error ? 'border-danger/60 focus:border-danger' : ''}`}
             placeholder={genres.length >= maxGenres ? 'Limit reached' : 'Type genre and press Enter...'}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
@@ -114,7 +114,7 @@ export function GenreSelector({
             <button
               type="button"
               onClick={() => onChange('')}
-              className="px-2 py-0.5 rounded-[3px] bg-danger/10 text-danger hover:bg-danger/20 border border-danger/20 transition-colors text-[10px] font-mono font-bold uppercase tracking-wider"
+              className="px-2 py-0.5 rounded-[var(--radius-xs)] bg-danger/10 text-danger hover:bg-danger/20 border border-danger/20 transition-colors text-[10px] font-mono font-bold uppercase tracking-wider"
             >
               Clear
             </button>

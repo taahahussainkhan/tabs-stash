@@ -56,7 +56,7 @@ export function GlobalSearch() {
   return (
     <div className="relative w-full">
       <div 
-        className="flex items-center gap-2 bg-[#121316] border border-[#2e323c] rounded-[4px] px-2.5 py-1.5 w-full cursor-text hover:border-[#3d424f] transition-colors group"
+        className="flex items-center gap-2 bg-[var(--background)] border border-[var(--border-color)] rounded-[var(--radius-sm)] px-2.5 py-1.5 w-full cursor-text hover:border-[#3d424f] transition-colors group"
         onClick={() => {
           setIsOpen(true)
           setTimeout(() => inputRef.current?.focus(), 50)
@@ -84,12 +84,12 @@ export function GlobalSearch() {
               e.stopPropagation()
               setQuery('')
             }} 
-            className="p-0.5 hover:bg-[#1e2026] rounded text-content-muted hover:text-content-primary"
+            className="p-0.5 hover:bg-[var(--surface)] rounded text-content-muted hover:text-content-primary"
           >
             <X className="w-3 h-3" />
           </button>
         ) : (
-          <kbd className="hidden sm:inline-flex items-center text-[9px] font-mono text-content-muted bg-[#1e2026] border border-[#2e323c] px-1.5 py-0.5 rounded-[3px] shrink-0">
+          <kbd className="hidden sm:inline-flex items-center text-[9px] font-mono text-content-muted bg-[var(--surface)] border border-[var(--border-color)] px-1.5 py-0.5 rounded-[var(--radius-xs)] shrink-0">
             ⌘K
           </kbd>
         )}
@@ -98,9 +98,9 @@ export function GlobalSearch() {
       {isOpen && query.trim().length >= 2 && (
         <div 
           ref={resultsRef}
-          className="absolute top-10 left-0 right-0 bg-[#1e2026] border border-[#2e323c] rounded-[6px] shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150 min-w-[320px]"
+          className="absolute top-10 left-0 right-0 bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150 min-w-[320px]"
         >
-          <div className="px-3 py-2 border-b border-[#2e323c] bg-[#17181d] flex items-center justify-between">
+          <div className="px-3 py-2 border-b border-[var(--border-color)] bg-[var(--surface-sidebar)] flex items-center justify-between">
             <span className="text-[10px] font-mono text-content-muted uppercase tracking-wider">Search Results</span>
             <span className="text-[10px] font-mono text-accent-ochre">{results.length} found</span>
           </div>
@@ -111,17 +111,17 @@ export function GlobalSearch() {
               <span className="text-xs font-mono text-content-muted">Searching archive...</span>
             </div>
           ) : results.length > 0 ? (
-            <div className="p-1 max-h-72 overflow-y-auto divide-y divide-[#242730]">
+            <div className="p-1 max-h-72 overflow-y-auto divide-y divide-[var(--border-subtle)]">
               {results.map((result) => {
                 const { icon, badge, label } = getBadgeStyle(result.type)
                 return (
                   <button
                     key={`${result.type}-${result.id}`}
                     onClick={() => handleResultClick(result.id, result.type)}
-                    className="w-full flex items-center justify-between gap-3 p-2.5 hover:bg-[#262830] transition-colors text-left rounded-[4px]"
+                    className="w-full flex items-center justify-between gap-3 p-2.5 hover:bg-[var(--surface-light)] transition-colors text-left rounded-[var(--radius-sm)]"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-7 h-7 rounded-[4px] bg-[#121316] border border-[#2e323c] flex items-center justify-center shrink-0">
+                      <div className="w-7 h-7 rounded-[var(--radius-sm)] bg-[var(--background)] border border-[var(--border-color)] flex items-center justify-center shrink-0">
                         {icon}
                       </div>
                       <div className="min-w-0">

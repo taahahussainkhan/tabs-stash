@@ -90,10 +90,10 @@ export function Modal({
       <div
         ref={modalRef}
         className={`
-          relative bg-[#1e2026] flex flex-col overflow-hidden shadow-2xl z-10 border border-[#2e323c]
+          relative bg-[var(--surface)] flex flex-col overflow-hidden shadow-2xl z-10 border border-[var(--border-color)]
           ${isDrawer 
             ? 'h-full rounded-none' 
-            : 'rounded-[8px] max-h-[90vh] w-full animate-in fade-in zoom-in-98 duration-150'
+            : 'rounded-[var(--radius-lg)] max-h-[90vh] w-full animate-in fade-in zoom-in-98 duration-150'
           }
           ${sizeClasses[size] || sizeClasses['2xl']}
         `}
@@ -101,7 +101,7 @@ export function Modal({
       >
         {/* Optional Title Header */}
         {title ? (
-          <div className="flex items-center justify-between px-5 py-3 border-b border-[#2e323c] bg-[#17181d] shrink-0">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--border-color)] bg-[var(--surface-sidebar)] shrink-0">
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-2 h-2 rounded-full bg-accent-vermillion shrink-0" />
               <h3 className="text-xs font-bold text-content-primary truncate tracking-tight uppercase font-mono">
@@ -111,7 +111,7 @@ export function Modal({
             {closable && (
               <button
                 onClick={handleClose}
-                className="p-1 hover:bg-[#262830] rounded-[3px] text-content-muted hover:text-white transition-colors border border-transparent hover:border-[#2e323c] cursor-pointer"
+                className="p-1 hover:bg-[var(--surface-light)] rounded-[var(--radius-xs)] text-content-muted hover:text-white transition-colors border border-transparent hover:border-[var(--border-color)] cursor-pointer"
                 aria-label="Close modal"
                 type="button"
               >
@@ -122,7 +122,7 @@ export function Modal({
         ) : closable ? (
           <button
             onClick={handleClose}
-            className="absolute top-3.5 right-3.5 z-30 p-1 bg-[#17181d] hover:bg-[#262830] rounded-[3px] text-content-muted hover:text-white transition-colors border border-[#2e323c] cursor-pointer shadow-sm"
+            className="absolute top-3.5 right-3.5 z-30 p-1 bg-[var(--surface-sidebar)] hover:bg-[var(--surface-light)] rounded-[var(--radius-xs)] text-content-muted hover:text-white transition-colors border border-[var(--border-color)] cursor-pointer shadow-sm"
             aria-label="Close modal"
             type="button"
           >
@@ -140,7 +140,7 @@ export function Modal({
 
         {/* Optional Footer */}
         {footer && (
-          <div className="px-5 py-3 border-t border-[#2e323c] bg-[#17181d] shrink-0">
+          <div className="px-5 py-3 border-t border-[var(--border-color)] bg-[var(--surface-sidebar)] shrink-0">
             {footer}
           </div>
         )}

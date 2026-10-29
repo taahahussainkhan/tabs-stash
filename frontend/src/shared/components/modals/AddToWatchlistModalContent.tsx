@@ -88,7 +88,7 @@ export function AddToWatchlistModalContent({ onClose, onSubmit, type = 'movie' }
   })
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -144,7 +144,7 @@ export function AddToWatchlistModalContent({ onClose, onSubmit, type = 'movie' }
                       toast.info('Type at least 2 characters to search catalog')
                     }
                   }}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] bg-[#14232a] hover:bg-[#1a2f38] border border-accent-cyan/30 text-accent-cyan text-[11px] font-mono transition-colors shrink-0 cursor-pointer shadow-sm"
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--radius-sm)] bg-[#14232a] hover:bg-[#1a2f38] border border-accent-cyan/30 text-accent-cyan text-[11px] font-mono transition-colors shrink-0 cursor-pointer shadow-sm"
                   title="Search catalog to auto-fill details"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
@@ -166,7 +166,7 @@ export function AddToWatchlistModalContent({ onClose, onSubmit, type = 'movie' }
 
 
           {type === 'series' && catalogSeasons.length > 0 && (
-            <div className="p-3 rounded-[4px] bg-[#14232a] border border-accent-cyan/30 flex items-center justify-between font-mono text-xs text-accent-cyan">
+            <div className="p-3 rounded-[var(--radius-sm)] bg-[#14232a] border border-accent-cyan/30 flex items-center justify-between font-mono text-xs text-accent-cyan">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-accent-cyan" />
                 <span>
@@ -231,7 +231,7 @@ export function AddToWatchlistModalContent({ onClose, onSubmit, type = 'movie' }
         </div>
 
         {/* Footer */}
-        <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-between gap-4 bg-[#17181d] shrink-0">
+        <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-between gap-4 bg-[var(--surface-sidebar)] shrink-0">
           <button
             type="button"
             onClick={onClose}

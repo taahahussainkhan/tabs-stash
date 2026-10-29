@@ -37,7 +37,7 @@ export function FilterModalContent({ onClose, onApply, currentFilters }: FilterM
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <div className="p-6 sm:p-10 flex-1 overflow-y-auto custom-scrollbar space-y-6">
         {/* Title */}
         <div className="space-y-1">
@@ -167,7 +167,7 @@ export function FilterModalContent({ onClose, onApply, currentFilters }: FilterM
       </div>
 
       {/* Footer */}
-      <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-between gap-4 bg-[#17181d] shrink-0">
+      <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-between gap-4 bg-[var(--surface-sidebar)] shrink-0">
         <button
           type="button"
           onClick={handleReset}

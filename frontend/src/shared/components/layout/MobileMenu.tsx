@@ -7,7 +7,7 @@ export function MobileMenu() {
       <div 
         tabIndex={0} 
         role="button" 
-        className="p-2 rounded-[4px] bg-[#1e2026] border border-[#2e323c] hover:bg-[#262830] text-content-secondary hover:text-white transition-colors cursor-pointer"
+        className="p-2 rounded-[var(--radius-sm)] bg-[var(--surface)] border border-[var(--border-color)] hover:bg-[var(--surface-light)] text-content-secondary hover:text-white transition-colors cursor-pointer"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -26,10 +26,10 @@ export function MobileMenu() {
       </div>
       <div
         tabIndex={0}
-        className="dropdown-content z-50 p-3 bg-[#1e2026] border border-[#2e323c] rounded-[6px] shadow-2xl w-64 mt-2"
+        className="dropdown-content z-50 p-3 bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] shadow-2xl w-64 mt-2"
       >
         {MOBILE_NAV_LINKS.map((section, index) => (
-          <div key={section.label} className={index > 0 ? 'mt-3 pt-3 border-t border-[#2e323c]' : ''}>
+          <div key={section.label} className={index > 0 ? 'mt-3 pt-3 border-t border-[var(--border-color)]' : ''}>
             <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-content-muted mb-1.5 px-2">
               {section.label}
             </div>
@@ -40,7 +40,7 @@ export function MobileMenu() {
                   <Link
                     key={link.path}
                     to={link.path}
-                    className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-[4px] text-xs font-semibold text-content-secondary hover:text-white hover:bg-[#262830] transition-colors"
+                    className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-[var(--radius-sm)] text-xs font-semibold text-content-secondary hover:text-white hover:bg-[var(--surface-light)] transition-colors"
                   >
                     {Icon && <Icon className="w-3.5 h-3.5 text-accent-vermillion" />}
                     {link.label}

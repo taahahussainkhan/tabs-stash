@@ -93,8 +93,8 @@ export function SeasonAccordion({ seasonWithProgress, seriesPublicId, seriesTitl
 
   return (
     <div 
-      className={`overflow-hidden transition-colors rounded-[6px] border border-[#2e323c] ${
-        isExpanded ? 'bg-[#1e2026] border-l-[3px] border-l-accent-ochre' : 'bg-[#1e2026] hover:bg-[#262830]'
+      className={`overflow-hidden transition-colors rounded-[var(--radius-md)] border border-[var(--border-color)] ${
+        isExpanded ? 'bg-[var(--surface)] border-l-[3px] border-l-accent-ochre' : 'bg-[var(--surface)] hover:bg-[var(--surface-light)]'
       }`}
     >
       {/* Season Header */}
@@ -103,7 +103,7 @@ export function SeasonAccordion({ seasonWithProgress, seriesPublicId, seriesTitl
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <div className="flex items-center gap-4 flex-1">
-          <div className="w-8 h-8 rounded-[4px] bg-[#121316] border border-[#2e323c] flex items-center justify-center text-content-muted">
+          <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-[var(--background)] border border-[var(--border-color)] flex items-center justify-center text-content-muted">
             {isExpanded ? (
               <ChevronUp className="w-4 h-4 text-accent-ochre" />
             ) : (
@@ -120,15 +120,15 @@ export function SeasonAccordion({ seasonWithProgress, seriesPublicId, seriesTitl
 
               {/* Season Status Badge */}
               {seasonStatus === 'completed' ? (
-                <span className="px-2 py-0.5 rounded text-[9px] font-mono uppercase font-bold text-[#4ade80] bg-[#143324] border border-[#1e593a] flex items-center gap-1">
+                <span className="px-2 py-0.5 rounded text-[9px] font-mono uppercase font-bold text-[var(--success)] bg-[var(--success-soft)] border border-[var(--success)] flex items-center gap-1">
                   <CheckCircle className="w-3 h-3" /> Completed
                 </span>
               ) : seasonStatus === 'watching' ? (
-                <span className="px-2 py-0.5 rounded text-[9px] font-mono uppercase font-bold text-[#2dd4bf] bg-[#0f2e2b] border border-[#134e4a] flex items-center gap-1">
+                <span className="px-2 py-0.5 rounded text-[9px] font-mono uppercase font-bold text-[var(--accent-sage)] bg-[var(--success-soft)] border border-[var(--success)] flex items-center gap-1">
                   <PlayCircle className="w-3 h-3" /> In Progress
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded text-[9px] font-mono uppercase font-bold text-[#a5b4fc] bg-[#1e1b4b] border border-[#3730a3] flex items-center gap-1">
+                <span className="px-2 py-0.5 rounded text-[9px] font-mono uppercase font-bold text-[var(--accent-indigo)] bg-[var(--primary-soft)] border border-[var(--accent-indigo)] flex items-center gap-1">
                   <Clock className="w-3 h-3" /> To Watch
                 </span>
               )}
@@ -136,7 +136,7 @@ export function SeasonAccordion({ seasonWithProgress, seriesPublicId, seriesTitl
 
             <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-content-muted">
               <span className="flex items-center gap-1.5">
-                <PlayCircle className="w-3.5 h-3.5 text-[#9ca3af]" />
+                <PlayCircle className="w-3.5 h-3.5 text-[var(--content-secondary)]" />
                 {watched_episodes} / {total_episodes} episodes
               </span>
               {season.year && <span>&bull; {season.year}</span>}
@@ -162,10 +162,10 @@ export function SeasonAccordion({ seasonWithProgress, seriesPublicId, seriesTitl
               }}
               disabled={markSeasonWatchedMutation.isPending}
               title={isCompleted ? 'Mark all episodes in season as unwatched' : 'Mark all episodes in season as completed'}
-              className={`px-2.5 py-1 rounded-[4px] border text-[10px] font-mono font-bold uppercase transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`px-2.5 py-1 rounded-[var(--radius-sm)] border text-[10px] font-mono font-bold uppercase transition-all flex items-center gap-1.5 cursor-pointer ${
                 isCompleted
-                  ? 'bg-[#1a1c23] hover:bg-[#232630] border-[#2e323c] text-[#9ca3af] hover:text-white'
-                  : 'bg-[#143324] hover:bg-[#1a4430] border-[#1e593a] text-[#4ade80] hover:text-white'
+                  ? 'bg-[#1a1c23] hover:bg-[#232630] border-[var(--border-color)] text-[var(--content-secondary)] hover:text-white'
+                  : 'bg-[var(--success-soft)] hover:bg-[#1a4430] border-[var(--success)] text-[var(--success)] hover:text-white'
               }`}
             >
               {markSeasonWatchedMutation.isPending ? (
@@ -186,7 +186,7 @@ export function SeasonAccordion({ seasonWithProgress, seriesPublicId, seriesTitl
             {/* Linear / Text Progress */}
             <div className="text-right font-mono hidden sm:block">
               <div className="text-xs font-bold text-accent-ochre">{progress_percentage.toFixed(0)}%</div>
-              <div className="w-20 h-1.5 bg-[#121316] border border-[#2e323c] rounded-full overflow-hidden mt-1">
+              <div className="w-20 h-1.5 bg-[var(--background)] border border-[var(--border-color)] rounded-full overflow-hidden mt-1">
                 <div 
                   className="h-full bg-accent-ochre" 
                   style={{ width: `${progress_percentage}%` }}
@@ -199,7 +199,7 @@ export function SeasonAccordion({ seasonWithProgress, seriesPublicId, seriesTitl
 
       {/* Episodes Grid (Expanded) */}
       {isExpanded && (
-        <div className="px-4 pb-4 pt-1 border-t border-[#242730] animate-in fade-in duration-200">
+        <div className="px-4 pb-4 pt-1 border-t border-[var(--border-subtle)] animate-in fade-in duration-200">
           {isLoading ? (
             <div className="flex justify-center py-8">
               <LoadingSpinner />

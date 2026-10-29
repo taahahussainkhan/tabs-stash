@@ -58,7 +58,7 @@ export function AddCommentsModalContent({ onClose, movie, sessionId, existingCom
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <div className="p-6 sm:p-10 flex-1 overflow-y-auto custom-scrollbar space-y-6">
         {/* Title */}
         <div className="space-y-1">
@@ -80,7 +80,7 @@ export function AddCommentsModalContent({ onClose, movie, sessionId, existingCom
             </div>
             <div className="space-y-1.5 max-h-48 overflow-y-auto custom-scrollbar pr-1">
               {comments.map((comment, index) => (
-                <div key={index} className="bg-[#15161a] border border-[#2e323c] rounded-[4px] p-2.5 relative group">
+                <div key={index} className="bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] p-2.5 relative group">
                   <button
                     type="button"
                     onClick={() => removeComment(index)}
@@ -138,7 +138,7 @@ export function AddCommentsModalContent({ onClose, movie, sessionId, existingCom
             />
           </PropertyRow>
 
-          <div className="space-y-2 pt-3 border-t border-[#242730]">
+          <div className="space-y-2 pt-3 border-t border-[var(--border-subtle)]">
             <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-content-muted/40 px-1">
               <AlignLeft className="w-3.5 h-3.5" />
               <span>Observation Text</span>
@@ -171,7 +171,7 @@ export function AddCommentsModalContent({ onClose, movie, sessionId, existingCom
       </div>
 
       {/* Footer */}
-      <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-between gap-4 bg-[#17181d] shrink-0">
+      <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-between gap-4 bg-[var(--surface-sidebar)] shrink-0">
         <button 
           type="button" 
           className="text-xs font-medium text-content-muted hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer"

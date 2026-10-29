@@ -42,14 +42,14 @@ export const TabFilterBar: React.FC<TabFilterBarProps> = ({
   return (
     <div className="space-y-4">
       {/* View Switcher Tabs */}
-      <div className="flex items-center justify-between border-b border-[#2e323c] pb-2 flex-wrap gap-3">
+      <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2 flex-wrap gap-3">
         <div className="flex items-center gap-2">
           <button
             onClick={() => onSelectTab('active')}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
               activeTab === 'active'
-                ? 'bg-[#e05a47] text-white shadow-sm'
-                : 'text-content-secondary hover:text-content-primary hover:bg-[#1e2026]'
+                ? 'bg-[var(--primary)] text-white shadow-sm'
+                : 'text-content-secondary hover:text-content-primary hover:bg-[var(--surface)]'
             }`}
           >
             <Layers className="w-4 h-4" />
@@ -62,7 +62,7 @@ export const TabFilterBar: React.FC<TabFilterBarProps> = ({
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
               activeTab === 'restored'
                 ? 'bg-amber-600 text-white shadow-sm'
-                : 'text-content-secondary hover:text-content-primary hover:bg-[#1e2026]'
+                : 'text-content-secondary hover:text-content-primary hover:bg-[var(--surface)]'
             }`}
           >
             <RotateCcw className="w-4 h-4" />
@@ -75,7 +75,7 @@ export const TabFilterBar: React.FC<TabFilterBarProps> = ({
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
               activeTab === 'links'
                 ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-content-secondary hover:text-content-primary hover:bg-[#1e2026]'
+                : 'text-content-secondary hover:text-content-primary hover:bg-[var(--surface)]'
             }`}
           >
             <Bookmark className="w-4 h-4" />
@@ -88,7 +88,7 @@ export const TabFilterBar: React.FC<TabFilterBarProps> = ({
           <button
             onClick={onConvertSelectedLinks}
             disabled={isConvertingLinks}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#e05a47] hover:bg-[#cc4a38] text-white rounded-md text-xs font-semibold transition-all shadow-sm disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white rounded-md text-xs font-semibold transition-all shadow-sm disabled:opacity-50"
           >
             <Plus className="w-3.5 h-3.5" />
             Convert {selectedLinksCount} Selected to Session
@@ -109,7 +109,7 @@ export const TabFilterBar: React.FC<TabFilterBarProps> = ({
                 ? 'Search saved links, titles, or domains...'
                 : 'Search stashes, titles, or URLs...'
             }
-            className="w-full pl-9 pr-4 py-2 bg-[#17181d] border border-[#2e323c] rounded-lg text-sm text-content-primary placeholder-content-muted focus:outline-none focus:border-[#e05a47] transition-colors"
+            className="w-full pl-9 pr-4 py-2 bg-[var(--surface-sidebar)] border border-[var(--border-color)] rounded-lg text-sm text-content-primary placeholder-content-muted focus:outline-none focus:border-[var(--primary)] transition-colors"
           />
         </div>
 
@@ -119,7 +119,7 @@ export const TabFilterBar: React.FC<TabFilterBarProps> = ({
               <select
                 value={selectedDevice}
                 onChange={(e) => onDeviceChange(e.target.value)}
-                className="px-3 py-2 bg-[#17181d] border border-[#2e323c] rounded-lg text-xs font-medium text-content-secondary focus:outline-none focus:border-[#e05a47] transition-colors"
+                className="px-3 py-2 bg-[var(--surface-sidebar)] border border-[var(--border-color)] rounded-lg text-xs font-medium text-content-secondary focus:outline-none focus:border-[var(--primary)] transition-colors"
               >
                 <option value="all">All Devices</option>
                 {devices.map((d) => (
@@ -134,7 +134,7 @@ export const TabFilterBar: React.FC<TabFilterBarProps> = ({
               <select
                 value={selectedDomain}
                 onChange={(e) => onDomainChange(e.target.value)}
-                className="px-3 py-2 bg-[#17181d] border border-[#2e323c] rounded-lg text-xs font-medium text-content-secondary focus:outline-none focus:border-[#e05a47] transition-colors"
+                className="px-3 py-2 bg-[var(--surface-sidebar)] border border-[var(--border-color)] rounded-lg text-xs font-medium text-content-secondary focus:outline-none focus:border-[var(--primary)] transition-colors"
               >
                 <option value="all">All Sites / Domains</option>
                 {domains.slice(0, 20).map((d) => (

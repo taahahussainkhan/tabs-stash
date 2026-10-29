@@ -173,7 +173,7 @@ export function AddSeriesWithStructureModal({ onClose, onSubmit }: AddSeriesWith
                       toast.info('Type at least 2 characters to search catalog')
                     }
                   }}
-                  className="mb-1 flex items-center gap-1.5 px-3 py-2 rounded-[6px] bg-[#14232a] hover:bg-[#1a2f38] border border-accent-cyan/30 text-accent-cyan text-xs font-mono transition-colors shrink-0 cursor-pointer shadow-sm"
+                  className="mb-1 flex items-center gap-1.5 px-3 py-2 rounded-[var(--radius-md)] bg-[#14232a] hover:bg-[#1a2f38] border border-accent-cyan/30 text-accent-cyan text-xs font-mono transition-colors shrink-0 cursor-pointer shadow-sm"
                   title="Search catalog to auto-fill details and seasons"
                 >
                   <Sparkles className="w-4 h-4" />

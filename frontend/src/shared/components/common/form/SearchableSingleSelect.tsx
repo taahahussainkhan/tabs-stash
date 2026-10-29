@@ -114,7 +114,7 @@ export function SearchableSingleSelect({
                 <div className={cn("relative w-full", minimalist && "contents")}>
                     <div className={cn(
                         "flex items-center justify-between transition-colors",
-                        minimalist ? "py-1" : "px-3 py-2 bg-[#15161a] border border-[#2e323c] rounded-[4px]"
+                        minimalist ? "py-1" : "px-3 py-2 bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)]"
                     )}>
                         <div
                             className="flex-1 cursor-pointer"
@@ -174,7 +174,7 @@ export function SearchableSingleSelect({
                             "w-full focus:outline-none transition-colors",
                             minimalist
                                 ? "bg-transparent border-none p-0 text-xs placeholder:text-content-muted/30"
-                                : "bg-[#15161a] border border-[#2e323c] rounded-[4px] py-1.5 pl-8 pr-3 text-xs text-content-primary placeholder:text-content-muted focus:border-accent-vermillion"
+                                : "bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] py-1.5 pl-8 pr-3 text-xs text-content-primary placeholder:text-content-muted focus:border-accent-vermillion"
                         )}
                     />
                 </div>
@@ -182,7 +182,7 @@ export function SearchableSingleSelect({
 
             {/* Dropdown */}
             {isOpen && (
-                <div className="absolute z-50 w-full mt-1 bg-[#1e2026] border border-[#2e323c] rounded-[6px] shadow-2xl max-h-60 overflow-y-auto left-0">
+                <div className="absolute z-50 w-full mt-1 bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] shadow-2xl max-h-60 overflow-y-auto left-0">
                     {query.length === 0 ? (
                         <div className="px-3 py-2 text-xs font-mono text-content-muted text-center cursor-default">
                             Type to search...
@@ -198,7 +198,7 @@ export function SearchableSingleSelect({
                                     key={option.id}
                                     type="button"
                                     onClick={() => handleSelect(option)}
-                                    className="w-full px-3 py-1.5 text-left hover:bg-[#262830] transition-colors flex flex-col rounded-[3px]"
+                                    className="w-full px-3 py-1.5 text-left hover:bg-[var(--surface-light)] transition-colors flex flex-col rounded-[var(--radius-xs)]"
                                 >
                                     <span className="text-xs text-content-primary font-medium">
                                         {option.label}
@@ -216,7 +216,7 @@ export function SearchableSingleSelect({
                             type="button"
                             onClick={handleCreate}
                             disabled={isCreating}
-                            className="w-full px-3 py-2 text-left hover:bg-[#262830] transition-colors flex items-center gap-2 text-xs font-bold text-accent-vermillion"
+                            className="w-full px-3 py-2 text-left hover:bg-[var(--surface-light)] transition-colors flex items-center gap-2 text-xs font-bold text-accent-vermillion"
                         >
                             <Plus size={14} />
                             <span>

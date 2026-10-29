@@ -28,7 +28,7 @@ export function GhostSelect({ value, options, onChange, placeholder = 'Select...
       >
         <option value="" disabled>{placeholder}</option>
         {options.map((o) => (
-          <option key={String(o.value)} value={o.value} className="bg-[#1e2026] text-content-primary">
+          <option key={String(o.value)} value={o.value} className="bg-[var(--surface)] text-content-primary">
             {o.label}
           </option>
         ))}

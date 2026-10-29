@@ -70,10 +70,10 @@ export function TabsPage() {
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#2e323c] pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[var(--border-color)] pb-6">
         <div>
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-[#e05a47]/10 rounded-xl text-[#e05a47] border border-[#e05a47]/20">
+            <div className="p-2.5 bg-[var(--primary)]/10 rounded-xl text-[var(--primary)] border border-[var(--primary)]/20">
               <Layers className="w-6 h-6" />
             </div>
             <div>
@@ -91,7 +91,7 @@ export function TabsPage() {
           <button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="flex items-center gap-2 px-3.5 py-2 bg-[#1e2026] hover:bg-[#252830] border border-[#2e323c] rounded-md text-xs font-semibold text-content-secondary hover:text-content-primary transition-all duration-150 disabled:opacity-50"
+            className="flex items-center gap-2 px-3.5 py-2 bg-[var(--surface)] hover:bg-[#252830] border border-[var(--border-color)] rounded-md text-xs font-semibold text-content-secondary hover:text-content-primary transition-all duration-150 disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
             Refresh
@@ -133,13 +133,13 @@ export function TabsPage() {
         <>
           {isLoadingSessions ? (
             <div className="py-20 text-center text-content-muted">
-              <RefreshCw className="w-8 h-8 animate-spin mx-auto text-[#e05a47] mb-3" />
+              <RefreshCw className="w-8 h-8 animate-spin mx-auto text-[var(--primary)] mb-3" />
               Loading your stashed workspaces...
             </div>
           ) : filteredSessions.length === 0 ? (
-            <div className="py-16 text-center bg-[#17181d] border border-[#2e323c] rounded-2xl p-8 space-y-4">
-              <div className="p-4 bg-[#1e2026] w-fit mx-auto rounded-full text-content-muted">
-                <Sparkles className="w-8 h-8 text-[#e05a47]" />
+            <div className="py-16 text-center bg-[var(--surface-sidebar)] border border-[var(--border-color)] rounded-2xl p-8 space-y-4">
+              <div className="p-4 bg-[var(--surface)] w-fit mx-auto rounded-full text-content-muted">
+                <Sparkles className="w-8 h-8 text-[var(--primary)]" />
               </div>
               <h3 className="text-lg font-bold text-content-primary">
                 {activeTab === 'restored'
@@ -190,8 +190,8 @@ export function TabsPage() {
               Loading your saved reading links...
             </div>
           ) : filteredLinks.length === 0 ? (
-            <div className="py-16 text-center bg-[#17181d] border border-[#2e323c] rounded-2xl p-8 space-y-4">
-              <div className="p-4 bg-[#1e2026] w-fit mx-auto rounded-full text-content-muted">
+            <div className="py-16 text-center bg-[var(--surface-sidebar)] border border-[var(--border-color)] rounded-2xl p-8 space-y-4">
+              <div className="p-4 bg-[var(--surface)] w-fit mx-auto rounded-full text-content-muted">
                 <Bookmark className="w-8 h-8 text-indigo-400" />
               </div>
               <h3 className="text-lg font-bold text-content-primary">No saved links found</h3>

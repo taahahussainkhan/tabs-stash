@@ -49,7 +49,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, hasNext, has
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={!hasPrev}
-        className="flex items-center gap-1 px-2.5 py-1.5 rounded-[4px] bg-[#1e2026] border border-[#2e323c] text-content-secondary hover:text-white hover:bg-[#262830] disabled:opacity-40 disabled:pointer-events-none transition-colors"
+        className="flex items-center gap-1 px-2.5 py-1.5 rounded-[var(--radius-sm)] bg-[var(--surface)] border border-[var(--border-color)] text-content-secondary hover:text-white hover:bg-[var(--surface-light)] disabled:opacity-40 disabled:pointer-events-none transition-colors"
         aria-label="Previous page"
       >
         <ChevronLeft className="w-3.5 h-3.5" />
@@ -71,10 +71,10 @@ export function Pagination({ currentPage, totalPages, onPageChange, hasNext, has
             <button
               key={page}
               onClick={() => onPageChange(page as number)}
-              className={`w-7 h-7 rounded-[4px] font-bold text-xs flex items-center justify-center transition-colors border ${
+              className={`w-7 h-7 rounded-[var(--radius-sm)] font-bold text-xs flex items-center justify-center transition-colors border ${
                 isCurrent 
-                  ? 'bg-[#e05a47] text-white border-[#ff7b68]' 
-                  : 'bg-[#1e2026] border-[#2e323c] text-content-secondary hover:text-white hover:bg-[#262830]'
+                  ? 'bg-[var(--primary)] text-white border-[var(--primary)]' 
+                  : 'bg-[var(--surface)] border-[var(--border-color)] text-content-secondary hover:text-white hover:bg-[var(--surface-light)]'
               }`}
             >
               {page}
@@ -86,7 +86,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, hasNext, has
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={!hasNext}
-        className="flex items-center gap-1 px-2.5 py-1.5 rounded-[4px] bg-[#1e2026] border border-[#2e323c] text-content-secondary hover:text-white hover:bg-[#262830] disabled:opacity-40 disabled:pointer-events-none transition-colors"
+        className="flex items-center gap-1 px-2.5 py-1.5 rounded-[var(--radius-sm)] bg-[var(--surface)] border border-[var(--border-color)] text-content-secondary hover:text-white hover:bg-[var(--surface-light)] disabled:opacity-40 disabled:pointer-events-none transition-colors"
         aria-label="Next page"
       >
         <span className="hidden sm:inline">Next</span>

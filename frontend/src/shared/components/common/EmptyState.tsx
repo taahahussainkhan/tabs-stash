@@ -21,45 +21,45 @@ export interface EmptyStateProps {
 const accentConfig = {
   vermillion: {
     badge: 'mono-badge-vermillion',
-    iconBorder: 'border-[#991b1b]',
-    iconBg: 'bg-[#3b1c18]',
-    iconColor: 'text-[#ff7b68]',
+    iconBorder: 'border-[var(--danger)]',
+    iconBg: 'bg-[var(--primary-soft)]',
+    iconColor: 'text-[var(--primary)]',
     borderLeft: 'border-l-accent-vermillion',
   },
   ochre: {
     badge: 'mono-badge-ochre',
-    iconBorder: 'border-[#78350f]',
-    iconBg: 'bg-[#3b2c12]',
-    iconColor: 'text-[#fbbf24]',
+    iconBorder: 'border-[var(--warning)]',
+    iconBg: 'bg-[var(--warning-soft)]',
+    iconColor: 'text-[var(--warning)]',
     borderLeft: 'border-l-accent-ochre',
   },
   sage: {
     badge: 'mono-badge-sage',
-    iconBorder: 'border-[#1e593a]',
-    iconBg: 'bg-[#143324]',
-    iconColor: 'text-[#4ade80]',
+    iconBorder: 'border-[var(--success)]',
+    iconBg: 'bg-[var(--success-soft)]',
+    iconColor: 'text-[var(--success)]',
     borderLeft: 'border-l-accent-sage',
   },
   cyan: {
     badge: 'mono-badge-cyan',
-    iconBorder: 'border-[#134e4a]',
-    iconBg: 'bg-[#0f2e2b]',
-    iconColor: 'text-[#2dd4bf]',
+    iconBorder: 'border-[var(--success)]',
+    iconBg: 'bg-[var(--success-soft)]',
+    iconColor: 'text-[var(--accent-sage)]',
     borderLeft: 'border-l-accent-cyan',
   },
   indigo: {
     badge: 'mono-badge-indigo',
-    iconBorder: 'border-[#3730a3]',
-    iconBg: 'bg-[#1e1b4b]',
+    iconBorder: 'border-[var(--accent-indigo)]',
+    iconBg: 'bg-[var(--primary-soft)]',
     iconColor: 'text-[#818cf8]',
     borderLeft: 'border-l-accent-indigo',
   },
   slate: {
     badge: 'mono-badge',
-    iconBorder: 'border-[#2e323c]',
-    iconBg: 'bg-[#15161a]',
+    iconBorder: 'border-[var(--border-color)]',
+    iconBg: 'bg-[var(--surface-input)]',
     iconColor: 'text-content-muted',
-    borderLeft: 'border-l-[#2e323c]',
+    borderLeft: 'border-l-[var(--border-color)]',
   },
 }
 
@@ -100,9 +100,9 @@ export function EmptyState({
 
   if (compact) {
     return (
-      <div className={`p-6 rounded-[4px] bg-[#15161a] border border-[#2e323c] text-center space-y-2.5 ${className}`}>
+      <div className={`p-6 rounded-[var(--radius-sm)] bg-[var(--surface-input)] border border-[var(--border-color)] text-center space-y-2.5 ${className}`}>
         {icon && (
-          <div className={`w-8 h-8 rounded-[4px] border ${styles.iconBorder} ${styles.iconBg} ${styles.iconColor} flex items-center justify-center mx-auto`}>
+          <div className={`w-8 h-8 rounded-[var(--radius-sm)] border ${styles.iconBorder} ${styles.iconBg} ${styles.iconColor} flex items-center justify-center mx-auto`}>
             {renderIcon()}
           </div>
         )}
@@ -132,12 +132,12 @@ export function EmptyState({
 
   return (
     <div
-      className={`relative max-w-lg mx-auto text-center py-14 px-8 rounded-[6px] bg-[#1e2026] border border-[#2e323c] border-l-[3px] ${styles.borderLeft} shadow-xl ${className}`}
+      className={`relative max-w-lg mx-auto text-center py-14 px-8 rounded-[var(--radius-md)] bg-[var(--surface)] border border-[var(--border-color)] border-l-[3px] ${styles.borderLeft} shadow-xl ${className}`}
     >
       {/* Icon Badge */}
       {icon && (
         <div
-          className={`w-12 h-12 rounded-[4px] border ${styles.iconBorder} ${styles.iconBg} ${styles.iconColor} flex items-center justify-center mx-auto mb-4 shadow-sm`}
+          className={`w-12 h-12 rounded-[var(--radius-sm)] border ${styles.iconBorder} ${styles.iconBg} ${styles.iconColor} flex items-center justify-center mx-auto mb-4 shadow-sm`}
         >
           {renderIcon()}
         </div>
@@ -190,10 +190,10 @@ export function EmptyState({
       )}
 
       {/* Monospace subtle footer note */}
-      <div className="mt-8 pt-4 border-t border-[#242730] flex items-center justify-center gap-2 text-[10px] font-mono text-content-muted">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#2e323c]" />
+      <div className="mt-8 pt-4 border-t border-[var(--border-subtle)] flex items-center justify-center gap-2 text-[10px] font-mono text-content-muted">
+        <span className="w-1.5 h-1.5 rounded-full bg-[var(--border-color)]" />
         <span>NO ENTRIES IN CURRENT ARCHIVE VIEW</span>
-        <span className="w-1.5 h-1.5 rounded-full bg-[#2e323c]" />
+        <span className="w-1.5 h-1.5 rounded-full bg-[var(--border-color)]" />
       </div>
     </div>
   )

@@ -43,7 +43,7 @@ export function BookDetailPage() {
   if (error || !data) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="bg-[#1e2026] border border-[#2e323c] p-6 rounded-[6px] max-w-md w-full">
+        <div className="bg-[var(--surface)] border border-[var(--border-color)] p-6 rounded-[var(--radius-md)] max-w-md w-full">
           <p className="text-danger font-bold text-sm mb-4">Volume Not Found</p>
           <button 
             className="btn-secondary text-xs px-4 py-2 w-full flex items-center justify-center gap-2" 
@@ -77,8 +77,8 @@ export function BookDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Book Cover & Acquisition */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="bg-[#1e2026] rounded-[6px] p-2 border border-[#2e323c] shadow-lg relative">
-            <div className="aspect-[3/4] rounded-[4px] overflow-hidden bg-[#121316] relative border border-[#2e323c]">
+          <div className="bg-[var(--surface)] rounded-[var(--radius-md)] p-2 border border-[var(--border-color)] shadow-lg relative">
+            <div className="aspect-[3/4] rounded-[var(--radius-sm)] overflow-hidden bg-[var(--background)] relative border border-[var(--border-color)]">
               {edition?.cover_image ? (
                 <img src={edition.cover_image} alt={book?.title} className="w-full h-full object-cover" />
               ) : (
@@ -97,8 +97,8 @@ export function BookDetailPage() {
           </div>
 
           {/* Acquisition Info */}
-          <div className="bg-[#1e2026] rounded-[6px] p-4 border border-[#2e323c] space-y-3 font-mono">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-accent-indigo pb-2 border-b border-[#242730]">
+          <div className="bg-[var(--surface)] rounded-[var(--radius-md)] p-4 border border-[var(--border-color)] space-y-3 font-mono">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-accent-indigo pb-2 border-b border-[var(--border-subtle)]">
               <Building2 size={14} /> Acquisition Record
             </div>
             <div className="space-y-2 text-xs">
@@ -121,7 +121,7 @@ export function BookDetailPage() {
                 </div>
               )}
               {item.paid_price !== undefined && (
-                <div className="flex justify-between items-center pt-2 border-t border-[#242730]">
+                <div className="flex justify-between items-center pt-2 border-t border-[var(--border-subtle)]">
                   <span className="text-content-muted">Purchase Cost</span>
                   <span className="text-accent-ochre font-bold">
                     {item.purchase_currency} {item.paid_price?.toFixed(2)}
@@ -135,7 +135,7 @@ export function BookDetailPage() {
         {/* Right Column: Details & Timeline */}
         <div className="lg:col-span-8 space-y-6">
           {/* Header Details */}
-          <div className="bg-[#1e2026] border border-[#2e323c] rounded-[6px] p-5 space-y-3">
+          <div className="bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] p-5 space-y-3">
             <div className="flex flex-wrap items-center gap-1.5 font-mono">
               <span className="mono-badge mono-badge-indigo">VOLUME</span>
               {book?.genres?.map(genre => (
@@ -173,7 +173,7 @@ export function BookDetailPage() {
               { icon: Globe, label: 'Language', value: edition?.language },
               { icon: Tag, label: 'Condition', value: item.condition },
             ].map((detail, idx) => detail.value && (
-              <div key={idx} className="bg-[#1e2026] rounded-[4px] p-3 border border-[#2e323c]">
+              <div key={idx} className="bg-[var(--surface)] rounded-[var(--radius-sm)] p-3 border border-[var(--border-color)]">
                 <div className="text-[10px] uppercase text-content-muted mb-0.5">{detail.label}</div>
                 <div className="text-xs font-bold text-content-primary truncate">{detail.value}</div>
               </div>
@@ -184,7 +184,7 @@ export function BookDetailPage() {
           <div className="space-y-6">
             {/* Reading History */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between border-b border-[#2e323c] pb-2">
+              <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
                 <h2 className="text-sm font-bold text-content-primary flex items-center gap-2">
                   <History className="w-4 h-4 text-accent-vermillion" /> Reading Sessions
                 </h2>
@@ -196,7 +196,7 @@ export function BookDetailPage() {
               <div className="space-y-3">
                 {sessions.length > 0 ? (
                   sessions.map((session) => (
-                    <div key={session.public_id} className="bg-[#1e2026] border border-[#2e323c] border-l-[3px] border-l-accent-indigo rounded-[6px] p-4 space-y-2.5">
+                    <div key={session.public_id} className="bg-[var(--surface)] border border-[var(--border-color)] border-l-[3px] border-l-accent-indigo rounded-[var(--radius-md)] p-4 space-y-2.5">
                       <div className="flex items-center justify-between gap-4 font-mono text-xs">
                         <div className="flex items-center gap-2">
                           <span className="mono-badge mono-badge-sage text-[10px]">
@@ -215,7 +215,7 @@ export function BookDetailPage() {
                         )}
                       </div>
                       {session.notes && (
-                        <p className="text-xs text-content-secondary leading-relaxed bg-[#15161a] p-2 rounded-[4px] border border-[#2e323c] font-sans">
+                        <p className="text-xs text-content-secondary leading-relaxed bg-[var(--surface-input)] p-2 rounded-[var(--radius-sm)] border border-[var(--border-color)] font-sans">
                           "{session.notes}"
                         </p>
                       )}
@@ -236,7 +236,7 @@ export function BookDetailPage() {
 
             {/* Reader Notes */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between border-b border-[#2e323c] pb-2">
+              <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2">
                 <h2 className="text-sm font-bold text-content-primary flex items-center gap-2">
                   <MessageSquare className="w-4 h-4 text-accent-cyan" /> Marginalia &amp; Reader Notes
                 </h2>
@@ -248,7 +248,7 @@ export function BookDetailPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {comments.length > 0 ? (
                   comments.map(comment => (
-                    <div key={comment.public_id} className="bg-[#1e2026] rounded-[4px] p-3 border border-[#2e323c] space-y-1.5">
+                    <div key={comment.public_id} className="bg-[var(--surface)] rounded-[var(--radius-sm)] p-3 border border-[var(--border-color)] space-y-1.5">
                       <div className="flex items-center justify-between font-mono text-[10px] text-accent-cyan font-bold">
                         <span>{comment.chapter_or_episode ? `Chapter ${comment.chapter_or_episode}` : 'Note'}</span>
                         {comment.timestamp && <span>Page {comment.timestamp}</span>}

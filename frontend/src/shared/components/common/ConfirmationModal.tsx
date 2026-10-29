@@ -14,25 +14,25 @@ const variantConfig = {
   danger: {
     icon: XCircle,
     iconClass: 'text-danger',
-    buttonClass: 'bg-[#271414] hover:bg-[#3b1818] text-danger border-danger/50',
+    buttonClass: 'bg-[var(--danger-soft)] hover:bg-[var(--danger-soft)] text-danger border-danger/50',
     containerClass: 'bg-danger/10 border-danger/20',
   },
   warning: {
     icon: AlertTriangle,
     iconClass: 'text-accent-ochre',
-    buttonClass: 'bg-[#e05a47] hover:bg-[#cc4a38] text-white border-[#ff7b68]',
+    buttonClass: 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white border-[var(--primary)]',
     containerClass: 'bg-accent-ochre/10 border-accent-ochre/20',
   },
   info: {
     icon: Info,
     iconClass: 'text-accent-cyan',
-    buttonClass: 'bg-[#e05a47] hover:bg-[#cc4a38] text-white border-[#ff7b68]',
+    buttonClass: 'bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white border-[var(--primary)]',
     containerClass: 'bg-accent-cyan/10 border-accent-cyan/20',
   },
   success: {
     icon: CheckCircle,
     iconClass: 'text-accent-sage',
-    buttonClass: 'bg-[#38a169] hover:bg-[#2e8555] text-white border-[#4ade80]',
+    buttonClass: 'bg-[var(--success)] hover:bg-[#2e8555] text-white border-[var(--success)]',
     containerClass: 'bg-accent-sage/10 border-accent-sage/20',
   },
 }
@@ -57,7 +57,7 @@ export function ConfirmationModal({
   return (
     <div className="space-y-6">
       <div className="flex items-start gap-4">
-        <div className={`p-2.5 rounded-[4px] border ${config.containerClass} ${config.iconClass} shrink-0`}>
+        <div className={`p-2.5 rounded-[var(--radius-sm)] border ${config.containerClass} ${config.iconClass} shrink-0`}>
           <Icon className="w-6 h-6" />
         </div>
         
@@ -69,17 +69,17 @@ export function ConfirmationModal({
         </div>
       </div>
 
-      <div className="flex justify-end gap-2 pt-4 border-t border-[#2e323c]">
+      <div className="flex justify-end gap-2 pt-4 border-t border-[var(--border-color)]">
         <button 
           type="button" 
-          className="px-4 py-1.5 rounded-[4px] font-semibold text-xs transition-colors bg-[#17181d] hover:bg-[#262830] text-content-secondary hover:text-content-primary border border-[#2e323c]" 
+          className="px-4 py-1.5 rounded-[var(--radius-sm)] font-semibold text-xs transition-colors bg-[var(--surface-sidebar)] hover:bg-[var(--surface-light)] text-content-secondary hover:text-content-primary border border-[var(--border-color)]" 
           onClick={onClose}
         >
           {cancelText}
         </button>
         <button 
           type="button" 
-          className={`px-4 py-1.5 rounded-[4px] font-bold text-xs transition-colors border ${config.buttonClass}`} 
+          className={`px-4 py-1.5 rounded-[var(--radius-sm)] font-bold text-xs transition-colors border ${config.buttonClass}`} 
           onClick={handleConfirm}
         >
           {confirmText}

@@ -23,7 +23,7 @@ export function GenresView({
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="w-8 h-8 rounded-full border-2 border-[#2e323c] border-t-accent-indigo animate-spin mb-3" />
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--border-color)] border-t-accent-indigo animate-spin mb-3" />
         <p className="text-xs font-mono text-content-muted">Loading genres taxonomy...</p>
       </div>
     )
@@ -34,7 +34,7 @@ export function GenresView({
   return (
     <div className="space-y-6 page-fade-in">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[#2e323c]">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[var(--border-color)]">
         <div>
           <div className="flex items-center gap-2 mb-1.5 font-mono">
             <span className="mono-badge mono-badge-indigo">TAXONOMY</span>
@@ -50,7 +50,7 @@ export function GenresView({
           <input
             type="text"
             placeholder="New genre or theme..."
-            className="input-modern bg-[#15161a] border border-[#2e323c] rounded-[4px] px-3 py-1.5 text-xs text-content-primary placeholder:text-content-muted focus:border-accent-indigo outline-none w-48 sm:w-60"
+            className="input-modern bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] px-3 py-1.5 text-xs text-content-primary placeholder:text-content-muted focus:border-accent-indigo outline-none w-48 sm:w-60"
             value={newGenreName}
             onChange={e => setNewGenreName(e.target.value)}
           />
@@ -72,7 +72,7 @@ export function GenresView({
             <Network className="w-3.5 h-3.5 text-accent-indigo" />
             <span>Thematic Classification Graph</span>
           </div>
-          <div className="rounded-[6px] overflow-hidden border border-[#2e323c] bg-[#1e2026] p-1">
+          <div className="rounded-[var(--radius-md)] overflow-hidden border border-[var(--border-color)] bg-[var(--surface)] p-1">
             <GenreNetworkGraph data={displayData} />
           </div>
         </section>
@@ -81,19 +81,19 @@ export function GenresView({
       {/* Main Content */}
       <div className="space-y-4">
         {displayData.length > 0 ? (
-          <div className="bg-[#1e2026] rounded-[6px] border border-[#2e323c] overflow-hidden">
+          <div className="bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border-color)] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-[#2e323c] bg-[#17181d]">
+                  <tr className="border-b border-[var(--border-color)] bg-[var(--surface-sidebar)]">
                     <th className="py-3 px-4 text-[10px] font-mono font-bold uppercase tracking-wider text-content-muted">Genre Name</th>
                     <th className="hidden sm:table-cell py-3 px-4 text-[10px] font-mono font-bold uppercase tracking-wider text-content-muted">Identifier Slug</th>
                     <th className="text-center py-3 px-4 text-[10px] font-mono font-bold uppercase tracking-wider text-content-muted">Volumes</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#242730] text-xs">
+                <tbody className="divide-y divide-[var(--border-subtle)] text-xs">
                   {displayData.map((item) => (
-                    <tr key={item.genre.id} className="hover:bg-[#262830] transition-colors group">
+                    <tr key={item.genre.id} className="hover:bg-[var(--surface-light)] transition-colors group">
                       <td className="py-3 px-4">
                         <div className="font-semibold text-content-primary group-hover:text-accent-indigo transition-colors flex items-center gap-1.5">
                           <Hash className="w-3 h-3 text-content-muted" />
@@ -101,7 +101,7 @@ export function GenresView({
                         </div>
                       </td>
                       <td className="hidden sm:table-cell py-3 px-4 font-mono text-content-secondary">
-                        <span className="bg-[#15161a] border border-[#2e323c] px-2 py-0.5 rounded-[3px] text-[11px]">
+                        <span className="bg-[var(--surface-input)] border border-[var(--border-color)] px-2 py-0.5 rounded-[var(--radius-xs)] text-[11px]">
                           {item.genre.slug}
                         </span>
                       </td>

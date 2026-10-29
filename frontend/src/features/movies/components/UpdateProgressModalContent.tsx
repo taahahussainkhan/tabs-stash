@@ -28,7 +28,7 @@ export function UpdateProgressModalContent({ onClose, onSubmit, movie }: UpdateP
   })
 
   return (
-    <div className="flex flex-col h-full bg-[#1e2026]">
+    <div className="flex flex-col h-full bg-[var(--surface)]">
       <form
         onSubmit={(e) => {
           e.preventDefault()
@@ -93,7 +93,7 @@ export function UpdateProgressModalContent({ onClose, onSubmit, movie }: UpdateP
           <form.Subscribe
             selector={(state) => state.values.status}
             children={(status) => status === 'paused' && (
-              <div className="space-y-2 pt-4 border-t border-[#242730] animate-in fade-in duration-150">
+              <div className="space-y-2 pt-4 border-t border-[var(--border-subtle)] animate-in fade-in duration-150">
                 <div className="flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-content-muted/40 px-1">
                   <AlignLeft className="w-3.5 h-3.5" />
                   <span>Pause Reason</span>
@@ -116,7 +116,7 @@ export function UpdateProgressModalContent({ onClose, onSubmit, movie }: UpdateP
         </div>
 
         {/* Footer */}
-        <div className="px-6 sm:px-10 py-4 border-t border-[#2e323c] flex items-center justify-between gap-4 bg-[#17181d] shrink-0">
+        <div className="px-6 sm:px-10 py-4 border-t border-[var(--border-color)] flex items-center justify-between gap-4 bg-[var(--surface-sidebar)] shrink-0">
           <button 
             type="button" 
             className="text-xs font-medium text-content-muted hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer" 

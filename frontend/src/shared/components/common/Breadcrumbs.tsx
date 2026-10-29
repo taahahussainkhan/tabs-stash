@@ -25,7 +25,7 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     <div className="flex items-center gap-3 mb-6 animate-in fade-in duration-200">
       <button
         onClick={() => navigate(backHref)}
-        className="w-8 h-8 rounded-[4px] flex items-center justify-center bg-[#1e2026] border border-[#2e323c] text-content-secondary hover:text-white hover:bg-[#262830] transition-colors"
+        className="w-8 h-8 rounded-[var(--radius-sm)] flex items-center justify-center bg-[var(--surface)] border border-[var(--border-color)] text-content-secondary hover:text-white hover:bg-[var(--surface-light)] transition-colors"
         title={backLabel}
       >
         <ArrowLeft className="w-4 h-4" />

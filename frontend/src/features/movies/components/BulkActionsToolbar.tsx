@@ -66,7 +66,7 @@ export function BulkActionsToolbar({
         transform: `translate(calc(-50% + ${position.x}px), ${position.y}px)`
       }}
     >
-      <div className="bg-[#1e2026] text-content-primary border border-[#2e323c] shadow-2xl rounded-[6px] px-3.5 py-2 flex items-center justify-between gap-3">
+      <div className="bg-[var(--surface)] text-content-primary border border-[var(--border-color)] shadow-2xl rounded-[var(--radius-md)] px-3.5 py-2 flex items-center justify-between gap-3">
         <div
           className="cursor-move text-content-muted hover:text-content-primary transition-colors"
           onMouseDown={handleDragStart}
@@ -79,15 +79,15 @@ export function BulkActionsToolbar({
           <span>{selectedCount} SELECTED</span>
         </div>
 
-        <div className="h-4 w-px bg-[#2e323c]" />
+        <div className="h-4 w-px bg-[var(--border-color)]" />
 
         <div className="flex items-center gap-1.5">
           <div className="dropdown dropdown-top dropdown-end">
-            <button tabIndex={0} className="px-2.5 py-1 rounded-[3px] bg-[#121316] border border-[#2e323c] text-xs font-semibold hover:bg-[#262830] transition-colors flex items-center gap-1">
+            <button tabIndex={0} className="px-2.5 py-1 rounded-[var(--radius-xs)] bg-[var(--background)] border border-[var(--border-color)] text-xs font-semibold hover:bg-[var(--surface-light)] transition-colors flex items-center gap-1">
               <Download className="w-3 h-3" />
               <span>Export</span>
             </button>
-            <ul tabIndex={0} className="dropdown-content menu p-1 bg-[#1e2026] border border-[#2e323c] rounded-[4px] shadow-2xl w-32 mb-1">
+            <ul tabIndex={0} className="dropdown-content menu p-1 bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-sm)] shadow-2xl w-32 mb-1">
               <li>
                 <button onClick={handleExportCSV} className="text-xs py-1">
                   <FileText className="w-3 h-3" /> CSV
@@ -102,7 +102,7 @@ export function BulkActionsToolbar({
           </div>
 
           <button
-            className="px-2.5 py-1 rounded-[3px] bg-[#271414] border border-danger/40 text-danger hover:bg-[#3b1818] text-xs font-semibold transition-colors flex items-center gap-1"
+            className="px-2.5 py-1 rounded-[var(--radius-xs)] bg-[var(--danger-soft)] border border-danger/40 text-danger hover:bg-[var(--danger-soft)] text-xs font-semibold transition-colors flex items-center gap-1"
             onClick={onDelete}
           >
             <Trash2 className="w-3 h-3" />
@@ -110,7 +110,7 @@ export function BulkActionsToolbar({
           </button>
 
           <button
-            className="p-1 rounded-[3px] hover:bg-[#262830] text-content-muted hover:text-white transition-colors ml-1"
+            className="p-1 rounded-[var(--radius-xs)] hover:bg-[var(--surface-light)] text-content-muted hover:text-white transition-colors ml-1"
             onClick={onClearSelection}
             title="Clear selection"
           >

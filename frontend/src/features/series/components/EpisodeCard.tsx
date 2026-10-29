@@ -23,11 +23,11 @@ export function EpisodeCard({
   return (
     <div
       onClick={onEpisodeClick}
-      className={`group bg-[#15161a] hover:bg-[#1e2026] rounded-[4px] border border-[#2e323c] hover:border-[#d97706] transition-colors cursor-pointer overflow-hidden flex flex-col justify-between ${
+      className={`group bg-[var(--surface-input)] hover:bg-[var(--surface)] rounded-[var(--radius-sm)] border border-[var(--border-color)] hover:border-[#d97706] transition-colors cursor-pointer overflow-hidden flex flex-col justify-between ${
         isWatched
-          ? 'border-l-2 border-l-[#4ade80]'
+          ? 'border-l-2 border-l-[var(--success)]'
           : isInProgress
-          ? 'border-l-2 border-l-[#2dd4bf]'
+          ? 'border-l-2 border-l-[var(--accent-sage)]'
           : 'border-l-2 border-l-[#6366f1]'
       }`}
     >
@@ -41,22 +41,22 @@ export function EpisodeCard({
 
             {/* Status Badge with solid colors */}
             {isWatched ? (
-              <span className="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase font-bold text-[#4ade80] bg-[#143324] border border-[#1e593a]">
+              <span className="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase font-bold text-[var(--success)] bg-[var(--success-soft)] border border-[var(--success)]">
                 Watched
               </span>
             ) : isInProgress ? (
-              <span className="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase font-bold text-[#2dd4bf] bg-[#0f2e2b] border border-[#134e4a]">
+              <span className="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase font-bold text-[var(--accent-sage)] bg-[var(--success-soft)] border border-[var(--success)]">
                 In Progress
               </span>
             ) : (
-              <span className="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase font-bold text-[#a5b4fc] bg-[#1e1b4b] border border-[#3730a3]">
+              <span className="px-1.5 py-0.5 rounded text-[8px] font-mono uppercase font-bold text-[var(--accent-indigo)] bg-[var(--primary-soft)] border border-[var(--accent-indigo)]">
                 To Watch
               </span>
             )}
           </div>
 
           <div className="flex items-center gap-1">
-            {hasComments && <MessageSquare className="w-3.5 h-3.5 text-[#2dd4bf]" />}
+            {hasComments && <MessageSquare className="w-3.5 h-3.5 text-[var(--accent-sage)]" />}
 
             {/* Direct 1-click Quick Toggle Button */}
             {onToggleWatched && (
@@ -69,14 +69,14 @@ export function EpisodeCard({
                 disabled={isTogglingWatched}
                 title={isWatched ? 'Mark as to watch (unwatched)' : 'Quick mark as completed'}
                 aria-label={isWatched ? 'Mark unwatched' : 'Mark watched'}
-                className="p-1 rounded bg-[#1e2026] hover:bg-[#2e323c] border border-[#2e323c] transition-all text-[#9ca3af] hover:text-[#ffffff]"
+                className="p-1 rounded bg-[var(--surface)] hover:bg-[var(--border-color)] border border-[var(--border-color)] transition-all text-[var(--content-secondary)] hover:text-[#ffffff]"
               >
                 {isTogglingWatched ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin text-[#d97706]" />
                 ) : isWatched ? (
-                  <CheckCircle2 className="w-4 h-4 text-[#4ade80] hover:scale-110 transition-transform" />
+                  <CheckCircle2 className="w-4 h-4 text-[var(--success)] hover:scale-110 transition-transform" />
                 ) : (
-                  <Circle className="w-4 h-4 text-[#6b7280] hover:text-[#4ade80] hover:scale-110 transition-transform" />
+                  <Circle className="w-4 h-4 text-[#6b7280] hover:text-[var(--success)] hover:scale-110 transition-transform" />
                 )}
               </button>
             )}
@@ -90,12 +90,12 @@ export function EpisodeCard({
         <div className="flex flex-wrap items-center gap-2 text-[10px] font-mono text-content-muted">
           {episode.duration && (
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3 text-[#9ca3af]" />
+              <Clock className="w-3 h-3 text-[var(--content-secondary)]" />
               {episode.duration}m
             </span>
           )}
           {episode.rating != null && (
-            <span className="flex items-center gap-0.5 text-[#fbbf24] font-bold">
+            <span className="flex items-center gap-0.5 text-[var(--warning)] font-bold">
               <Star className="w-3 h-3 fill-current" />
               ★ {episode.rating.toFixed(1)}
             </span>
@@ -103,13 +103,13 @@ export function EpisodeCard({
         </div>
 
         {episode.notes && (
-          <p className="text-[10px] text-content-secondary italic mt-2 line-clamp-1 pl-2 border-l border-[#2e323c]">
+          <p className="text-[10px] text-content-secondary italic mt-2 line-clamp-1 pl-2 border-l border-[var(--border-color)]">
             {episode.notes}
           </p>
         )}
 
         {/* Quick Action Footer */}
-        <div className="mt-3 pt-2 border-t border-[#242730] flex items-center gap-1.5 transition-opacity">
+        <div className="mt-3 pt-2 border-t border-[var(--border-subtle)] flex items-center gap-1.5 transition-opacity">
           {onToggleWatched && (
             <button
               type="button"
@@ -118,10 +118,10 @@ export function EpisodeCard({
                 onToggleWatched(e)
               }}
               disabled={isTogglingWatched}
-              className={`flex-1 h-6 rounded-[3px] border text-[10px] font-mono font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${
+              className={`flex-1 h-6 rounded-[var(--radius-xs)] border text-[10px] font-mono font-bold uppercase transition-all flex items-center justify-center gap-1.5 ${
                 isWatched
-                  ? 'bg-[#1a1c23] hover:bg-[#232630] border-[#2e323c] text-[#9ca3af] hover:text-white'
-                  : 'bg-[#143324] hover:bg-[#1a4430] border-[#1e593a] text-[#4ade80] hover:text-white'
+                  ? 'bg-[#1a1c23] hover:bg-[#232630] border-[var(--border-color)] text-[var(--content-secondary)] hover:text-white'
+                  : 'bg-[var(--success-soft)] hover:bg-[#1a4430] border-[var(--success)] text-[var(--success)] hover:text-white'
               }`}
             >
               {isTogglingWatched ? (
@@ -146,7 +146,7 @@ export function EpisodeCard({
               e.stopPropagation()
               onAddComments()
             }}
-            className="h-6 px-2.5 rounded-[3px] bg-[#1e2026] hover:bg-[#262830] border border-[#2e323c] text-[10px] font-mono font-bold uppercase text-content-secondary hover:text-white transition-colors flex items-center justify-center gap-1"
+            className="h-6 px-2.5 rounded-[var(--radius-xs)] bg-[var(--surface)] hover:bg-[var(--surface-light)] border border-[var(--border-color)] text-[10px] font-mono font-bold uppercase text-content-secondary hover:text-white transition-colors flex items-center justify-center gap-1"
           >
             <MessageSquare className="w-2.5 h-2.5" />
             <span>Note</span>

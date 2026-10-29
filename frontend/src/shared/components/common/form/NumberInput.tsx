@@ -40,7 +40,7 @@ export function NumberInput({
     size === 'lg' ? 'h-11 px-4 text-sm' : 
     'h-9 px-3 text-xs'
 
-  const inputBaseClass = `input-modern w-full font-mono text-center bg-[#15161a] border border-[#2e323c] rounded-[4px] focus:border-accent-vermillion text-content-primary transition-colors ${sizeClass} ${error ? 'border-danger/60 focus:border-danger' : ''} ${className}`
+  const inputBaseClass = `input-modern w-full font-mono text-center bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] focus:border-accent-vermillion text-content-primary transition-colors ${sizeClass} ${error ? 'border-danger/60 focus:border-danger' : ''} ${className}`
 
   const handleIncrement = () => {
     const currentValue = typeof value === 'number' ? value : parseFloat(value as string) || 0
@@ -82,7 +82,7 @@ export function NumberInput({
           <button
             type="button"
             onClick={handleDecrement}
-            className="absolute left-1.5 z-20 w-6 h-6 flex items-center justify-center rounded-[3px] bg-[#1e2026] hover:bg-[#262830] text-content-muted hover:text-content-primary border border-[#2e323c] transition-colors"
+            className="absolute left-1.5 z-20 w-6 h-6 flex items-center justify-center rounded-[var(--radius-xs)] bg-[var(--surface)] hover:bg-[var(--surface-light)] text-content-muted hover:text-content-primary border border-[var(--border-color)] transition-colors"
             aria-label="Decrease value"
           >
             <Minus className="w-3 h-3" />
@@ -105,7 +105,7 @@ export function NumberInput({
           <button
             type="button"
             onClick={handleIncrement}
-            className="absolute right-1.5 z-20 w-6 h-6 flex items-center justify-center rounded-[3px] bg-[#1e2026] hover:bg-[#262830] text-content-muted hover:text-content-primary border border-[#2e323c] transition-colors"
+            className="absolute right-1.5 z-20 w-6 h-6 flex items-center justify-center rounded-[var(--radius-xs)] bg-[var(--surface)] hover:bg-[var(--surface-light)] text-content-muted hover:text-content-primary border border-[var(--border-color)] transition-colors"
             aria-label="Increase value"
           >
             <Plus className="w-3 h-3" />

@@ -125,7 +125,7 @@ export function SearchableMultiSelect({
                     "flex flex-wrap items-center gap-1.5 transition-colors cursor-text",
                     minimalist
                         ? "contents"
-                        : "bg-[#15161a] border border-[#2e323c] rounded-[4px] p-1.5 focus-within:border-accent-vermillion"
+                        : "bg-[var(--surface-input)] border border-[var(--border-color)] rounded-[var(--radius-sm)] p-1.5 focus-within:border-accent-vermillion"
                 )}
                 onClick={() => wrapperRef.current?.querySelector('input')?.focus()}
             >
@@ -175,7 +175,7 @@ export function SearchableMultiSelect({
 
             {/* Dropdown */}
             {isOpen && (
-                <div className="absolute z-50 w-full mt-1 bg-[#1e2026] border border-[#2e323c] rounded-[6px] shadow-2xl max-h-60 overflow-y-auto left-0">
+                <div className="absolute z-50 w-full mt-1 bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] shadow-2xl max-h-60 overflow-y-auto left-0">
                     {query.length === 0 ? (
                         <div className="px-3 py-2 text-xs font-mono text-content-muted text-center cursor-default">
                             Type to search...
@@ -191,7 +191,7 @@ export function SearchableMultiSelect({
                                     key={option.id}
                                     type="button"
                                     onClick={() => handleSelect(option)}
-                                    className="w-full px-3 py-1.5 text-left hover:bg-[#262830] transition-colors flex flex-col rounded-[3px]"
+                                    className="w-full px-3 py-1.5 text-left hover:bg-[var(--surface-light)] transition-colors flex flex-col rounded-[var(--radius-xs)]"
                                 >
                                     <span className="text-xs text-content-primary font-medium">
                                         {option.label}
@@ -209,7 +209,7 @@ export function SearchableMultiSelect({
                             type="button"
                             onClick={handleCreate}
                             disabled={isCreating}
-                            className="w-full px-3 py-2 text-left hover:bg-[#262830] transition-colors flex items-center gap-2 text-xs font-bold text-accent-vermillion"
+                            className="w-full px-3 py-2 text-left hover:bg-[var(--surface-light)] transition-colors flex items-center gap-2 text-xs font-bold text-accent-vermillion"
                         >
                             <Plus size={14} />
                             <span>

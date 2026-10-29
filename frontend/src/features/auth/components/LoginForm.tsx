@@ -88,7 +88,7 @@ export function LoginForm() {
         <label className="flex items-center gap-2 cursor-pointer">
           <input 
             type="checkbox" 
-            className="w-3.5 h-3.5 rounded-[2px] border-[#2e323c] bg-[#15161a] accent-accent-vermillion" 
+            className="w-3.5 h-3.5 rounded-[2px] border-[var(--border-color)] bg-[var(--surface-input)] accent-accent-vermillion" 
           />
           <span className="text-content-muted text-[11px] font-mono">Remember session</span>
         </label>

@@ -89,8 +89,8 @@ export function Table<T extends object>({
 
   if (data.length === 0) {
     return (
-      <div className="border border-[#2e323c] rounded-[6px] bg-[#1e2026] p-12 text-center">
-        <div className="w-10 h-10 rounded-[4px] bg-[#15161a] border border-[#2e323c] flex items-center justify-center mx-auto mb-3 text-content-muted">
+      <div className="border border-[var(--border-color)] rounded-[var(--radius-md)] bg-[var(--surface)] p-12 text-center">
+        <div className="w-10 h-10 rounded-[var(--radius-sm)] bg-[var(--surface-input)] border border-[var(--border-color)] flex items-center justify-center mx-auto mb-3 text-content-muted">
           <MoreVertical className="w-4 h-4 opacity-40" />
         </div>
         <div className="mono-badge mono-badge text-[9px] mb-1 inline-block">TABLE ARCHIVE</div>
@@ -103,7 +103,7 @@ export function Table<T extends object>({
   return (
     <div 
       ref={parentRef}
-      className="overflow-auto w-full max-h-[700px] border border-[#2e323c] rounded-[6px] bg-[#1e2026]"
+      className="overflow-auto w-full max-h-[700px] border border-[var(--border-color)] rounded-[var(--radius-md)] bg-[var(--surface)]"
     >
       <div 
         style={{
@@ -113,13 +113,13 @@ export function Table<T extends object>({
         }}
       >
         <table className="w-full text-left border-collapse table-fixed">
-          <thead className="sticky top-0 z-10 bg-[#17181d] border-b border-[#2e323c]">
+          <thead className="sticky top-0 z-10 bg-[var(--surface-sidebar)] border-b border-[var(--border-color)]">
             <tr>
               {selectable && (
                 <th className="px-4 py-3 w-10">
                   <input
                     type="checkbox"
-                    className="w-3.5 h-3.5 rounded-[2px] border-[#2e323c] bg-[#121316] text-[#e05a47] accent-[#e05a47] transition-all cursor-pointer"
+                    className="w-3.5 h-3.5 rounded-[2px] border-[var(--border-color)] bg-[var(--background)] text-[var(--primary)] accent-[var(--primary)] transition-all cursor-pointer"
                     checked={isAllSelected()}
                     onChange={handleSelectAll}
                   />
@@ -146,8 +146,8 @@ export function Table<T extends object>({
                   key={virtualRow.key}
                   data-index={virtualRow.index}
                   ref={rowVirtualizer.measureElement}
-                  className={`hover:bg-[#262830] transition-colors group absolute w-full flex items-center border-b border-[#242730] ${
-                    isSelected(row) ? 'bg-[#2a2223] border-l-2 border-l-[#e05a47]' : ''
+                  className={`hover:bg-[var(--surface-light)] transition-colors group absolute w-full flex items-center border-b border-[var(--border-subtle)] ${
+                    isSelected(row) ? 'bg-[#2a2223] border-l-2 border-l-[var(--primary)]' : ''
                   }`}
                   style={{
                     transform: `translateY(${virtualRow.start}px)`,
@@ -158,7 +158,7 @@ export function Table<T extends object>({
                     <td className="px-4 py-3 w-10">
                       <input
                         type="checkbox"
-                        className="w-3.5 h-3.5 rounded-[2px] border-[#2e323c] bg-[#121316] text-[#e05a47] accent-[#e05a47] transition-all cursor-pointer"
+                        className="w-3.5 h-3.5 rounded-[2px] border-[var(--border-color)] bg-[var(--background)] text-[var(--primary)] accent-[var(--primary)] transition-all cursor-pointer"
                         checked={isSelected(row)}
                         onChange={() => handleSelectRow(row)}
                       />
@@ -177,15 +177,15 @@ export function Table<T extends object>({
                   {actions && (
                     <td className="px-4 py-3 w-16 text-right">
                       <div className="relative inline-block text-left dropdown dropdown-end">
-                        <button tabIndex={0} className="p-1 rounded-[4px] text-content-muted hover:text-content-primary hover:bg-[#262830] transition-all">
+                        <button tabIndex={0} className="p-1 rounded-[var(--radius-sm)] text-content-muted hover:text-content-primary hover:bg-[var(--surface-light)] transition-all">
                           <MoreVertical className="w-3.5 h-3.5" />
                         </button>
-                        <ul tabIndex={0} className="dropdown-content z-20 menu p-1 bg-[#1e2026] border border-[#2e323c] rounded-[6px] shadow-2xl w-36 mt-1">
+                        <ul tabIndex={0} className="dropdown-content z-20 menu p-1 bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] shadow-2xl w-36 mt-1">
                           {actions.map((action, actionIndex) => (
                             <li key={actionIndex}>
                               <button 
                                 onClick={() => action.onClick(row)}
-                                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-[3px] text-xs font-medium transition-colors hover:bg-[#262830] ${action.className || 'text-content-secondary'}`}
+                                className={`flex items-center gap-2 px-2.5 py-1.5 rounded-[var(--radius-xs)] text-xs font-medium transition-colors hover:bg-[var(--surface-light)] ${action.className || 'text-content-secondary'}`}
                               >
                                 {action.label}
                               </button>

@@ -25,7 +25,7 @@ export function AuthorsView({
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="w-8 h-8 rounded-full border-2 border-[#2e323c] border-t-accent-indigo animate-spin mb-3" />
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--border-color)] border-t-accent-indigo animate-spin mb-3" />
         <p className="text-xs font-mono text-content-muted">Loading author registry...</p>
       </div>
     )
@@ -34,7 +34,7 @@ export function AuthorsView({
   return (
     <div className="space-y-6 page-fade-in">
       {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[#2e323c]">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-4 border-b border-[var(--border-color)]">
         <div>
           <div className="flex items-center gap-2 mb-1.5 font-mono">
             <span className="mono-badge mono-badge-indigo">AUTHORS</span>
@@ -62,7 +62,7 @@ export function AuthorsView({
             <Network className="w-3.5 h-3.5 text-accent-indigo" />
             <span>Author Connections Nexus</span>
           </div>
-          <div className="rounded-[6px] overflow-hidden border border-[#2e323c] bg-[#1e2026] p-1">
+          <div className="rounded-[var(--radius-md)] overflow-hidden border border-[var(--border-color)] bg-[var(--surface)] p-1">
             <AuthorNetworkGraph data={networkData} />
           </div>
         </section>
@@ -71,11 +71,11 @@ export function AuthorsView({
       {/* Main Content */}
       <div className="space-y-4">
         {authors && authors.length > 0 ? (
-          <div className="bg-[#1e2026] rounded-[6px] border border-[#2e323c] overflow-hidden">
+          <div className="bg-[var(--surface)] rounded-[var(--radius-md)] border border-[var(--border-color)] overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-[#2e323c] bg-[#17181d]">
+                  <tr className="border-b border-[var(--border-color)] bg-[var(--surface-sidebar)]">
                     <th className="py-3 px-4 text-[10px] font-mono font-bold uppercase tracking-wider text-content-muted">Name</th>
                     <th className="hidden md:table-cell py-3 px-4 text-[10px] font-mono font-bold uppercase tracking-wider text-content-muted">Language</th>
                     <th className="hidden lg:table-cell py-3 px-4 text-[10px] font-mono font-bold uppercase tracking-wider text-content-muted">Country</th>
@@ -84,9 +84,9 @@ export function AuthorsView({
                     <th className="text-right py-3 px-4 text-[10px] font-mono font-bold uppercase tracking-wider text-content-muted">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#242730] text-xs">
+                <tbody className="divide-y divide-[var(--border-subtle)] text-xs">
                   {authors.map((author) => (
-                    <tr key={author.id} className="hover:bg-[#262830] transition-colors group">
+                    <tr key={author.id} className="hover:bg-[var(--surface-light)] transition-colors group">
                       <td className="py-3 px-4">
                         <div className="font-semibold text-content-primary group-hover:text-accent-indigo transition-colors">{author.name}</div>
                         {author.bio && (
@@ -112,19 +112,19 @@ export function AuthorsView({
                       <td className="py-3 px-4 text-right">
                         <div className="flex justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Link to={`/authors/${author.id}`}>
-                            <button className="p-1 rounded-[3px] text-content-muted hover:text-white bg-[#15161a] border border-[#2e323c]" title="View Profile">
+                            <button className="p-1 rounded-[var(--radius-xs)] text-content-muted hover:text-white bg-[var(--surface-input)] border border-[var(--border-color)]" title="View Profile">
                               <UserCircle className="w-3.5 h-3.5" />
                             </button>
                           </Link>
                           <button
-                            className="p-1 rounded-[3px] text-content-muted hover:text-white bg-[#15161a] border border-[#2e323c]"
+                            className="p-1 rounded-[var(--radius-xs)] text-content-muted hover:text-white bg-[var(--surface-input)] border border-[var(--border-color)]"
                             onClick={() => handleEditAuthor(author)}
                             title="Edit"
                           >
                             <Pen className="w-3.5 h-3.5" />
                           </button>
                           <button
-                            className="p-1 rounded-[3px] text-danger hover:bg-danger/10 bg-[#15161a] border border-danger/30"
+                            className="p-1 rounded-[var(--radius-xs)] text-danger hover:bg-danger/10 bg-[var(--surface-input)] border border-danger/30"
                             onClick={() => handleDeleteAuthor(author)}
                             title="Delete"
                           >

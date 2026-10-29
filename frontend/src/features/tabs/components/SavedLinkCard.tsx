@@ -21,12 +21,12 @@ export const SavedLinkCard: React.FC<SavedLinkCardProps> = ({
 }) => {
   return (
     <div
-      className={`bg-[#17181d] border rounded-xl p-4 flex items-center justify-between gap-3 transition-all ${
+      className={`bg-[var(--surface-sidebar)] border rounded-xl p-4 flex items-center justify-between gap-3 transition-all ${
         isSelected
           ? 'border-indigo-500 bg-[#1e1f2b]'
           : link.isRead
-          ? 'border-[#2e323c]/60 opacity-75'
-          : 'border-[#2e323c] hover:border-[#3e4350]'
+          ? 'border-[var(--border-color)]/60 opacity-75'
+          : 'border-[var(--border-color)] hover:border-[#3e4350]'
       }`}
     >
       <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -34,7 +34,7 @@ export const SavedLinkCard: React.FC<SavedLinkCardProps> = ({
           type="checkbox"
           checked={isSelected}
           onChange={() => onToggleSelect(link.id)}
-          className="rounded border-[#2e323c] bg-[#1e2026] text-indigo-600 focus:ring-0 w-4 h-4 cursor-pointer"
+          className="rounded border-[var(--border-color)] bg-[var(--surface)] text-indigo-600 focus:ring-0 w-4 h-4 cursor-pointer"
         />
 
         <img
@@ -57,7 +57,7 @@ export const SavedLinkCard: React.FC<SavedLinkCardProps> = ({
             {link.title || link.hostname || 'Saved Link'}
           </a>
           <div className="flex items-center gap-2 mt-1 text-[11px] text-content-muted">
-            <span className="px-1.5 py-0.5 bg-[#1e2026] border border-[#2e323c] rounded font-mono">
+            <span className="px-1.5 py-0.5 bg-[var(--surface)] border border-[var(--border-color)] rounded font-mono">
               {link.hostname}
             </span>
             <span>•</span>
@@ -82,7 +82,7 @@ export const SavedLinkCard: React.FC<SavedLinkCardProps> = ({
           className={`p-1.5 rounded transition-colors ${
             link.isRead
               ? 'text-emerald-400 hover:bg-emerald-400/10'
-              : 'text-content-muted hover:text-content-primary hover:bg-[#1e2026]'
+              : 'text-content-muted hover:text-content-primary hover:bg-[var(--surface)]'
           }`}
           title={link.isRead ? 'Mark as unread' : 'Mark as read'}
         >
@@ -91,7 +91,7 @@ export const SavedLinkCard: React.FC<SavedLinkCardProps> = ({
 
         <button
           onClick={() => onCopyUrl(link.url)}
-          className="p-1.5 text-content-muted hover:text-content-primary hover:bg-[#1e2026] rounded transition-colors"
+          className="p-1.5 text-content-muted hover:text-content-primary hover:bg-[var(--surface)] rounded transition-colors"
           title="Copy URL"
         >
           <Copy className="w-4 h-4" />
@@ -101,7 +101,7 @@ export const SavedLinkCard: React.FC<SavedLinkCardProps> = ({
           href={link.url}
           target="_blank"
           rel="noreferrer"
-          className="p-1.5 text-content-muted hover:text-content-primary hover:bg-[#1e2026] rounded transition-colors"
+          className="p-1.5 text-content-muted hover:text-content-primary hover:bg-[var(--surface)] rounded transition-colors"
           title="Open in new tab"
         >
           <ExternalLink className="w-4 h-4" />

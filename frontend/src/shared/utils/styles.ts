@@ -3,26 +3,26 @@ export const getStatusColorClass = (status: string) => {
     case 'completed':
     case 'read':
     case 'finished':
-      return 'text-[#4ade80] bg-[#143324] border-[#1e593a]'
+      return 'text-[var(--success)] bg-[var(--success-soft)] border-[var(--success)]'
     case 'watching':
     case 'reading':
-      return 'text-[#2dd4bf] bg-[#0f2e2b] border-[#134e4a]'
+      return 'text-[var(--accent-sage)] bg-[var(--success-soft)] border-[var(--success)]'
     case 'paused':
     case 'on-hold':
-      return 'text-[#fbbf24] bg-[#3b2c12] border-[#78350f]'
+      return 'text-[var(--warning)] bg-[var(--warning-soft)] border-[var(--warning)]'
     case 'dropped':
-      return 'text-[#f87171] bg-[#3b1818] border-[#7f1d1d]'
+      return 'text-[var(--danger)] bg-[var(--danger-soft)] border-[var(--danger)]'
     case 'planning':
     case 'wishlist':
     case 'want-to-read':
     case 'to_watch':
     case 'to-watch':
-      return 'text-[#a5b4fc] bg-[#1e1b4b] border-[#3730a3]'
+      return 'text-[var(--accent-indigo)] bg-[var(--primary-soft)] border-[var(--accent-indigo)]'
     case 'rewatching':
     case 'rereading':
-      return 'text-[#ff7b68] bg-[#3b1c18] border-[#991b1b]'
+      return 'text-[var(--primary)] bg-[var(--primary-soft)] border-[var(--danger)]'
     default:
-      return 'text-content-muted bg-[#191b20] border-[#2e323c]'
+      return 'text-content-muted bg-[var(--surface-secondary)] border-[var(--border-color)]'
   }
 }
 
@@ -31,24 +31,24 @@ export const getStatusDotClass = (status: string) => {
     case 'completed':
     case 'read':
     case 'finished':
-      return 'bg-[#38a169]'
+      return 'bg-[var(--success)]'
     case 'watching':
     case 'reading':
-      return 'bg-[#0d9488]'
+      return 'bg-[var(--accent-sage)]'
     case 'paused':
     case 'on-hold':
-      return 'bg-[#e5a83b]'
+      return 'bg-[var(--warning)]'
     case 'dropped':
-      return 'bg-[#e53e3e]'
+      return 'bg-[var(--danger)]'
     case 'planning':
     case 'wishlist':
     case 'want-to-read':
     case 'to_watch':
     case 'to-watch':
-      return 'bg-[#5c67f2]'
+      return 'bg-[var(--accent-indigo)]'
     case 'rewatching':
     case 'rereading':
-      return 'bg-[#e05a47]'
+      return 'bg-[var(--primary)]'
     default:
       return 'bg-content-muted'
   }

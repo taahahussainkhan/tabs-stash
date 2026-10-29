@@ -40,13 +40,13 @@ export function Input({
   const roundedClass = 
     rounded === 'none' ? 'rounded-none' :
     rounded === 'full' ? 'rounded-full' :
-    'rounded-[4px]'
+    'rounded-[var(--radius-sm)]'
   
   const errorText = typeof error === 'object' && error !== null
     ? ((error as any).message || (error as any).error || String(error))
     : error
 
-  const inputBaseClass = `input-modern w-full bg-[#15161a] border border-[#2e323c] focus:border-accent-vermillion text-content-primary transition-colors ${sizeClass} ${roundedClass} ${errorText ? 'border-danger/60 focus:border-danger' : ''} ${className}`
+  const inputBaseClass = `input-modern w-full bg-[var(--surface-input)] border border-[var(--border-color)] focus:border-accent-vermillion text-content-primary transition-colors ${sizeClass} ${roundedClass} ${errorText ? 'border-danger/60 focus:border-danger' : ''} ${className}`
 
   const Label = () => label ? (
     <label className={`label ${labelSize === 'sm' ? 'py-1' : 'pb-1.5'} px-0.5`} htmlFor={inputId}>

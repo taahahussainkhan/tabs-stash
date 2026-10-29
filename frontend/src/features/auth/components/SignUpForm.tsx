@@ -44,7 +44,7 @@ export function SignUpForm({ onSignedUp }: Props) {
 
   const passwordStrength = useMemo(() => {
     const password = form.state.values.password
-    if (!password) return { score: 0, label: '', colorClass: 'bg-[#2e323c]' }
+    if (!password) return { score: 0, label: '', colorClass: 'bg-[var(--border-color)]' }
     
     let score = 0
     if (password.length >= 8) score++
@@ -53,10 +53,10 @@ export function SignUpForm({ onSignedUp }: Props) {
     if (/\d/.test(password)) score++
     if (/[^a-zA-Z0-9]/.test(password)) score++
     
-    if (score <= 2) return { score, label: 'Weak', colorClass: 'bg-[#e53e3e]' }
-    if (score <= 3) return { score, label: 'Fair', colorClass: 'bg-[#e5a83b]' }
-    if (score <= 4) return { score, label: 'Good', colorClass: 'bg-[#0d9488]' }
-    return { score, label: 'Strong', colorClass: 'bg-[#38a169]' }
+    if (score <= 2) return { score, label: 'Weak', colorClass: 'bg-[var(--danger)]' }
+    if (score <= 3) return { score, label: 'Fair', colorClass: 'bg-[var(--warning)]' }
+    if (score <= 4) return { score, label: 'Good', colorClass: 'bg-[var(--accent-sage)]' }
+    return { score, label: 'Strong', colorClass: 'bg-[var(--success)]' }
   }, [form.state.values.password])
 
   return (
@@ -180,7 +180,7 @@ export function SignUpForm({ onSignedUp }: Props) {
                     className={`h-1 flex-1 rounded-full transition-all duration-300 ${
                       level <= passwordStrength.score
                         ? passwordStrength.colorClass
-                        : 'bg-[#15161a] border border-[#2e323c]'
+                        : 'bg-[var(--surface-input)] border border-[var(--border-color)]'
                     }`}
                   />
                 ))}
@@ -191,7 +191,7 @@ export function SignUpForm({ onSignedUp }: Props) {
       </div>
 
       {success && (
-        <div className="flex items-center gap-2 p-3 bg-[#143324] border border-[#1e593a] rounded-[4px] font-mono text-xs text-[#4ade80]">
+        <div className="flex items-center gap-2 p-3 bg-[var(--success-soft)] border border-[var(--success)] rounded-[var(--radius-sm)] font-mono text-xs text-[var(--success)]">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <p>{success}</p>
         </div>

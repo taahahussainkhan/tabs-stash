@@ -40,8 +40,8 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
           
           {status && (
             <span className={cn(
-              'px-1.5 py-0.5 rounded-[3px] text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 border',
-              statusColorClass || 'bg-surface-light text-content-muted border-[#2e323c]'
+              'px-1.5 py-0.5 rounded-[var(--radius-xs)] text-[10px] font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 border',
+              statusColorClass || 'bg-surface-light text-content-muted border-[var(--border-color)]'
             )}>
               {statusDotClass && (
                 <span className={cn('w-1.5 h-1.5 rounded-full', statusDotClass)}></span>
@@ -66,11 +66,11 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
             <div 
               tabIndex={0} 
               role="button" 
-              className="p-1.5 rounded-[4px] text-content-muted hover:text-content-primary hover:bg-[#262830] transition-colors"
+              className="p-1.5 rounded-[var(--radius-sm)] text-content-muted hover:text-content-primary hover:bg-[var(--surface-light)] transition-colors"
             >
               <MoreVertical className="w-4 h-4" />
             </div>
-            <ul tabIndex={0} className="dropdown-content z-20 menu p-1.5 bg-[#1e2026] border border-[#2e323c] rounded-[6px] shadow-2xl w-48 mt-1">
+            <ul tabIndex={0} className="dropdown-content z-20 menu p-1.5 bg-[var(--surface)] border border-[var(--border-color)] rounded-[var(--radius-md)] shadow-2xl w-48 mt-1">
               {dropdownItems}
             </ul>
           </div>

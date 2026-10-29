@@ -14,13 +14,13 @@ export function CardActions({ series, onEdit, onMarkCompleted, onRewatch, onView
   const navigate = useNavigate()
 
   return (
-    <div className="mt-auto flex items-center gap-1.5 pt-3 border-t border-[#242730]">
+    <div className="mt-auto flex items-center gap-1.5 pt-3 border-t border-[var(--border-subtle)]">
       <button 
         onClick={(e) => {
           e.stopPropagation()
           navigate(`/series/${series.id}`)
         }} 
-        className="flex-1 h-7 rounded-[4px] bg-[#121316] hover:bg-[#262830] border border-[#2e323c] text-content-primary text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
+        className="flex-1 h-7 rounded-[var(--radius-sm)] bg-[var(--background)] hover:bg-[var(--surface-light)] border border-[var(--border-color)] text-content-primary text-xs font-semibold transition-colors flex items-center justify-center gap-1.5"
       >
         <Eye className="w-3 h-3" /> Seasons
       </button>
@@ -30,7 +30,7 @@ export function CardActions({ series, onEdit, onMarkCompleted, onRewatch, onView
             e.stopPropagation()
             onEdit(series)
           }} 
-          className="w-7 h-7 rounded-[4px] bg-[#121316] hover:bg-[#262830] border border-[#2e323c] text-content-secondary hover:text-white transition-colors flex items-center justify-center"
+          className="w-7 h-7 rounded-[var(--radius-sm)] bg-[var(--background)] hover:bg-[var(--surface-light)] border border-[var(--border-color)] text-content-secondary hover:text-white transition-colors flex items-center justify-center"
           title="Edit"
         >
           <Edit className="w-3 h-3" />
@@ -42,7 +42,7 @@ export function CardActions({ series, onEdit, onMarkCompleted, onRewatch, onView
             e.stopPropagation()
             onMarkCompleted(series)
           }} 
-          className="w-7 h-7 rounded-[4px] bg-[#143324] text-[#4ade80] hover:bg-[#1e593a] border border-[#1e593a] transition-colors flex items-center justify-center"
+          className="w-7 h-7 rounded-[var(--radius-sm)] bg-[var(--success-soft)] text-[var(--success)] hover:bg-[var(--success)] border border-[var(--success)] transition-colors flex items-center justify-center"
           title="Complete"
         >
           <CheckCircle2 className="w-3.5 h-3.5" />
@@ -54,7 +54,7 @@ export function CardActions({ series, onEdit, onMarkCompleted, onRewatch, onView
             e.stopPropagation()
             onRewatch(series)
           }} 
-          className="w-7 h-7 rounded-[4px] bg-[#3b1c18] text-[#ff7b68] hover:bg-[#4f2420] border border-[#991b1b] transition-colors flex items-center justify-center"
+          className="w-7 h-7 rounded-[var(--radius-sm)] bg-[var(--primary-soft)] text-[var(--primary)] hover:bg-[#4f2420] border border-[var(--danger)] transition-colors flex items-center justify-center"
           title="Rewatch"
         >
           <Play className="w-3.5 h-3.5" />
@@ -66,7 +66,7 @@ export function CardActions({ series, onEdit, onMarkCompleted, onRewatch, onView
             e.stopPropagation()
             onViewHistory(series)
           }} 
-          className="w-7 h-7 rounded-[4px] bg-[#121316] hover:bg-[#262830] border border-[#2e323c] text-content-muted hover:text-white transition-colors flex items-center justify-center"
+          className="w-7 h-7 rounded-[var(--radius-sm)] bg-[var(--background)] hover:bg-[var(--surface-light)] border border-[var(--border-color)] text-content-muted hover:text-white transition-colors flex items-center justify-center"
           title="History"
         >
           <Clock className="w-3.5 h-3.5" />
