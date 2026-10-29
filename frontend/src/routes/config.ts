@@ -20,6 +20,7 @@ const PublishersPage = lazy(() => import('../features/publishers/PublishersPage'
 const MagazinesPage = lazy(() => import('../features/magazines/MagazinesPage').then(m => ({ default: m.MagazinesPage })))
 const TabsPage = lazy(() => import('../features/tabs/TabsPage').then(m => ({ default: m.TabsPage })))
 const CardsPage = lazy(() => import('../features/cards/CardsPage').then(m => ({ default: m.CardsPage })))
+const MediaLogPage = lazy(() => import('../features/medalog/MediaLogPage').then(m => ({ default: m.MediaLogPage })))
 
 // Route configuration type
 export interface RouteConfig {
@@ -43,6 +44,9 @@ export const routes: RouteConfig[] = [
     // Tab Stash & Quick Cards
     { path: '/tabs', component: TabsPage, protected: true, layout: true },
     { path: '/cards', component: CardsPage, protected: true, layout: true },
+
+    // MediaLog (phone captures)
+    { path: '/medalog', component: MediaLogPage, protected: true, layout: true },
 
     // Movies routes
 
