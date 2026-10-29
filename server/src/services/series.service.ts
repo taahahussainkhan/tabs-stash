@@ -111,35 +111,38 @@ export class SeriesService {
 
   static async getStats(userId: string): Promise<Record<string, number>> {
     const uId = new Types.ObjectId(userId);
-    const total = await SeriesModel.countDocuments({ userId: uId });
-    const favorites = await SeriesModel.countDocuments({ userId: uId, isFavorite: true });
-    const watchlist = await SeriesModel.countDocuments({ userId: uId, isWatchlist: true });
 
-    const watching = await MediaSessionModel.countDocuments({
-      userId: uId,
-      mediaType: 'series',
-      status: 'watching',
-    });
+    // One aggregation per collection instead of six sequential counts.
+    const [summary] = await SeriesModel.aggregate([
+      { $match: { userId: uId } },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+          favorites: { $sum: { $cond: ['$isFavorite', 1, 0] } },
+          watchlist: { $sum: { $cond: ['$isWatchlist', 1, 0] } },
+        },
+      },
+      { $project: { _id: 0 } },
+    ]);
 
-    const completed = await MediaSessionModel.countDocuments({
-      userId: uId,
-      mediaType: 'series',
-      status: 'completed',
-    });
+    const statusBuckets = await MediaSessionModel.aggregate([
+      { $match: { userId: uId, mediaType: 'series' } },
+      { $group: { _id: '$status', count: { $sum: 1 } } },
+    ]);
 
-    const to_watch = await MediaSessionModel.countDocuments({
-      userId: uId,
-      mediaType: 'series',
-      status: 'to_watch',
-    });
+    const byStatus = statusBuckets.reduce<Record<string, number>>((acc, bucket) => {
+      acc[String(bucket._id)] = bucket.count;
+      return acc;
+    }, {});
 
     return {
-      total,
-      watching,
-      completed,
-      to_watch,
-      watchlist,
-      favorites,
+      total: summary?.total ?? 0,
+      watching: byStatus.watching ?? 0,
+      completed: byStatus.completed ?? 0,
+      to_watch: byStatus.to_watch ?? 0,
+      watchlist: summary?.watchlist ?? 0,
+      favorites: summary?.favorites ?? 0,
     };
   }
 

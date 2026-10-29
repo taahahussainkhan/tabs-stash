@@ -123,11 +123,42 @@ export class MovieService {
 
   static async getStats(userId: string): Promise<Record<string, number>> {
     const uId = new Types.ObjectId(userId);
-    const total = await MovieModel.countDocuments({ userId: uId });
-    const favorites = await MovieModel.countDocuments({ userId: uId, isFavorite: true });
-    const watchlist = await MovieModel.countDocuments({ userId: uId, isWatchlist: true });
 
-    return { total, favorites, watchlist };
+    // Two round trips instead of one query per counter: flags live on the movie
+    // document, watch state lives on the session.
+    const [summary] = await MovieModel.aggregate([
+      { $match: { userId: uId } },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: 1 },
+          favorites: { $sum: { $cond: ['$isFavorite', 1, 0] } },
+          watchlist: { $sum: { $cond: ['$isWatchlist', 1, 0] } },
+        },
+      },
+      { $project: { _id: 0 } },
+    ]);
+
+    const statusBuckets = await MediaSessionModel.aggregate([
+      { $match: { userId: uId, mediaType: 'movie' } },
+      { $group: { _id: '$status', count: { $sum: 1 } } },
+    ]);
+
+    const byStatus = statusBuckets.reduce<Record<string, number>>((acc, bucket) => {
+      acc[String(bucket._id)] = bucket.count;
+      return acc;
+    }, {});
+
+    return {
+      total: summary?.total ?? 0,
+      favorites: summary?.favorites ?? 0,
+      watchlist: summary?.watchlist ?? 0,
+      watching: byStatus.watching ?? 0,
+      completed: byStatus.completed ?? 0,
+      paused: byStatus.paused ?? 0,
+      rewatching: byStatus.rewatching ?? 0,
+      to_watch: byStatus.to_watch ?? 0,
+    };
   }
 
   static async checkExists(
