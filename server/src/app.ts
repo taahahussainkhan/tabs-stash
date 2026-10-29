@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import { corsMiddleware } from './middlewares/cors.middleware';
 import { generalLimiter } from './middlewares/rate-limiter.middleware';
 import { errorHandler } from './middlewares/error.middleware';
+import { invalidateStatsOnWrite } from './middlewares/stats-invalidation.middleware';
 import { apiRouter } from './routes';
 import { env } from './config/env';
 
@@ -32,6 +33,9 @@ if (env.NODE_ENV !== 'test') {
 // Body Parsers with strict size limits (prevents payload DoS)
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
+
+// Keep the per-user counters in sync with every write
+app.use(invalidateStatsOnWrite);
 
 // API Root
 app.use('/api/v1', apiRouter);

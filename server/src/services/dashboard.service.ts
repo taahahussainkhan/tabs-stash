@@ -5,74 +5,12 @@ import { StashedSessionModel } from '../models/session.model';
 import { MediaSessionModel } from '../models/media-session.model';
 import { Types } from 'mongoose';
 import { CacheService } from './cache.service';
+import { StatsService } from './stats.service';
 
 export class DashboardService {
+  /** Numbers only - served from the counters document, never counted here. */
   static async getDashboardStats(userId: string) {
-    const uId = new Types.ObjectId(userId);
-    const firstDayOfMonth = new Date();
-    firstDayOfMonth.setDate(1);
-    firstDayOfMonth.setHours(0, 0, 0, 0);
-
-    // Run media aggregation and counts in parallel
-    const [
-      mediaAgg,
-      totalMovies,
-      totalSeries,
-      totalBooks,
-      totalStashedTabs,
-      watchlistMovies,
-      watchlistSeries,
-      wishlistBooks,
-    ] = await Promise.all([
-      MediaSessionModel.aggregate([
-        { $match: { userId: uId } },
-        {
-          $facet: {
-            watching: [
-              { $match: { mediaType: { $in: ['movie', 'series'] }, status: 'watching' } },
-              { $count: 'count' },
-            ],
-            reading: [
-              { $match: { mediaType: 'book', status: 'reading' } },
-              { $count: 'count' },
-            ],
-            completed: [
-              { $match: { status: 'completed' } },
-              { $count: 'count' },
-            ],
-            completedThisMonth: [
-              { $match: { status: 'completed', endDate: { $gte: firstDayOfMonth } } },
-              { $count: 'count' },
-            ],
-          },
-        },
-      ]),
-      MovieModel.countDocuments({ userId: uId }),
-      SeriesModel.countDocuments({ userId: uId }),
-      BookItemModel.countDocuments({ userId: uId }),
-      StashedSessionModel.countDocuments({ userId: uId, deletedAt: null }),
-      MovieModel.countDocuments({ userId: uId, isWatchlist: true }),
-      SeriesModel.countDocuments({ userId: uId, isWatchlist: true }),
-      BookItemModel.countDocuments({ userId: uId, ownershipStatus: 'Wishlist' }),
-    ]);
-
-    const mediaFacet = mediaAgg[0] || {};
-    const watching = mediaFacet.watching?.[0]?.count || 0;
-    const reading = mediaFacet.reading?.[0]?.count || 0;
-    const completed = mediaFacet.completed?.[0]?.count || 0;
-    const completedThisMonth = mediaFacet.completedThisMonth?.[0]?.count || 0;
-
-    return {
-      total_movies: totalMovies,
-      total_series: totalSeries,
-      total_books: totalBooks,
-      total_stashed_tabs: totalStashedTabs,
-      watching: watching + reading,
-      reading,
-      completed,
-      watchlist: watchlistMovies + watchlistSeries + wishlistBooks,
-      completed_this_month: completedThisMonth,
-    };
+    return StatsService.read(userId);
   }
 
   static async getDashboardData(userId: string) {
@@ -83,55 +21,11 @@ export class DashboardService {
     }
 
     const uId = new Types.ObjectId(userId);
-    const firstDayOfMonth = new Date();
-    firstDayOfMonth.setDate(1);
-    firstDayOfMonth.setHours(0, 0, 0, 0);
 
-    // 2. Fetch stats AND media session feeds concurrently in one unified roundtrip
-    const [
-      mediaAgg,
-      totalMovies,
-      totalSeries,
-      totalBooks,
-      totalStashedTabs,
-      watchlistMovies,
-      watchlistSeries,
-      wishlistBooks,
-      activeSessions,
-      completedSessions,
-      wlMovies,
-      wlSeries,
-    ] = await Promise.all([
-      MediaSessionModel.aggregate([
-        { $match: { userId: uId } },
-        {
-          $facet: {
-            watching: [
-              { $match: { mediaType: { $in: ['movie', 'series'] }, status: 'watching' } },
-              { $count: 'count' },
-            ],
-            reading: [
-              { $match: { mediaType: 'book', status: 'reading' } },
-              { $count: 'count' },
-            ],
-            completed: [
-              { $match: { status: 'completed' } },
-              { $count: 'count' },
-            ],
-            completedThisMonth: [
-              { $match: { status: 'completed', endDate: { $gte: firstDayOfMonth } } },
-              { $count: 'count' },
-            ],
-          },
-        },
-      ]),
-      MovieModel.countDocuments({ userId: uId }),
-      SeriesModel.countDocuments({ userId: uId }),
-      BookItemModel.countDocuments({ userId: uId }),
-      StashedSessionModel.countDocuments({ userId: uId, deletedAt: null }),
-      MovieModel.countDocuments({ userId: uId, isWatchlist: true }),
-      SeriesModel.countDocuments({ userId: uId, isWatchlist: true }),
-      BookItemModel.countDocuments({ userId: uId, ownershipStatus: 'Wishlist' }),
+    // 2. Numbers come from the counters document, feeds come from the sessions.
+    //    One indexed lookup instead of eight `countDocuments` calls.
+    const statsDoc = await StatsService.read(userId);
+    const [activeSessions, completedSessions, wlMovies, wlSeries] = await Promise.all([
       MediaSessionModel.find({
         userId: uId,
         status: { $in: ['watching', 'reading'] },
@@ -150,22 +44,16 @@ export class DashboardService {
       SeriesModel.find({ userId: uId, isWatchlist: true }).sort({ updatedAt: -1 }).limit(5).lean(),
     ]);
 
-    const mediaFacet = mediaAgg[0] || {};
-    const watching = mediaFacet.watching?.[0]?.count || 0;
-    const reading = mediaFacet.reading?.[0]?.count || 0;
-    const completed = mediaFacet.completed?.[0]?.count || 0;
-    const completedThisMonth = mediaFacet.completedThisMonth?.[0]?.count || 0;
-
     const stats = {
-      total_movies: totalMovies,
-      total_series: totalSeries,
-      total_books: totalBooks,
-      total_stashed_tabs: totalStashedTabs,
-      watching: watching + reading,
-      reading,
-      completed,
-      watchlist: watchlistMovies + watchlistSeries + wishlistBooks,
-      completed_this_month: completedThisMonth,
+      total_movies: statsDoc.total_movies,
+      total_series: statsDoc.total_series,
+      total_books: statsDoc.total_books,
+      total_stashed_tabs: statsDoc.total_stashed_tabs,
+      watching: statsDoc.watching + statsDoc.reading,
+      reading: statsDoc.reading,
+      completed: statsDoc.completed,
+      watchlist: statsDoc.watchlist,
+      completed_this_month: statsDoc.completed_this_month,
     };
 
     // 2. Collect all referenced media IDs to batch fetch
